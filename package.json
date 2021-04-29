@@ -1,0 +1,40 @@
+{
+  "name": "api-isay",
+  "version": "0.1.0",
+  "main": "index.js",
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "cross-env NODE_ENV=test jest --testTimeout=1000000 --coverage --forceExit",
+    "dev": "NODE_ENV=development nodemon index.js",
+    "stop": "NODE_ENV=production forever stop index.js || true",
+    "start": "NODE_ENV=production forever start index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@gitlab.com:binarxglints_batch11/finalproject/team-a/backend.git"
+  },
+  "author": "Team ISay",
+  "license": "MIT",
+  "dependencies": {
+    "bcrypt": "^5.0.1",
+    "cors": "^2.8.5",
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "express-fileupload": "^1.2.1",
+    "express-mongo-sanitize": "^2.0.2",
+    "express-rate-limit": "^5.2.6",
+    "express-validator": "^6.10.1",
+    "firebase": "^8.4.2",
+    "firebase-admin": "^9.7.0",
+    "helmet": "^4.5.0",
+    "hpp": "^0.2.3",
+    "mongoose": "^5.12.6",
+    "morgan": "^1.10.0",
+    "passport": "^0.4.1",
+    "xss-clean": "^0.1.1"
+  },
+  "devDependencies": {},
+  "description": ""
+}

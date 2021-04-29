@@ -13,7 +13,7 @@ const StatusSchema = new mongoose.Schema(
       ref: "profile",
     },
     media: {
-      type: Array(),
+      type: Array,
       required: false,
     },
     comment: [

@@ -30,7 +30,28 @@ app.use(fileUpload()); //support Form Data
 //set static assets to public directory
 app.use(express.static("public"));
 
+//======================== Socket IO Server ===============================
+const http = require("http");
+const socketIo = require("socket.io");
+const portChat = 4001;
+const appChat = express();
+const server = http.createServer(appChat);
+const io = socketIo( server, {
+  serveClient: false,
+  cors: {
+    origin: "*",
+  },
+});
 
+
+server.listen(portChat, () => console.log(`Chat server listening on port ${portChat}`));
+io.on("connection", (socket) => {
+  console.log("New client connected");
+  socket.on("disconnect", () => {
+    console.log("Client disconnected");
+  });
+});
+//======================== END SOCKET IO Server=====================
 
 // ROUTES DECLARATION & IMPORT
 
@@ -48,6 +69,9 @@ app.use("/user", profileRoutes);
 
 const activitiesRoutes = require("./routes/activitiesRoute.js");
 app.use("/user", activitiesRoutes);
+
+const chatRoutes = require("./routes/chatRoute.js");
+io.use("/chat", chatRoutes);
 
 // ROUTES DECLARATION & IMPORT
 

@@ -13,7 +13,7 @@ const StatusSchema = new mongoose.Schema(
       ref: "profile",
     },
     media: {
-      type: Array(),
+      type: Array,
       required: false,
     },
     comment: [
@@ -37,6 +37,6 @@ const StatusSchema = new mongoose.Schema(
   }
 );
 
-InterestSchema.plugin(mongoose_delete, { overrideMethods: "all" });
+StatusSchema.plugin(mongoose_delete, { overrideMethods: "all" });
 
 module.exports = mongoose.model("status", StatusSchema, "status");

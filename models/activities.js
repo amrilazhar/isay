@@ -31,6 +31,6 @@ const ActivitiesSchema = new mongoose.Schema(
   }
 );
 
-InterestSchema.plugin(mongoose_delete, { overrideMethods: "all" });
+ActivitiesSchema.plugin(mongoose_delete, { overrideMethods: "all" });
 
 module.exports = mongoose.model("activities", ActivitiesSchema, "activities");

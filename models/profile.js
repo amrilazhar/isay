@@ -33,6 +33,10 @@ const ProfileSchema = new mongoose.Schema(
       type : String,
       required : true,
       ref : "user"
+    },
+    location : {
+      type : mongoose.Schema.Types.ObjectId,
+      required : false,
     }
   },
   {
@@ -53,6 +57,6 @@ function getAvatar(image) {
     : `/images/avatar${image}`;
 }
 
-InterestSchema.plugin(mongoose_delete, { overrideMethods: "all" });
+ProfileSchema.plugin(mongoose_delete, { overrideMethods: "all" });
 
 module.exports = mongoose.model("profile", ProfileSchema, "profile");

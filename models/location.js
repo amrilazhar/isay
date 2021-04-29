@@ -1,12 +1,12 @@
 const mongoose = require("mongoose");
 
-const InterestSchema = new mongoose.Schema(
+const LocationSchema = new mongoose.Schema(
   {
-    interest : {
+    city : {
       type: String,
       required: true,
     },
-    category : {
+    country : {
       type : String,
       required : true,
     }
@@ -19,4 +19,4 @@ const InterestSchema = new mongoose.Schema(
   }
 );
 
-module.exports = mongoose.model("interest", InterestSchema, "interest");
+module.exports = mongoose.model("location", LocationSchema, "location");

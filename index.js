@@ -41,7 +41,7 @@ const commentRoutes = require("./routes/commentRoute.js");
 app.use("/user", commentRoutes);
 
 const statusRoutes = require("./routes/statusRoute.js");
-app.use("/user", statusRoutes);
+app.use("/status", statusRoutes);
 
 const profileRoutes = require("./routes/profileRoute.js");
 app.use("/user", profileRoutes);

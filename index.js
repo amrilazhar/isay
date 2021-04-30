@@ -38,16 +38,19 @@ const userRoutes = require("./routes/userRoute.js");
 app.use("/user", userRoutes);
 
 const commentRoutes = require("./routes/commentRoute.js");
-app.use("/user", commentRoutes);
+app.use("/comment", commentRoutes);
 
 const statusRoutes = require("./routes/statusRoute.js");
-app.use("/user", statusRoutes);
+app.use("/status", statusRoutes);
 
 const profileRoutes = require("./routes/profileRoute.js");
-app.use("/user", profileRoutes);
+app.use("/profile", profileRoutes);
 
 const activitiesRoutes = require("./routes/activitiesRoute.js");
-app.use("/user", activitiesRoutes);
+app.use("/activity", activitiesRoutes);
+
+const chatRoutes = require("./routes/chatRoute.js")
+app.Chat.use("/chat", chatRoutes)
 
 // ROUTES DECLARATION & IMPORT
 

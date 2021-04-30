@@ -15,6 +15,7 @@ const morgan = require("morgan");
 const express = require("express");
 const app = express();
 const fileUpload = require("express-fileupload");
+const socketIo = require("socket.io");
 
 //Set body parser for HTTP post operation
 app.use(express.json()); // support json encoded bodies
@@ -29,29 +30,6 @@ app.use(fileUpload()); //support Form Data
 
 //set static assets to public directory
 app.use(express.static("public"));
-
-//======================== Socket IO Server ===============================
-const http = require("http");
-const socketIo = require("socket.io");
-const portChat = 4001;
-const appChat = express();
-const server = http.createServer(appChat);
-const io = socketIo( server, {
-  serveClient: false,
-  cors: {
-    origin: "*",
-  },
-});
-
-
-server.listen(portChat, () => console.log(`Chat server listening on port ${portChat}`));
-io.on("connection", (socket) => {
-  console.log("New client connected");
-  socket.on("disconnect", () => {
-    console.log("Client disconnected");
-  });
-});
-//======================== END SOCKET IO Server=====================
 
 // ROUTES DECLARATION & IMPORT
 
@@ -70,12 +48,8 @@ app.use("/user", profileRoutes);
 const activitiesRoutes = require("./routes/activitiesRoute.js");
 app.use("/user", activitiesRoutes);
 
-const chatRoutes = require("./routes/chatRoute.js");
-io.use("/chat", chatRoutes);
 
 // ROUTES DECLARATION & IMPORT
-
-
 
 //======================== security code ==============================//
 // Sanitize data
@@ -121,9 +95,31 @@ if (process.env.NODE_ENV === "dev") {
 }
 //======================== end security code ==============================//
 
-
 // Listen Server
 if (process.env.NODE_ENV !== "test") {
   let PORT = 3000;
-  app.listen(PORT, () => console.log(`server running on PORT : ${PORT}`));
+  let server = app.listen(PORT, () =>
+    console.log(`server running on PORT : ${PORT}`)
+  );
+
+  //======================== Socket IO Server =========================
+  const io = socketIo(server, {
+    serveClient: false,
+    cors: {
+      origin: "*",
+    },
+  });
+
+
+  const chatRoutes = require("./routes/chatRoute.js");
+  app.use(
+    "/chat",
+    (req, res, next) => {
+      req.io = io;
+      next();
+    },
+    chatRoutes
+  );
+
+  //======================== END SOCKET IO Server=====================
 } else module.exports = app;

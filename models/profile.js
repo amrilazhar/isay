@@ -53,6 +53,6 @@ function getAvatar(image) {
     : `/images/avatar${image}`;
 }
 
-InterestSchema.plugin(mongoose_delete, { overrideMethods: "all" });
+ProfileSchema.plugin(mongoose_delete, { overrideMethods: "all" });
 
 module.exports = mongoose.model("profile", ProfileSchema, "profile");

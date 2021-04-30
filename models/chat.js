@@ -3,10 +3,11 @@ const mongoose_delete = require("mongoose-delete");
 
 const ChatRoomSchema = new mongoose.Schema(
   {
-    member : {
-      type: Array,
+    member : [{
+      type: mongoose.Schema.Types.ObjectId,
       required: true,
-    },
+      ref : 'profile',
+    }],
   },
   {
     timestamps: {
@@ -22,8 +23,8 @@ const ChatDataSchema = new mongoose.Schema(
         type: mongoose.Schema.Types.ObjectId,
         required: true,
       },
-      sender : {
-        type: mongoose.Schema.Types.ObjectId,
+      message : {
+        type: Object,
         required: true,
         ref : "profile"
       },
@@ -37,5 +38,5 @@ const ChatDataSchema = new mongoose.Schema(
   );
 
 
-module.exports.chatRoom = mongoose.model("chatRoom", ChatRoomSchema, "chatRoom");
-module.exports.chatData = mongoose.model("chatData", ChatDataSchema, "chatData");
+module.exports.room = mongoose.model("chatRoom", ChatRoomSchema, "chatRoom");
+module.exports.message = mongoose.model("chatData", ChatDataSchema, "chatData");

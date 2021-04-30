@@ -49,8 +49,8 @@ app.use("/profile", profileRoutes);
 const activitiesRoutes = require("./routes/activitiesRoute.js");
 app.use("/activity", activitiesRoutes);
 
-const chatRoutes = require("./routes/chatRoute.js")
-app.Chat.use("/chat", chatRoutes)
+const utilsRoutes = require("./routes/utilsRoute.js");
+app.use("/utils", utilsRoutes);
 
 // ROUTES DECLARATION & IMPORT
 

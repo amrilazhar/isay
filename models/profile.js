@@ -33,6 +33,10 @@ const ProfileSchema = new mongoose.Schema(
       type : String,
       required : true,
       ref : "user"
+    },
+    location : {
+      type : mongoose.Schema.Types.ObjectId,
+      required : false,
     }
   },
   {

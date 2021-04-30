@@ -19,7 +19,8 @@ module.exports.comment = require("./comment.js");
 module.exports.status = require("./status.js");
 module.exports.profile = require("./profile.js");
 module.exports.interest = require("./interest.js");
-module.exports.chat = require("./interest.js");
+module.exports.chat = require("./chat.js");
+module.exports.location = require("./location.js");
 
 //END IMPORT MODELS
 

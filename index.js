@@ -51,7 +51,6 @@ app.use("/activity", activitiesRoutes);
 const utilsRoutes = require("./routes/utilsRoute.js");
 app.use("/utils", utilsRoutes);
 
-
 // ROUTES DECLARATION & IMPORT
 
 //======================== security code ==============================//
@@ -100,20 +99,21 @@ if (process.env.NODE_ENV === "dev") {
 
 // Listen Server
 if (process.env.NODE_ENV !== "test") {
-  let PORT = 3000;
+  let PORT = 4000;
   let server = app.listen(PORT, () =>
     console.log(`server running on PORT : ${PORT}`)
   );
 
   //======================== Socket IO Server =========================
   const io = socketIo(server, {
-    serveClient: false,
     cors: {
       origin: "*",
     },
+    path: "/socket",
+    serveClient: false,
   });
-
-
+  
+  
   const chatRoutes = require("./routes/chatRoute.js");
   app.use(
     "/chat",

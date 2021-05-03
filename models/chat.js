@@ -24,10 +24,19 @@ const ChatDataSchema = new mongoose.Schema(
         required: true,
       },
       message : {
-        type: Object,
-        required: true,
-        ref : "profile"
+        type: String,
+        required: false,
       },
+      from : {
+        type : mongoose.Schema.Types.ObjectId,
+        required : true,
+        ref : "profile"
+      }, 
+      to : {
+        type : mongoose.Schema.Types.ObjectId,
+        required : true,
+        ref : "profile"
+      }
     },
     {
       timestamps: {

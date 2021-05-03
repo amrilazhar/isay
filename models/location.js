@@ -6,6 +6,14 @@ const LocationSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    city_type : {
+      type : String,
+      required : false,
+    },
+    province : {
+      type : String,
+      required : false,
+    },
     country : {
       type : String,
       required : true,

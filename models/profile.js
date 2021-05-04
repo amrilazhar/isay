@@ -14,8 +14,14 @@ const ProfileSchema = new mongoose.Schema(
     },
     interest: [
       {
-        type: mongoose.Schema.Types.ObjectId,
+        type: Array,
         ref: "interest",
+      },
+    ],
+    post: [
+      {
+        type: Array,
+        ref: "post",
       },
     ],
     activities: [
@@ -35,8 +41,9 @@ const ProfileSchema = new mongoose.Schema(
       ref : "user"
     },
     location : {
-      type : mongoose.Schema.Types.ObjectId,
+      type : String,
       required : false,
+      ref: "location"
     }
   },
   {

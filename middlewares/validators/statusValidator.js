@@ -13,7 +13,7 @@ const isValidObjectId = async (value, { req }) => {
 	return true;
 };
 
-exports.createStatus = [
+exports.create = [
 	body("content")
 		.trim()
 		.isLength({ min: 5, max: 1000 })
@@ -22,7 +22,7 @@ exports.createStatus = [
 	body("media").trim(),
 ];
 
-exports.updateStatus = [
+exports.update = [
 	params("id").trim().custom(isValidObjectId),
 	body("content")
 		.trim()
@@ -32,10 +32,10 @@ exports.updateStatus = [
 	body("media").trim(),
 ];
 
-exports.deleteStatus = [params("id").trim().custom(isValidObjectId)];
+exports.delete = [params("id").trim().custom(isValidObjectId)];
 
-exports.getStatusByInterest = [];
+exports.getByInterest = [];
 
-exports.getStatusByUser = [];
+exports.getByUser = [];
 
-exports.getStatusAll = [];
+exports.get = [];

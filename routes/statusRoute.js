@@ -13,7 +13,7 @@ router.post("/create/", statusController.createStatus);
 router.get("/", statusController.getStatusAll);
 router.get("/users/", statusController.getStatusByUser);
 router.get("/interest/", statusController.getStatusByInterest);
-router.put("/update/", statusController.updateStatus);
-router.delete("/delete/", statusController.deleteStatus);
+router.put("/update/:id", statusController.updateStatus);
+router.delete("/delete/:id", statusController.deleteStatus);
 
 module.exports = router;

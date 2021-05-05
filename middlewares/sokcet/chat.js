@@ -38,7 +38,7 @@ async function startSocketChat(req, res, next) {
             handshake: socket.handshake.query.roomID,
             message: message,
           };
-          next();
+          socketImageUpload(req, res);
         } else {
           chat.message
             .create({
@@ -86,7 +86,7 @@ async function socketImageUpload(req, res) {
 
     //get Mime Type
     mimeArr.forEach((item, i) => {
-      if (req.utils.message.content[0].indexOf(item) > -1) {
+      if (req.utils.message.content.indexOf(item) > -1) {
         mimeType = item.split("/")[1];
         contentType = mimeArr[i];
       }
@@ -98,13 +98,12 @@ async function socketImageUpload(req, res) {
         message: "file must be JPEG, GIF, PNG or BMP",
       });
     }
-
     // Set the AWS region
     const REGION = "ap-southeast-1"; //e.g. "us-east-1"
 
     // // Set the parameters.
     let imageBuffer = Buffer.from(
-      req.utils.message.content[0].replace(/^data:image\/\w+;base64,/, ""),
+      req.utils.message.content.replace(/^data:image\/\w+;base64,/, ""),
       "base64"
     );
 
@@ -130,8 +129,7 @@ async function socketImageUpload(req, res) {
     // Create and upload the object to the specified Amazon S3 bucket.
     const run = async () => {
       try {
-        const data = await s3.send(new PutObjectCommand(uploadParams));
-        
+        const data = await s3.send(new PutObjectCommand(uploadParams));        
         return uploadParams.Key;
       } catch (err) {
         console.log("Error", err);

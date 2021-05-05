@@ -22,6 +22,12 @@ const StatusSchema = new mongoose.Schema(
 				ref: "comment",
 			},
 		],
+		interest: [
+			{
+				type: mongoose.Schema.Types.ObjectId,
+				ref: "interest",
+			},
+		],
 		likeBy: [
 			{
 				type: mongoose.Schema.Types.ObjectId,

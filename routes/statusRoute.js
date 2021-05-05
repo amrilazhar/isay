@@ -2,6 +2,10 @@ const express = require("express");
 const router = express.Router();
 
 // IMPORT AUTH HERE
+let authDummy = (req, res, next) => {
+	req.profile = { id: "6092c10dfc13ae1d130000c8" };
+	next();
+};
 
 // IMPORT MIDDLEWARE HERE
 
@@ -9,7 +13,7 @@ const router = express.Router();
 const statusController = require("../controllers/statusController");
 
 // SET ROUTER HERE
-router.post("/create/", statusController.createStatus);
+router.post("/create/", authDummy, statusController.createStatus);
 router.get("/", statusController.getStatusAll);
 router.get("/users/", statusController.getStatusByUser);
 router.get("/interest/", statusController.getStatusByInterest);

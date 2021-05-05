@@ -1,4 +1,4 @@
-const { status, comment, profile } = require("../models");
+const { status, comment, profile, interest } = require("../models");
 
 class StatusController {
 	//TODO : create status/post
@@ -6,9 +6,10 @@ class StatusController {
 		try {
 			let data = {
 				content: req.body.content,
-				owner: req.body.owner,
+				owner: req.profile.id,
 				media: req.body.media ? req.body.media : "images.jpg",
 				comment: req.body.comment,
+				interest: req.body.interest,
 				likeBy: req.body.likeBy,
 			};
 			let statusCreate = await status.create(data);
@@ -18,6 +19,9 @@ class StatusController {
 					error: statusCreate,
 				});
 			} else {
+				// Socket io
+				req.io.emit("status:" + req.body.interest, statusCreate);
+
 				return res.status(201).json({
 					success: true,
 					message: "Success",
@@ -38,9 +42,10 @@ class StatusController {
 		try {
 			let data = {
 				content: req.body.content,
-				owner: req.body.owner,
+				owner: req.body.profile,
 				media: req.body.media ? req.body.media : "images.jpg",
 				comment: req.body.comment,
+				interest: req.body.interest,
 				likeBy: req.body.likeBy,
 			};
 
@@ -80,12 +85,12 @@ class StatusController {
 			let statusUsers = await status
 				.findById({ _id: req.params.id })
 				.populate({
-					path:"profile",
-					select:"name avatar bio activities interest location",
+					path: "profile",
+					select: "name avatar bio activities interest location",
 				})
 				.populate({
-					path:"status",
-					select:"content owner",
+					path: "status",
+					select: "content owner",
 				});
 			if (!statusUsers) {
 				return res.status(400).json({
@@ -110,8 +115,33 @@ class StatusController {
 	//TODO : Get status/post by interest
 	async getStatusByInterest(req, res) {
 		try {
+			let limit = req.query.limit ? req.query.limit : 10;
+			let skip = req.query.skip ? req.query.skip : 0;
+			let statusData = await status
+				.find({})
+				.sort({ updated_at: -1 })
+				.populate("comment")
+				.populate("owner")
+				.limit(limit)
+				.skip(skip)
+				.exec();
+			if (statusData.length > 0) {
+				return res.status(200).send({
+					message: "success",
+					data: statusData,
+				});
+			} else {
+				return res.status(200).json({
+					message: "success",
+					data: [],
+				});
+			}
 		} catch (e) {
 			console.log(e);
+			return res.status(500).json({
+				message: "Internal Server Error",
+				error: e.message,
+			});
 		}
 	}
 
@@ -120,14 +150,14 @@ class StatusController {
 		try {
 			let statusAll = await status.find().exec();
 			if (!statusAll == 0) {
-				return res.status(400).json({ 
-					message: "No status found", 
-					data: null 
+				return res.status(400).json({
+					message: "Cannot found status",
+					data: null,
 				});
 			} else {
-				return res.status(200).json({ 
-					message: "Success", 
-					data: statusAll 
+				return res.status(200).json({
+					message: "Success",
+					data: statusAll,
 				});
 			}
 		} catch (e) {

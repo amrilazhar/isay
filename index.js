@@ -99,7 +99,7 @@ if (process.env.NODE_ENV === "dev") {
 
 // Listen Server
 if (process.env.NODE_ENV !== "test") {
-  let PORT = 4000;
+  let PORT = 3000;
   let server = app.listen(PORT, () =>
     console.log(`server running on PORT : ${PORT}`)
   );

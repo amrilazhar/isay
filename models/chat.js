@@ -36,6 +36,16 @@ const ChatDataSchema = new mongoose.Schema(
         type : mongoose.Schema.Types.ObjectId,
         required : true,
         ref : "profile"
+      },
+      readed : {
+        type : Boolean,
+        required : false,
+        default : false,
+      },
+      message_type : {
+        type : String,
+        required : true,
+        default : 'text',
       }
     },
     {

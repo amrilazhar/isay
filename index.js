@@ -15,6 +15,7 @@ const morgan = require("morgan");
 const express = require("express");
 const app = express();
 const fileUpload = require("express-fileupload");
+const socketIo = require("socket.io");
 
 //Set body parser for HTTP post operation
 app.use(express.json()); // support json encoded bodies
@@ -30,21 +31,13 @@ app.use(fileUpload()); //support Form Data
 //set static assets to public directory
 app.use(express.static("public"));
 
-
-
 // ROUTES DECLARATION & IMPORT
 
 const userRoutes = require("./routes/userRoute.js");
 app.use("/user", userRoutes);
 
-const commentRoutes = require("./routes/commentRoute.js");
-app.use("/comment", commentRoutes);
-
 const statusRoutes = require("./routes/statusRoute.js");
 app.use("/status", statusRoutes);
-
-const profileRoutes = require("./routes/profileRoute.js");
-app.use("/profile", profileRoutes);
 
 const activitiesRoutes = require("./routes/activitiesRoute.js");
 app.use("/activity", activitiesRoutes);
@@ -53,8 +46,6 @@ const utilsRoutes = require("./routes/utilsRoute.js");
 app.use("/utils", utilsRoutes);
 
 // ROUTES DECLARATION & IMPORT
-
-
 
 //======================== security code ==============================//
 // Sanitize data
@@ -100,9 +91,51 @@ if (process.env.NODE_ENV === "dev") {
 }
 //======================== end security code ==============================//
 
-
 // Listen Server
 if (process.env.NODE_ENV !== "test") {
   let PORT = 3000;
-  app.listen(PORT, () => console.log(`server running on PORT : ${PORT}`));
+  let server = app.listen(PORT, () =>
+    console.log(`server running on PORT : ${PORT}`)
+  );
+
+  //======================== Socket IO Server =========================
+  const io = socketIo(server, {
+    cors: {
+      origin: "*",
+    },
+    path: "/socket",
+    serveClient: false,
+  });
+
+  // const chatRoutes = require("./routes/chatRoute.js");
+  // app.use(
+  //   "/chat",
+  //   (req, res, next) => {
+  //     req.io = io;
+  //     next();
+  //   },
+  //   chatRoutes
+  // );
+
+  const commentRoutes = require("./routes/commentRoute.js");
+  app.use(
+    "/comment",
+    (req, res, next) => {
+      req.io = io;
+      next();
+    },
+    commentRoutes
+  );
+
+  const profileRoutes = require("./routes/profileRoute.js");
+  app.use(
+    "/profile",
+    (req, res, next) => {
+      req.io = io;
+      next();
+    },
+    profileRoutes
+  );
+
+  //======================== END SOCKET IO Server=====================
 } else module.exports = app;

@@ -2,10 +2,6 @@ const mongoose = require("mongoose");
 
 const LocationSchema = new mongoose.Schema(
   {
-    province : {
-      type: String,
-      required: true,
-    },
     city_type : {
       type : String,
       required : true,
@@ -13,6 +9,10 @@ const LocationSchema = new mongoose.Schema(
     city : {
       type : String,
       required : true,
+    },
+    province : {
+      type : String,
+      required : false,
     },
     country : {
       type : String,

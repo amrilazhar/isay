@@ -1,10 +1,10 @@
+const mongoose = require("mongoose");
 const { location } = require("../models");
 
 class locationController {
     //=============================== get all location ==================//
     async getAllLocation(req, res) {
       try {
-        //get data genre
         let dataLocation = await location.find().exec()
         //cek if data exist
         if (dataLocation.length == 0) {

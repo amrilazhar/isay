@@ -1,3 +1,4 @@
+const mongoose = require("mongoose");
 const { user, profile, interest, location } = require("../models");
 
 class ProfileController {
@@ -7,10 +8,6 @@ class ProfileController {
       //find user id
       let dataProfile = await profile
         .findOne({ _id: req.params.id })
-        .populate({
-          path: "post",
-          select: "content media comment likeBy",
-        })
         .populate({
           path: "interest",
           select: "interest category",
@@ -37,40 +34,31 @@ class ProfileController {
   async profileUpdate(req, res) {
     try {
       //for adding data interest and location
-      let interested = [];
-      if (typeof req.body.interest == "string") {
-        req.body.interest = [req.body.interest];
-      }
-      if (req.interest) {
-        for (let i = 0; i < req.category.length; i++) {
-          interested.push({
-            interest: req.body.interest[i],
-            category: req.body.category[i]
-          });
-        }
-      }
-
-      let locations = [];
-      if (typeof req.body.location == "string") {
-        req.body.location = [req.body.location];
-      }
-      if (req.location) {
-        for (let i = 0; i < req.location.length; i++) {
-          locations.push({
-            location: req.body.location[i]
-          });
-        }
-      }
-
-
       let profileData = {
         bio: req.body.bio ? req.body.bio : "No description",
         name: req.body.name,
-        interest: interested,
         avatar: req.body.avatar ? req.body.avatar : "defaultAvatar.jpg",
-        user : req.user.id,
-        location: []
+        user : req.body._id,
+        activities: req.body.activities,
       };
+
+      req.profileData.location = locations
+      let locations = []
+      locations = await location.findOne({_id: req.params.id})
+      if(!locations) {
+        return res.status(402).json({ message: "Location is not found"})
+      } else {
+      locations.push({_id: req.params.id});
+      locations.save()};
+
+      req.profileData.interest = interested
+      let interested = []
+      interested = await interest.findOne({_id: req.params.id})
+      if(!interested){
+        return res.status(402).json({ message: "interest is not found"})
+      } else {
+        locations.push({_id: req.params.id});
+        locations.save()};
 
       let dataProfile = await profile.findOneAndUpdate(
         { _id: req.params.id },
@@ -129,6 +117,7 @@ class ProfileController {
         .json({ message: "Internal Server Error ", error: e });
     }
   }
+
 }
 
 module.exports = new ProfileController();

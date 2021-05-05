@@ -18,12 +18,6 @@ const ProfileSchema = new mongoose.Schema(
         ref: "interest",
       },
     ],
-    post: [
-      {
-        type: Array,
-        ref: "post",
-      },
-    ],
     activities: [
       {
         type: mongoose.Schema.Types.ObjectId,
@@ -36,12 +30,12 @@ const ProfileSchema = new mongoose.Schema(
       get : getAvatar,
     },
     user : {
-      type : String,
+      type : mongoose.Schema.Types.ObjectId,
       required : true,
       ref : "user"
     },
     location : {
-      type : String,
+      type : mongoose.Schema.Types.ObjectId,
       required : false,
       ref: "location"
     }

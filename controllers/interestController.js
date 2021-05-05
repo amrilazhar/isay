@@ -1,5 +1,5 @@
+const mongoose = require("mongoose");
 const { interest } = require("../models");
-
 class interestController {
     //=============================== get all interest ==================//
     async getAllInterest(req, res) {
@@ -13,7 +13,7 @@ class interestController {
           return res.status(200).json({ message: "Success", data: dataInterest });
       } catch (e) {
         console.log(e);
-        res.status(500).json({ message: "Internal server error" ,error: e });
+        return res.status(500).json({ message: "Internal server error" ,error: e });
       }
     }
 
@@ -34,7 +34,7 @@ class interestController {
             return res.status(200).json({ message: "Success", data: createInterest });
         } catch (e) {
           console.log(e);
-          res.status(500).json({ message: "Internal server error" , error: e});
+          return res.status(500).json({ message: "Internal server error" , error: e});
         }
       }
 
@@ -81,7 +81,7 @@ async deleteInterest(req, res) {
         .json({ message: "Success", deletedCount: deleteInt.deletedCount });
   } catch (e) {
     console.log(e);
-    res.status(500).json({ message: "Internal server error" , error : e});
+    return res.status(500).json({ message: "Internal server error" , error : e});
   }
 }
 }

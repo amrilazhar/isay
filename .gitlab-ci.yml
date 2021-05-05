@@ -1,0 +1,28 @@
+# We have 1 stage Deploy
+stages:
+  - deploy
+
+# Config cache
+cache:
+  paths:
+    - node_modules/
+
+# Deploy job
+deploy:
+  type: deploy
+  # Attach Deploy job to Deploy stage
+  stage: deploy
+  # Config to use our Runner with Executor Shell
+  tags:
+    - develop
+  script:
+    # Only copy changed files to project folder
+    - cp -r -u * $PROJECT_DIR
+    - cd $PROJECT_DIR
+    - echo "MONGO_URI"=$ENVIRONMENT_PRODUCTION_MONGO_URI > .env.production
+    - npm i
+    # Restart NodeJS service
+    - npm run stop
+    - npm run start
+  only:
+    - develop

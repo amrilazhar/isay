@@ -79,19 +79,11 @@ class StatusController {
 		}
 	}
 
-	//TODO : Get status/post by User
+	//! : Get status/post by User
 	async getStatusByUser(req, res) {
 		try {
-			let statusUsers = await status
-				.findById({ _id: req.params.id })
-				.populate({
-					path: "profile",
-					select: "name avatar bio activities interest location",
-				})
-				.populate({
-					path: "status",
-					select: "content owner",
-				});
+			let statusUsers = await status.findById(req.params.id);
+
 			if (!statusUsers) {
 				return res.status(400).json({
 					message: "Status user can't be appeared",
@@ -145,7 +137,7 @@ class StatusController {
 		}
 	}
 
-	//TODO : Get all status
+	//! : Get all status
 	async getStatusAll(req, res) {
 		try {
 			let statusAll = await status.find().exec();

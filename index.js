@@ -17,6 +17,9 @@ const app = express();
 const fileUpload = require("express-fileupload");
 const socketIo = require("socket.io");
 
+// COR
+app.use(cors());
+
 //Set body parser for HTTP post operation
 app.use(express.json()); // support json encoded bodies
 app.use(
@@ -72,9 +75,6 @@ app.use(
   })
 );
 
-// CORS
-app.use(cors());
-
 if (process.env.NODE_ENV === "dev") {
   app.use(morgan("dev"));
 } else {
@@ -107,15 +107,15 @@ if (process.env.NODE_ENV !== "test") {
     serveClient: false,
   });
 
-  // const chatRoutes = require("./routes/chatRoute.js");
-  // app.use(
-  //   "/chat",
-  //   (req, res, next) => {
-  //     req.io = io;
-  //     next();
-  //   },
-  //   chatRoutes
-  // );
+  const chatRoutes = require("./routes/chatRoute.js");
+  app.use(
+    "/chat",
+    (req, res, next) => {
+      req.io = io;
+      next();
+    },
+    chatRoutes
+  );
 
   const commentRoutes = require("./routes/commentRoute.js");
   app.use(

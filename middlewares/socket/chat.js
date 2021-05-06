@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-const { chat, profile } = require("../../models");
+const { chat } = require("../../models");
 const crypto = require("crypto");
 const { S3Client, PutObjectCommand } = require("@aws-sdk/client-s3");
 

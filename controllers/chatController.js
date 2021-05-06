@@ -15,7 +15,7 @@ class ChatController {
         .limit(limit)
         .skip(skip)
         .exec();
-
+        
       if (dataMessage.length > 0) {
         return res.status(200).send({ message: "success", data: dataMessage });
       } else {

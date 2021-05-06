@@ -7,9 +7,9 @@ const CommentSchema = new mongoose.Schema(
       type: String,
       required: false,
     },
-    post_id: {
-      type: mongoose.Schema.Types.ObjectId,
-      required: true,
+    media: {
+      type: Array,
+      required: false,
     },
     owner: {
       type: mongoose.Schema.Types.ObjectId,
@@ -22,6 +22,13 @@ const CommentSchema = new mongoose.Schema(
         ref: "profile",
       },
     ],
+    child : [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        required: false,
+        ref: "comment"
+      }
+    ]
   },
   {
     timestamps: {
@@ -30,6 +37,8 @@ const CommentSchema = new mongoose.Schema(
     },
   }
 );
+
+
 
 CommentSchema.plugin(mongoose_delete, { overrideMethods: "all" });
 

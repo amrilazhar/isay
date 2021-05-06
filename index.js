@@ -36,14 +36,8 @@ app.use(express.static("public"));
 const userRoutes = require("./routes/userRoute.js");
 app.use("/user", userRoutes);
 
-const commentRoutes = require("./routes/commentRoute.js");
-app.use("/comment", commentRoutes);
-
 const statusRoutes = require("./routes/statusRoute.js");
 app.use("/status", statusRoutes);
-
-const profileRoutes = require("./routes/profileRoute.js");
-app.use("/profile", profileRoutes);
 
 const activitiesRoutes = require("./routes/activitiesRoute.js");
 app.use("/activity", activitiesRoutes);
@@ -112,16 +106,35 @@ if (process.env.NODE_ENV !== "test") {
     path: "/socket",
     serveClient: false,
   });
-  
-  
-  const chatRoutes = require("./routes/chatRoute.js");
+
+  // const chatRoutes = require("./routes/chatRoute.js");
+  // app.use(
+  //   "/chat",
+  //   (req, res, next) => {
+  //     req.io = io;
+  //     next();
+  //   },
+  //   chatRoutes
+  // );
+
+  const commentRoutes = require("./routes/commentRoute.js");
   app.use(
-    "/chat",
+    "/comment",
     (req, res, next) => {
       req.io = io;
       next();
     },
-    chatRoutes
+    commentRoutes
+  );
+
+  const profileRoutes = require("./routes/profileRoute.js");
+  app.use(
+    "/profile",
+    (req, res, next) => {
+      req.io = io;
+      next();
+    },
+    profileRoutes
   );
 
   //======================== END SOCKET IO Server=====================

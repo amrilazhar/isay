@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const mongoose_delete = require("mongoose-delete");
+const mongoosePaginate = require('mongoose-paginate-v2');
 
 const ActivitiesSchema = new mongoose.Schema(
   {
@@ -31,6 +32,8 @@ const ActivitiesSchema = new mongoose.Schema(
   }
 );
 
+
+ActivitiesSchema.plugin(mongoosePaginate);
 ActivitiesSchema.plugin(mongoose_delete, { overrideMethods: "all" });
 
 module.exports = mongoose.model("activities", ActivitiesSchema, "activities");

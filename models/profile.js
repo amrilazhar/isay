@@ -1,12 +1,13 @@
 const mongoose = require("mongoose");
 const mongoose_delete = require("mongoose-delete");
+const mongoosePaginate = require('mongoose-paginate-v2');
 
 const ProfileSchema = new mongoose.Schema(
   {
     bio: {
       type: String,
       required: false,
-      default : ""
+      default : "No description"
     },
     name: {
       type: String,
@@ -24,6 +25,12 @@ const ProfileSchema = new mongoose.Schema(
         ref: "activities",
       },
     ],
+    post: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "status",
+      }
+    ],
     avatar : {
       type : String,
       required : false,
@@ -31,7 +38,7 @@ const ProfileSchema = new mongoose.Schema(
     },
     user : {
       type : mongoose.Schema.Types.ObjectId,
-      required : true,
+      required : false,
       ref : "user"
     },
     location : {
@@ -58,6 +65,6 @@ function getAvatar(image) {
     : `/images/avatar${image}`;
 }
 
+ProfileSchema.plugin(mongoosePaginate);
 ProfileSchema.plugin(mongoose_delete, { overrideMethods: "all" });
-
 module.exports = mongoose.model("profile", ProfileSchema, "profile");

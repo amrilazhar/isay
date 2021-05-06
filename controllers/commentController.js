@@ -5,7 +5,7 @@ class CommentController {
 
   async getAllComment(req, res) {
     try {
-      let dataPost = await comment.find()  
+      let dataPost = await comment.find({ _id: req.params.id })  
 
       if (dataPost.length == 0) {
         return res.status(400).json({ message: "No Posted found", data: null });
@@ -15,8 +15,6 @@ class CommentController {
           .json({
             message: "Success",
             data: dataPost,
-            totalPages: Math.ceil(count / limit),
-            currentPage: page,
           });
     } catch (e) {
       console.log(e);
@@ -43,7 +41,6 @@ class CommentController {
       let createComment = await comment.create(data);
       ownerComment.child.push(createComment._id).save()
 
-      req.io.emit("comment:" + createComment._id, ownerComment);
       if (!createComment) {
         return res
           .status(400)
@@ -80,7 +77,6 @@ class CommentController {
         let createComment = await comment.create(data);
         ownerComment.child.push( createComment._id ).save()
   
-        req.io.emit("comment:" + createComment._id, ownerComment);
         if (!createComment) {
           return res
             .status(400)
@@ -136,7 +132,7 @@ class CommentController {
       findUser.likeBy.push(req.profile.id);
       let insertUser = findUser.save();
       if (!insertUser) {
-        return res.status(402).json({ message: "Data user can't be appeared" });
+        return res.status(402).json({ message: "Can't like" });
       } else
        res.status(200).json({ message: "like success", data: findUser })//.likeBy.sort({ name : -1 } ).limit(5) });
     } catch (e) {
@@ -160,7 +156,7 @@ class CommentController {
       if (!insertUser) {
         return res.status(402).json({ message: "Data user can't be appeared" });
       } else
-        res.status(200).json({ message: "like success", data: deleteLike });
+        res.status(200).json({ message: "remove like success", data: deleteLike });
     } catch (e) {
       console.log(e);
       return res.status(500).json({ message: "Internal Server Error" });

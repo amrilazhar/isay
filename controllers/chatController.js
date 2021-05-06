@@ -37,26 +37,6 @@ class ChatController {
         member: { $all: [from, to] },
       });
 
-      // //============checking manually if the user has been create a private room each other
-      // let roomFind = await chat.room.find({}).exec();
-      // let chatRoom = null;
-
-      // if (roomFind.length > 0) {
-      //   for (let index = 0; index < roomFind.length; index++) {
-      //     let match = 0;
-      //     roomFind[index].member.forEach((item, idx) => {
-      //       if (String(item) == from || String(item)) {
-      //         match++;
-      //       }
-      //     });
-      //     if (match == 2) {
-      //       chatRoom = roomFind[index];
-      //       index = roomFind.length;
-      //     }
-      //   }
-      // }
-      // //=========END checking manually if the user has been create a room
-
       //================ create a room if user has not been registered in private room
       if (chatRoom == null) {
         chatRoom = await chat.room.create({ member: [from, to] });

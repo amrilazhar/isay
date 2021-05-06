@@ -1,5 +1,7 @@
 const mongoose = require("mongoose");
 const mongoose_delete = require("mongoose-delete");
+const mongoosePaginate = require('mongoose-paginate-v2');
+
 
 const StatusSchema = new mongoose.Schema(
 	{
@@ -43,6 +45,7 @@ const StatusSchema = new mongoose.Schema(
 	}
 );
 
+StatusSchema.plugin(mongoosePaginate);
 StatusSchema.plugin(mongoose_delete, { overrideMethods: "all" });
 
 module.exports = mongoose.model("status", StatusSchema, "status");

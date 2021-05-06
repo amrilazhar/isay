@@ -17,6 +17,9 @@ const app = express();
 const fileUpload = require("express-fileupload");
 const socketIo = require("socket.io");
 
+// COR
+app.use(cors());
+
 //Set body parser for HTTP post operation
 app.use(express.json()); // support json encoded bodies
 app.use(
@@ -75,9 +78,6 @@ app.use(
 	})
 );
 
-// CORS
-app.use(cors());
-
 if (process.env.NODE_ENV === "dev") {
 	app.use(morgan("dev"));
 } else {
@@ -96,39 +96,49 @@ if (process.env.NODE_ENV === "dev") {
 
 // Listen Server
 if (process.env.NODE_ENV !== "test") {
-	let PORT = 3000;
-	let server = app.listen(PORT, () =>
-		console.log(`server running on PORT : ${PORT}`)
-	);
+  let PORT = 3000;
+  let server = app.listen(PORT, () =>
+    console.log(`server running on PORT : ${PORT}`)
+  );
 
-	//======================== Socket IO Server =========================
-	const io = socketIo(server, {
-		cors: {
-			origin: "*",
-		},
-		path: "/socket",
-		serveClient: false,
-	});
+  //======================== Socket IO Server =========================
+  const io = socketIo(server, {
+    cors: {
+      origin: "*",
+    },
+    path: "/socket",
+    serveClient: false,
+  });
 
-	const chatRoutes = require("./routes/chatRoute.js");
-	app.use(
-		"/chat",
-		(req, res, next) => {
-			req.io = io;
-			next();
-		},
-		chatRoutes
-	);
+  const chatRoutes = require("./routes/chatRoute.js");
+  app.use(
+    "/chat",
+    (req, res, next) => {
+      req.io = io;
+      next();
+    },
+    chatRoutes
+  );
 
-	const statusRoutes = require("./routes/statusRoute.js");
-	app.use(
-		"/status",
-		(req, res, next) => {
-			req.io = io;
-			next();
-		},
-		statusRoutes
-	);
+  const commentRoutes = require("./routes/commentRoute.js");
+  app.use(
+    "/comment",
+    (req, res, next) => {
+      req.io = io;
+      next();
+    },
+    commentRoutes
+  );
 
-	//======================== END SOCKET IO Server=====================
+  const profileRoutes = require("./routes/profileRoute.js");
+  app.use(
+    "/profile",
+    (req, res, next) => {
+      req.io = io;
+      next();
+    },
+    profileRoutes
+  );
+
+  //======================== END SOCKET IO Server=====================
 } else module.exports = app;

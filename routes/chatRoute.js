@@ -1,6 +1,6 @@
-// const express = require("express");
-// const mongoose = require("mongoose");
-// const router = express.Router();
+const express = require("express");
+const mongoose = require("mongoose");
+const router = express.Router();
 
 // IMPORT HERE
 const chatController = require("../controllers/chatController");
@@ -18,4 +18,4 @@ let authDummy = (req, res, next) => {
 router.post("/joinRoom", authDummy, chatController.joinRoom, startSocketChat);
 router.get("/getMessageHistory/:chatRoom", authDummy, chatController.getMessageHistory);
 
-// module.exports = router;
+module.exports = router;

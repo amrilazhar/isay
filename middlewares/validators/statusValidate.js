@@ -53,7 +53,7 @@ exports.getUsers = async (req, res, next) => {
 };
 
 //Todo : Get by Interest
-exports.getUsers = async (req, res, next) => {
+exports.getInterest = async (req, res, next) => {
 	try {
 		let errors = [];
 	} catch (e) {
@@ -64,14 +64,4 @@ exports.getUsers = async (req, res, next) => {
 	}
 };
 
-//Todo : Get All
-exports.getUsers = async (req, res, next) => {
-	try {
-		let errors = [];
-	} catch (e) {
-		return res.status(500).json({
-			message: "Internal Server Error",
-			error: e.message,
-		});
-	}
-};
+

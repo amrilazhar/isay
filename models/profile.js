@@ -27,7 +27,7 @@ const ProfileSchema = new mongoose.Schema(
     avatar : {
       type : String,
       required : false,
-      get : getAvatar,
+
     },
     user : {
       type : String,
@@ -47,15 +47,6 @@ const ProfileSchema = new mongoose.Schema(
     toJSON: { getters: true },
   }
 );
-
-function getAvatar(image) {
-  if (image[0] !== "/") {
-    image = "/" + image;
-  }
-  return process.env.PUBLIC_URL
-    ? process.env.PUBLIC_URL + `/images/avatar${image}`
-    : `/images/avatar${image}`;
-}
 
 ProfileSchema.plugin(mongoose_delete, { overrideMethods: "all" });
 

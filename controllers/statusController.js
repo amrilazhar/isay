@@ -64,7 +64,7 @@ class StatusController {
 					error: statusUpdate,
 				});
 			} else {
-				return res.status(201).json({
+				return res.status(200).json({
 					success: true,
 					message: "Success",
 					data: statusUpdate,
@@ -79,10 +79,10 @@ class StatusController {
 		}
 	}
 
-	//! : Get status/post by User
+	//TODO : Get status/post by User
 	async getStatusByUser(req, res) {
 		try {
-			let statusUsers = await status.findById(req.params.id);
+			let statusUsers = await status.findOne(req.params.id);
 
 			if (!statusUsers) {
 				return res.status(400).json({
@@ -90,7 +90,7 @@ class StatusController {
 					error: statusUsers,
 				});
 			} else {
-				return res.status(201).json({
+				return res.status(200).json({
 					message: "Success",
 					data: statusUsers,
 				});
@@ -109,11 +109,18 @@ class StatusController {
 		try {
 			let limit = req.query.limit ? req.query.limit : 10;
 			let skip = req.query.skip ? req.query.skip : 0;
+			let interestUser = await profile.findOne({ _id: req.profile.id });
+			let stringFind = { $or: [] };
+
+			interestUser.interest.forEach((item) => {
+				stringFind["$or"].push({ interest: item });
+			});
+
 			let statusData = await status
-				.find({})
+				.find(stringFind)
 				.sort({ updated_at: -1 })
-				.populate("comment")
-				.populate("owner")
+				.populate("interest")
+				.populate("owner", "name avatar id location")
 				.limit(limit)
 				.skip(skip)
 				.exec();
@@ -126,30 +133,6 @@ class StatusController {
 				return res.status(200).json({
 					message: "success",
 					data: [],
-				});
-			}
-		} catch (e) {
-			console.log(e);
-			return res.status(500).json({
-				message: "Internal Server Error",
-				error: e.message,
-			});
-		}
-	}
-
-	//! : Get all status
-	async getStatusAll(req, res) {
-		try {
-			let statusAll = await status.find().exec();
-			if (!statusAll == 0) {
-				return res.status(400).json({
-					message: "Cannot found status",
-					data: null,
-				});
-			} else {
-				return res.status(200).json({
-					message: "Success",
-					data: statusAll,
 				});
 			}
 		} catch (e) {

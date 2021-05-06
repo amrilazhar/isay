@@ -22,11 +22,7 @@ exports.create = [
 		.trim()
 		.isLength({ min: 5, max: 1000 })
 		.withMessage("Content must be 5 more character"),
-	body("owner")
-		.trim()
-		.custom(isValidObjectId)
-		.bail()
-		.customSanitizer(objectId),
+	body("owner").trim().custom(isValidObjectId).bail().customSanitizer(objectId),
 	body("media").trim(),
 	body("comment")
 		.trim()
@@ -38,10 +34,7 @@ exports.create = [
 		.custom(isValidObjectId)
 		.bail()
 		.customSanitizer(objectId),
-	body("likeBy")
-		.trim()
-		.custom(isValidObjectId)
-		.bail().customSanitizer(objectId),	
+	body("likeBy").trim().custom(isValidObjectId).bail().customSanitizer(objectId),
 ];
 
 exports.update = [
@@ -54,10 +47,7 @@ exports.update = [
 	body("media").trim(),
 ];
 
-exports.delete = [
-	params("id")
-	.trim()
-	.custom(isValidObjectId)];
+exports.delete = [params("id").trim().custom(isValidObjectId)];
 
 exports.getByInterest = [];
 

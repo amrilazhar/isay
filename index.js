@@ -140,5 +140,15 @@ if (process.env.NODE_ENV !== "test") {
     profileRoutes
   );
 
+  const statusRoutes = require("./routes/statusRoute.js");
+  app.use(
+    "/status",
+    (req, res, next) => {
+      req.io = io;
+      next();
+    },
+    statusRoutes
+  );
+
   //======================== END SOCKET IO Server=====================
 } else module.exports = app;

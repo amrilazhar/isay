@@ -34,7 +34,7 @@ const ProfileSchema = new mongoose.Schema(
     avatar : {
       type : String,
       required : false,
-      get : getAvatar,
+
     },
     user : {
       type : mongoose.Schema.Types.ObjectId,

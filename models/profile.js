@@ -15,7 +15,7 @@ const ProfileSchema = new mongoose.Schema(
     },
     interest: [
       {
-        type: Array,
+        type: mongoose.Schema.Types.ObjectId,
         ref: "interest",
       },
     ],
@@ -56,14 +56,6 @@ const ProfileSchema = new mongoose.Schema(
   }
 );
 
-function getAvatar(image) {
-  if (image[0] !== "/") {
-    image = "/" + image;
-  }
-  return process.env.PUBLIC_URL
-    ? process.env.PUBLIC_URL + `/images/avatar${image}`
-    : `/images/avatar${image}`;
-}
 
 ProfileSchema.plugin(mongoosePaginate);
 ProfileSchema.plugin(mongoose_delete, { overrideMethods: "all" });

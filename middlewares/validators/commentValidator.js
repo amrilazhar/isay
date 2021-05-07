@@ -1,6 +1,6 @@
 const validator = require("validator");
 const mongoose = require("mongoose");
-const { user, review, movie } = require("../../models");
+const { profile, review, movie, comment, status } = require("../../models");
 
 class CommentValidator {
   async commentValidate(req, res, next) {
@@ -11,12 +11,11 @@ class CommentValidator {
         errors.push("id is not valid and must be 24 character & hexadecimal");
       }
 
-      if (!mongoose.Types.ObjectId.isValid(req.profile.id)) {
+      if (!mongoose.Types.ObjectId.isValid(req.query.id_comment)) {
         errors.push(
-          "profile id is not valid and must be 24 character & hexadecimal"
+          "comment is not found"
         );
       }
-
       if (errors.length > 0) {
         return res.status(400).json({
           message: errors.join(", "),

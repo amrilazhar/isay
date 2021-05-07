@@ -7,7 +7,6 @@ class ProfileValidator {
     try {
       let errors = []
       let act = req.route.path.substring(1).replace('/:id', '');
-      console.log(act,"<========================== ini req")
 
       if (act === "updateProfile") {
         if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
@@ -27,16 +26,32 @@ class ProfileValidator {
         }
       }
 
-      if (act === "addLocation" || act === "addInterest") {
+      if (errors.length > 0) {
+        return res.status(400).json({
+          message: errors.join(", "),
+        });
+      }
+
+      next();
+    } catch (e) {
+      return res.status(500).json({
+        message: "Internal Server Error",
+        error: e.message,
+      });
+    }
+  }
+
+
+  async interestValidate(req, res, next) {
+    try {
+      let errors = []
+      let act = req.route.path.substring(1)
+      console.log(act,"<========================== ini req")
+
+      if (act === "addInterest") {
         if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
           errors.push(
             "id profile is not valid and must be 24 character & hexadecimal"
-          );
-        }
-
-        if (!mongoose.Types.ObjectId.isValid(req.location._id)) {
-          errors.push(
-            "id location is not valid and must be 24 character & hexadecimal"
           );
         }
 
@@ -47,6 +62,28 @@ class ProfileValidator {
         }
       }
 
+      if (errors.length > 0) {
+        return res.status(400).json({
+          message: errors.join(", "),
+        });
+      }
+
+      next();
+    } catch (e) {
+      return res.status(500).json({
+        message: "Internal Server Error",
+        error: e.message,
+      });
+    }
+  }
+
+
+
+
+
+
+
+      
       if (act === "deleteLocation" || act === "deleteInterest") {
         if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
           errors.push(

@@ -11,8 +11,8 @@ let authDummy = (req, res, next) => {
       next();
     };
 // SET ROUTER COMMENT HERE
-router.get("/getAllComment",commentController.getAllComment);
-router.post("/postComment",authDummy,commentController.postComment);
+router.get("/getAllComment/:id",commentController.getAllComment);
+router.post("/postComment/:id",authDummy,commentController.postComment);
 router.put("/updateComment/:id",commentController.updateComment);
 router.delete("/deleleteComment/:id",commentController.deleteComment);
 router.put("/addLike",authDummy,commentController.addLike)

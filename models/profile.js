@@ -15,7 +15,7 @@ const ProfileSchema = new mongoose.Schema(
     },
     interest: [
       {
-        type: Array,
+        type: mongoose.Schema.Types.ObjectId,
         ref: "interest",
       },
     ],

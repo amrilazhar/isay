@@ -82,7 +82,7 @@ class StatusController {
 	//TODO : Get status/post by User
 	async getStatusByUser(req, res) {
 		try {
-			let statusUsers = await status.findOne(req.params.id);
+			let statusUsers = await status.find({owner : req.profile.id});
 
 			if (!statusUsers) {
 				return res.status(400).json({

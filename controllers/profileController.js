@@ -17,7 +17,7 @@ class ProfileController {
           select: "province city_type city country",
         })
         .exec();
-      req.io.emit("my profile:" + dataProfile, dataProfile);
+      // req.io.emit("my profile:" + dataProfile, dataProfile);
 
       return res.status(200).json({ message: "Success", data: dataProfile });
     } catch (e) {
@@ -51,7 +51,7 @@ class ProfileController {
          { profile_id : req.query.id } ,
         options
       );
-      req.io.emit("my profile's post:" + dataProfile, dataProfile);
+      // req.io.emit("my profile's post:" + dataProfile, dataProfile);
       return res.status(200).json({ message: "Success", data: dataProfile });
     } catch (e) {
       console.log(e);
@@ -84,7 +84,7 @@ class ProfileController {
         {  profile_id : req.query.id },
         options
       );
-      req.io.emit("my profile's activities:" + dataProfile, dataProfile);
+      // req.io.emit("my profile's activities:" + dataProfile, dataProfile);
       return res.status(200).json({ message: "Success", data: dataProfile });
     } catch (e) {
       console.log(e);
@@ -116,7 +116,7 @@ class ProfileController {
       if (!dataProfile) {
         return res.status(402).json({ message: "Data user can't be appeared" });
       }
-      req.io.emit("my profile update:" + dataProfile, dataProfile);
+      // req.io.emit("my profile update:" + dataProfile, dataProfile);
       return res.status(201).json({
         message: "Success",
         data: dataProfile,

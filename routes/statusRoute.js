@@ -3,7 +3,7 @@ const router = express.Router();
 
 // IMPORT AUTH HERE
 let authDummy = (req, res, next) => {
-	req.profile = { id: "60935f673fba7223585128d8" };
+	req.profile = { id: "608ac628c8d0a1bfded19469" };
 	next();
 };
 

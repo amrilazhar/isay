@@ -1,6 +1,7 @@
 const { status, comment, profile, interest } = require("../models");
 
 class StatusController {
+	
 	//TODO : create status/post
 	async createStatus(req, res) {
 		try {
@@ -82,7 +83,7 @@ class StatusController {
 	//TODO : Get status/post by User
 	async getStatusByUser(req, res) {
 		try {
-			let statusUsers = await status.findOne(req.params.id);
+			let statusUsers = await status.find(req.params.id);
 
 			if (!statusUsers) {
 				return res.status(400).json({

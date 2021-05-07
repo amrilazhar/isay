@@ -49,7 +49,13 @@ exports.update = [
 
 exports.delete = [params("id").trim().custom(isValidObjectId)];
 
-exports.getByInterest = [];
+exports.getByInterest = [
+	param("id")
+		.stripLow()
+		.custom(isValidObjectId)
+		.bail()
+		.customSanitizer(objectId),
+];
 
 exports.getByUser = [
 	param("id")
@@ -58,5 +64,3 @@ exports.getByUser = [
 		.bail()
 		.customSanitizer(objectId),
 ];
-
-exports.get = [];

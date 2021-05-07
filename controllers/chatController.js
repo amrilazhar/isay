@@ -15,7 +15,7 @@ class ChatController {
         .limit(limit)
         .skip(skip)
         .exec();
-
+        
       if (dataMessage.length > 0) {
         return res.status(200).send({ message: "success", data: dataMessage });
       } else {
@@ -36,26 +36,6 @@ class ChatController {
       let chatRoom = await chat.room.findOne({
         member: { $all: [from, to] },
       });
-
-      // //============checking manually if the user has been create a private room each other
-      // let roomFind = await chat.room.find({}).exec();
-      // let chatRoom = null;
-
-      // if (roomFind.length > 0) {
-      //   for (let index = 0; index < roomFind.length; index++) {
-      //     let match = 0;
-      //     roomFind[index].member.forEach((item, idx) => {
-      //       if (String(item) == from || String(item)) {
-      //         match++;
-      //       }
-      //     });
-      //     if (match == 2) {
-      //       chatRoom = roomFind[index];
-      //       index = roomFind.length;
-      //     }
-      //   }
-      // }
-      // //=========END checking manually if the user has been create a room
 
       //================ create a room if user has not been registered in private room
       if (chatRoom == null) {

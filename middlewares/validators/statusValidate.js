@@ -41,7 +41,7 @@ exports.delete = async (req, res, next) => {
 };
 
 //Todo : Get by Users
-exports.getUsers = async (req, res, next) => {
+exports.user = async (req, res, next) => {
 	try {
 		let errors = [];
 	} catch (e) {
@@ -53,7 +53,7 @@ exports.getUsers = async (req, res, next) => {
 };
 
 //Todo : Get by Interest
-exports.getInterest = async (req, res, next) => {
+exports.interest = async (req, res, next) => {
 	try {
 		let errors = [];
 	} catch (e) {

@@ -130,11 +130,20 @@ exports.updateUser = async (req, res, next) => {
 
 		let user = await User.findOne({ _id: req.user.uid });
 
+		let noFieldUpdated = true;
+
 		userFields.forEach((field) => {
 			if (req.body[field]) {
+				noFieldUpdated = false;
 				user[field] = req.body[field];
 			}
 		});
+
+		if (noFieldUpdated) {
+			const err = new Error('No field was updated')
+			err.statusCode = 422;
+			throw err;
+		}
 
 		const firebaseUser = {};
 

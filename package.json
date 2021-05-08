@@ -7,7 +7,7 @@
   },
   "scripts": {
     "test": "cross-env NODE_ENV=test jest --testTimeout=1000000 --coverage --forceExit",
-    "dev": "NODE_ENV=development nodemon index.js && firebase emulator:start --only functions",
+    "dev": "NODE_ENV=development nodemon index.js",
     "stop": "NODE_ENV=production forever stop index.js || true",
     "start": "NODE_ENV=production forever start index.js"
   },

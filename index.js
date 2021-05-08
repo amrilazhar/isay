@@ -98,10 +98,11 @@ app.use("/user", userRoutes);
 
 // ROUTES DECLARATION & IMPORT
 
-app.use((error, req, res, next) => {
-	const status = error.statusCode || 500;
-	const message = error.message;
-	const data = error.data;
+app.use((err, req, res, next) => {
+	console.log(err);
+	const status = err.statusCode || 500;
+	const message = err.message;
+	const data = err.data;
 	res.status(status).json({ success: false, message: message, data: data });
 });
 

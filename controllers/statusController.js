@@ -82,7 +82,10 @@ class StatusController {
 	//TODO : Get status/post by User
 	async getStatusByUser(req, res) {
 		try {
-			let statusUsers = await status.find({ owner: req.profile.id });
+			let statusUsers = await status
+				.find({ owner: req.profile.id })
+				.sort({ updated_at: -1 })
+				.populate("interest");
 
 			if (!statusUsers) {
 				return res.status(400).json({
@@ -104,7 +107,7 @@ class StatusController {
 		}
 	}
 
-	//TODO : Get status/post by interest
+	//TODO : Get status/post by interest (all)
 	async getStatusByInterest(req, res) {
 		try {
 			let limit = req.query.limit ? req.query.limit : 10;
@@ -133,6 +136,31 @@ class StatusController {
 				return res.status(200).json({
 					message: "success",
 					data: [],
+				});
+			}
+		} catch (e) {
+			console.log(e);
+			return res.status(500).json({
+				message: "Internal Server Error",
+				error: e.message,
+			});
+		}
+	}
+
+	//TODO : Get status/post by interest (single)
+	async getSingleInterest(req, res) {
+		try {
+			let statusData = await status.findOne({ _id: req.params.id });
+
+			if (!statusData) {
+				return res.status(400).json({
+					message: "Status data can't be appeared",
+					error: statusData,
+				});
+			} else {
+				return res.status(200).json({
+					message: "Success",
+					data: statusData,
 				});
 			}
 		} catch (e) {

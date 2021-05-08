@@ -17,7 +17,8 @@ const statusController = require("../controllers/statusController");
 router.post("/create/", authDummy, statusValidator.create, statusController.createStatus);
 router.get("/users/", authDummy, statusValidator.user, statusController.getStatusByUser);
 router.get("/interest/", authDummy, statusValidator.interest, statusController.getStatusByInterest);
-router.put("/update/:id", statusValidator.update, statusController.updateStatus);
-router.delete("/delete/:id", statusValidator.delete, statusController.deleteStatus);
+router.get("/interest/:id", authDummy, statusValidator.single, statusController.getSingleInterest);
+router.put("/update/:id", authDummy,statusValidator.update, statusController.updateStatus);
+router.delete("/delete/:id", authDummy,statusValidator.delete, statusController.deleteStatus);
 
 module.exports = router;

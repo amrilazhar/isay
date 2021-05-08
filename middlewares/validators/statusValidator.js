@@ -58,6 +58,14 @@ exports.update = [
 	body("likeBy").trim().custom(isValidObjectId).bail().customSanitizer(objectId),
 ];
 
+exports.user = [
+	param("id")
+		.stripLow()
+		.custom(isValidObjectId)
+		.bail()
+		.customSanitizer(objectId),
+];
+
 exports.interest = [
 	param("id")
 		.stripLow()
@@ -66,7 +74,7 @@ exports.interest = [
 		.customSanitizer(objectId),
 ];
 
-exports.user = [
+exports.single = [
 	param("id")
 		.stripLow()
 		.custom(isValidObjectId)

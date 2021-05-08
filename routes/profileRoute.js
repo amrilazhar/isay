@@ -19,7 +19,7 @@ router.get("/getProfile/:id", profileController.myProfile);
 router.get("/getActProfile",profileController.myProfilePost);
 router.get("/getPostProfile", profileController.myProfileActivities);
 router.put("/updateProfile/:id",profileValidator.profileValidate,profileController.profileUpdate);
-router.put("/AddInterest/:id",profileValidator.interestValidate,profileController.addInterest);
+router.put("/AddInterest/:id", profileController.addInterest);
 router.put("/AddLocation/:id",profileController.addLocation);
 router.delete("/delInterest/:id",profileController.deleteInterest);
 router.delete("/delLocation/:id",profileController.deleteLocation);

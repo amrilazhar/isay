@@ -4,6 +4,9 @@ const router = express.Router();
 // IMPORT HERE 
 const commentController = require("../controllers/commentController");
 
+//IMPORT MIDDLEWARE
+const commentValidator = require("../middlewares/validators/commentValidator");
+
 
 let authDummy = (req, res, next) => {
       req.profile = { id: "608c19b85a4b0b19ccced595" };
@@ -11,11 +14,12 @@ let authDummy = (req, res, next) => {
       next();
     };
 // SET ROUTER COMMENT HERE
-router.get("/getAllComment/:id",commentController.getAllComment);
-router.post("/postComment/:id",authDummy,commentController.postComment);
-router.put("/updateComment/:id",commentController.updateComment);
-router.delete("/deleleteComment/:id",commentController.deleteComment);
-router.put("/addLike",authDummy,commentController.addLike)
-
+router.get("/getAllComment/:id",authDummy,commentController.getAllComment);
+router.post("/postComment/:id",authDummy, commentValidator.commentValidate,commentController.postComment);
+router.post("/postComAftCom/:id",authDummy, commentValidator.commentValidate,commentController.postCommentAfterComment);
+router.put("/updateComment/:id",authDummy,commentValidator.commentValidate,commentController.updateComment);
+router.delete("/deleteComment/:id",authDummy,commentController.deleteComment);
+router.put("/addLike",authDummy,commentController.addLike);
+router.put("/removeLike",authDummy,commentController.removeLike);
 
 module.exports = router;

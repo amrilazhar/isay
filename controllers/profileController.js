@@ -168,7 +168,7 @@ class ProfileController {
   //===========================|| delete Interest ||========================//
   async deleteInterest(req, res) {
     try {
-      let findUser = await profile.findOne({ _id: req.params.id }); //id belum tahu
+      let findUser = await profile.findOne({ _id: req.params.id }); 
       let indexOfInterest = findUser.interest.indexOf(req.body.interest);
       if (indexOfInterest < 0) {
         return res
@@ -202,7 +202,7 @@ class ProfileController {
     //===========================|| delete location ||========================//
     async deleteLocation(req, res) {
       try {
-        let findUser = await profile.findOne({ _id: req.params.id }); //id belum tahu
+        let findUser = await profile.findOne({ _id: req.params.id }); 
         let indexOfLocation = findUser.location.indexOf(req.body.location);
         if (indexOfLocation < 0) {
           return res

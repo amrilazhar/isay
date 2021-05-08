@@ -1,13 +1,25 @@
 const express = require("express");
 const router = express.Router();
 
-// IMPORT HERE 
+// IMPORT HERE
 const interestController = require("../controllers/interestController");
 const profileController = require("../controllers/profileController");
 const locationController = require("../controllers/locationController");
 
 //IMPORT MIDDLEWARE
 const profileValidator = require("../middlewares/validators/profileValidator");
+
+let authDummy = (req, res, next) => {
+  let id = [
+    "608ac628c8d0a1bfded19469",
+    "608ac638c8d0a1bfded1946a",
+    "608ac649c8d0a1bfded1946b",
+  ];
+  //
+  req.profile = { id: id[Math.floor(Math.random() * 2)] };
+
+  next();
+};
 
 // SET ROUTER INTEREST HERE
 router.get("/getInterest", interestController.getAllInterest);
@@ -23,12 +35,17 @@ router.delete("/deleteLocation/:id", locationController.deleteLocation);
 
 // SET ROUTER PROFILE HERE
 router.get("/getProfile/:id", profileController.myProfile);
-router.get("/getActProfile",profileController.myProfilePost);
+router.get("/getActProfile", profileController.myProfilePost);
 router.get("/getPostProfile", profileController.myProfileActivities);
-router.put("/updateProfile/:id",profileValidator.profileValidate,profileController.profileUpdate);
-router.put("/AddInterest/:id",profileController.addInterest);
-router.put("/AddLocation/:id",profileController.addLocation);
-router.delete("/delInterest/:id",profileController.deleteInterest);
-router.delete("/delLocation/:id",profileController.deleteLocation);
+router.put(
+  "/updateProfile/:id",
+  profileValidator.profileValidate,
+  profileController.profileUpdate
+);
+router.put("/AddInterest/:id", profileController.addInterest);
+router.put("/AddLocation/:id", profileController.addLocation);
+router.delete("/delInterest/:id", profileController.deleteInterest);
+router.delete("/delLocation/:id", profileController.deleteLocation);
+router.get("/getListUserInterest", authDummy, profileController.getListUserInterest);
 
 module.exports = router;

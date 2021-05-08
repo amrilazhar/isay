@@ -1,8 +1,14 @@
 const mongoose = require("mongoose");
-const { status, profile, interest, location, activities } = require("../models");
+const {
+  status,
+  profile,
+  interest,
+  location,
+  activities,
+} = require("../models");
 
 class ProfileController {
-//=====================|| my profile ||=================//
+  //=====================|| my profile ||=================//
   async myProfile(req, res) {
     try {
       //find user id
@@ -28,8 +34,7 @@ class ProfileController {
     }
   }
 
-
-//=====================|| my profile post ||=================//
+  //=====================|| my profile post ||=================//
   async myProfilePost(req, res) {
     try {
       let paginateStatus = true;
@@ -38,7 +43,7 @@ class ProfileController {
           paginateStatus = false;
         }
       }
-      
+
       const options = {
         select: "content media comment likeBy",
         sort: { updated_at: -1 },
@@ -48,7 +53,7 @@ class ProfileController {
       };
 
       let dataProfile = await status.paginate(
-         { profile_id : req.query.id } ,
+        { profile_id: req.query.id },
         options
       );
       // req.io.emit("my profile's post:" + dataProfile, dataProfile);
@@ -60,7 +65,7 @@ class ProfileController {
         .json({ message: "Internal Server Error", error: e });
     }
   }
-//======================|| my profile activity ||====================//
+  //======================|| my profile activity ||====================//
 
   async myProfileActivities(req, res) {
     try {
@@ -70,7 +75,7 @@ class ProfileController {
           paginateStatus = false;
         }
       }
-      
+
       const options = {
         select: "status_id activities_type comment_id",
         sort: { updated_at: -1 },
@@ -81,7 +86,7 @@ class ProfileController {
       };
 
       let dataProfile = await activities.paginate(
-        {  profile_id : req.query.id },
+        { profile_id: req.query.id },
         options
       );
       // req.io.emit("my profile's activities:" + dataProfile, dataProfile);
@@ -94,17 +99,14 @@ class ProfileController {
     }
   }
 
-
-
   // =======================|| Update Profile ||================//
   async profileUpdate(req, res) {
     try {
-
       let profileData = {
         bio: req.body.bio ? req.body.bio : "No description",
         name: req.body.name,
         avatar: req.body.avatar ? req.body.avatar : "defaultAvatar.jpg",
-        user : req.body._id,
+        user: req.body._id,
         activities: req.body.activities,
       };
 
@@ -140,16 +142,18 @@ class ProfileController {
       if (!insertUser) {
         return res.status(402).json({ message: "Location can't added" });
       } else
-       res.status(200).json({ message: "Location added success", data: findUser })//.likeBy.sort({ name : -1 } ).limit(5) });
+        res
+          .status(200)
+          .json({ message: "Location added success", data: findUser }); //.likeBy.sort({ name : -1 } ).limit(5) });
     } catch (e) {
       console.log(e);
       return res.status(500).json({ message: "Internal Server Error" });
     }
   }
 
-   //===========================|| add Interest ||========================//
+  //===========================|| add Interest ||========================//
 
-   async addInterest(req, res) {
+  async addInterest(req, res) {
     try {
       let findUser = await profile.findOne({ _id: req.params.id });
       findUser.interest.push(req.interest._id);
@@ -157,13 +161,14 @@ class ProfileController {
       if (!insertUser) {
         return res.status(402).json({ message: "Interest can't added" });
       } else
-       res.status(200).json({ message: "Interest added success", data: findUser })//.likeBy.sort({ name : -1 } ).limit(5) });
+        res
+          .status(200)
+          .json({ message: "Interest added success", data: findUser }); //.likeBy.sort({ name : -1 } ).limit(5) });
     } catch (e) {
       console.log(e);
       return res.status(500).json({ message: "Internal Server Error" });
     }
   }
-
 
   //===========================|| delete Interest ||========================//
   async deleteInterest(req, res) {
@@ -202,37 +207,63 @@ class ProfileController {
     }
   }
 
-    //===========================|| delete location ||========================//
-    async deleteLocation(req, res) {
-      try {
-        let findUser = await profile.findOne({ _id: req.params.id }); //id belum tahu
-        let indexOfLocation = findUser.location.indexOf(req.body.location);
-        if (indexOfLocation < 0) {
-          return res
-            .status(204)
-            .json({ message: "location name has not been added at Interest" });
-        } else {
-          findUser.location.splice(indexOfLocation, 1);
-        }
-        let deletelocation = await profile.findOneAndUpdate(
-          { _id: findUser._id },
-          findUser,
-          { new: true }
-        );
-        if (!deletelocation) {
-          return res.status(204).json({ message: "Data user can't be appeared" });
-        }
-
+  //===========================|| delete location ||========================//
+  async deleteLocation(req, res) {
+    try {
+      let findUser = await profile.findOne({ _id: req.params.id }); //id belum tahu
+      let indexOfLocation = findUser.location.indexOf(req.body.location);
+      if (indexOfLocation < 0) {
         return res
-          .status(200)
-          .json({ message: "delete location success", data: deletelocation });
-      } catch (e) {
-        console.log(e);
-        return res
-          .status(500)
-          .json({ message: "Internal Server Error ", error: e });
+          .status(204)
+          .json({ message: "location name has not been added at Interest" });
+      } else {
+        findUser.location.splice(indexOfLocation, 1);
       }
+      let deletelocation = await profile.findOneAndUpdate(
+        { _id: findUser._id },
+        findUser,
+        { new: true }
+      );
+      if (!deletelocation) {
+        return res.status(204).json({ message: "Data user can't be appeared" });
+      }
+
+      return res
+        .status(200)
+        .json({ message: "delete location success", data: deletelocation });
+    } catch (e) {
+      console.log(e);
+      return res
+        .status(500)
+        .json({ message: "Internal Server Error ", error: e });
     }
+  }
+
+  //=====================|| Get Interest User ||=================//
+  async getListUserInterest(req, res) {
+    try {
+      //find user id
+      let dataProfile = await profile
+      .findOne({ _id: req.profile.id })
+      .populate({
+        path: "interest",
+        select: "interest category",
+      })
+      .exec();
+       
+      let dataInterest = dataProfile.interest.map(item=>{ if (item.category == 'topic') return item });
+      // req.io.emit("my profile:" + dataProfile, dataProfile);
+
+      return res
+        .status(200)
+        .json({ message: "Success", data: dataInterest });
+    } catch (e) {
+      console.log(e);
+      return res
+        .status(500)
+        .json({ message: "Internal Server Error", error: e });
+    }
+  }
 }
 
 module.exports = new ProfileController();

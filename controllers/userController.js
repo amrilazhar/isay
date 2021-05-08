@@ -1,4 +1,7 @@
-const admin = require("../utils/firebase");
+const crypto = require("crypto");
+const jwt = require("jsonwebtoken");
+const { OAuth2Client } = require("google-auth-library");
+const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 const User = require("../models/users");
 
@@ -6,21 +9,18 @@ const validationErrorHandler = require("../utils/validationErrorHandler");
 
 const successMessage = "Fetched user successfully";
 
-const userFields = ["email", "password", "photoURL", "firstName", "lastName"];
-const firebaseUserFields = ["email", "password", "photoURL"];
+const userFields = [
+	"newEmail",
+	"password",
+	"photoURL",
+	"firstName",
+	"lastName",
+];
 
-// const actionCodeSettings = {
-// 	url: "https://i-say-44322.firebaseapp.com",
-// 	handleCodeInApp: true,
-// 	iOS: {
-// 		bundleId: "id.my.gabatch11.isay",
-// 	},
-// 	android: {
-// 		packageName: "id.my.gabatch11.isay",
-// 		installApp: true,
-// 		minimumVersion: "12",
-// 	},
-// };
+const generateToken = () => {
+	const token = crypto.randomBytes(32).toString("hex");
+	return token;
+};
 
 exports.signup = async (req, res, next) => {
 	try {
@@ -29,38 +29,96 @@ exports.signup = async (req, res, next) => {
 		// TODO GENERATE NAME
 
 		const user = new User({
+			email: req.body.email,
+			password: req.body.password,
 			// firstName: ,
 			// lastName: ,
-			email: req.body.email,
 			// photoUrl: imageUrl,
+			emailToken: generateToken(),
+			emailExpiration: Date.now() + 3600000,
 		});
 
 		await user.save();
 
-		const firebaseUser = await admin.auth().createUser({
-			uid: user._id.toString(),
-			email: user.email,
-			emailVerified: false,
-			password: req.body.password,
-			disabled: false,
-			// photoURL: '',
-		});
+		// TODO SEND E-MAIL
+		console.log(user.emailToken);
 
-		const emailConfirmationLink = await admin
-			.auth()
-			.generateEmailVerificationLink(req.body.email);
-
-		console.log(emailConfirmationLink);
-
-		const token = await admin.auth().createCustomToken(firebaseUser.uid, {
-			admin: user.admin,
-		});
+		const token = jwt.sign(
+			{
+				id: user._id.toString(),
+				admin: user.admin,
+			},
+			process.env.JWT_SECRET,
+			{ expiresIn: "30d" }
+		);
 
 		res.status(201).json({
 			success: true,
 			message: "User created!",
-			data: { id: firebaseUser.uid, token: token },
+			data: { id: user._id, token: token },
 		});
+	} catch (err) {
+		if (!err.statusCode) {
+			err.statusCode = 500;
+		}
+		next(err);
+	}
+};
+
+exports.login = async (req, res, next) => {
+	try {
+		validationErrorHandler(req, res, next);
+
+		const password = req.body.password;
+
+		const user = await User.findOne({ email: req.body.email });
+
+		if (!user) {
+			const error = new Error("A user with this e-mail could not be found");
+			error.statusCode = 401;
+			throw error;
+		}
+
+		const isEqual = await user.comparePassword(password);
+
+		if (!isEqual) {
+			const error = new Error("Wrong password!");
+			error.statusCode = 401;
+			throw error;
+		}
+
+		const token = jwt.sign(
+			{
+				id: user._id.toString(),
+				admin: user.admin,
+			},
+			process.env.JWT_SECRET,
+			{ expiresIn: "30d" }
+		);
+
+		res.status(200).json({
+			success: true,
+			message: "Login success",
+			data: { token: token, id: user._id.toString() },
+		});
+	} catch (err) {
+		if (!err.statusCode) {
+			err.statusCode = 500;
+		}
+		next(err);
+	}
+};
+
+exports.googleSignIn = async (req, res, next) => {
+	try {
+		const ticket = await client.verifyIdToken({
+			idToken: req.body.token,
+			audience: process.env.GOOGLE_CLIENT_ID,
+		});
+
+		const { email } = ticket.getPayload();
+
+		console.log(ticket.getPayload());
 	} catch (err) {
 		if (!err.statusCode) {
 			err.statusCode = 500;
@@ -128,56 +186,37 @@ exports.updateUser = async (req, res, next) => {
 	try {
 		validationErrorHandler(req, res, next);
 
-		let user = await User.findOne({ _id: req.user.uid });
+		let user = await User.findOne({ _id: req.user.id });
 
 		let noFieldUpdated = true;
 
 		userFields.forEach((field) => {
 			if (req.body[field]) {
+				console.log(req.body[field]);
 				noFieldUpdated = false;
 				user[field] = req.body[field];
 			}
 		});
 
 		if (noFieldUpdated) {
-			const err = new Error('No field was updated')
+			const err = new Error("No field was updated");
 			err.statusCode = 422;
 			throw err;
 		}
 
-		const firebaseUser = {};
+		if (req.body?.newEmail) {
+			user.emailToken = generateToken();
+			user.emailExpiration = Date.now() + 3600000;
 
-		firebaseUserFields.forEach((field) => {
-			if (req.body[field]) {
-				firebaseUser[field] = req.body[field];
-			}
-		});
-
-		if (
-			Object.entries(firebaseUser).length !== 0 &&
-			firebaseUser.constructor === Object
-		) {
-			if (req.body?.email) {
-				firebaseUser.emailVerified = false;
-			}
-
-			await admin.auth().updateUser(req.user.uid, firebaseUser);
-
-			if (req.body?.email) {
-				const emailConfirmationLink = await admin
-					.auth()
-					.generateEmailVerificationLink(req.body.email);
-
-				// TODO CUSTOM E-MAIL
-				console.log(emailConfirmationLink);
-			}
+			// TODO SEND E-MAIL
+			console.log(user.emailToken);
 		}
 
 		await user.save();
 
 		user = {
 			id: user._id,
-			email: user.email,
+			newEmail: user.newEmail,
 			// firstName: user.firstName,
 			// lastName: user.lastName,
 			// photoUrl: user.photoUrl
@@ -201,16 +240,116 @@ exports.resetPassword = async (req, res, next) => {
 	try {
 		validationErrorHandler(req, res, next);
 
-		const emailConfirmationLink = await admin
-			.auth()
-			.generatePasswordResetLink(req.body.email);
+		const user = await User.findOne({ email: req.body.email });
+
+		user.resetPasswordToken = generateToken();
+		user.resetPasswordExpiration = Date.now() + 3600000;
+
+		await user.save();
 
 		// TODO CUSTOM E-MAIL
-		console.log(emailConfirmationLink);
+		console.log(user.resetPasswordToken);
 
 		res.status(200).json({
 			success: true,
 			message: "Password reset link has been sent!",
+		});
+	} catch (err) {
+		if (!err.statusCode) {
+			err.statusCode = 500;
+		}
+		next(err);
+	}
+};
+
+exports.verify = async (req, res, next) => {
+	let user;
+	try {
+		switch (req.query.action) {
+			case "resetPassword":
+				user = await User.findOne({
+					resetPasswordToken: req.query.token,
+					resetPasswordExpiration: { $gt: Date.now() },
+				});
+
+				if (!user) {
+					const err = new Error("Invalid token or token has expired");
+					err.statusCode = 404;
+					throw err;
+				}
+
+				return res.status(200).json({
+					success: true,
+					message: "Token is valid",
+					data: {
+						token: user.resetPasswordToken,
+					},
+				});
+			case "verifyEmail":
+				user = await User.findOne({
+					emailToken: req.query.token,
+					emailExpiration: { $gt: Date.now() },
+				});
+
+				if (!user) {
+					const err = new Error("Invalid token or token has expired");
+					err.statusCode = 404;
+					throw err;
+				}
+
+				user.emailToken = null;
+				user.emailExpiration = null;
+				user.emailVerified = true;
+
+				if (user.newEmail) {
+					user.email = user.newEmail;
+					user.newEmail = null;
+				}
+
+				await user.save();
+
+				console.log(user);
+
+				return res.status(200).json({
+					success: true,
+					message: "E-mail has been verified",
+					data: {
+						email: user.email,
+					},
+				});
+			default:
+				const err = new Error("Invalid action");
+				err.statusCode = 400;
+				throw err;
+		}
+	} catch (err) {
+		if (!err.statusCode) {
+			err.statusCode = 500;
+		}
+		next(err);
+	}
+};
+
+exports.changePassword = async (req, res, next) => {
+	try {
+		const user = await User.findOne({
+			resetPasswordToken: req.body.token,
+			resetPasswordExpiration: { $gt: Date.now() },
+		});
+
+		if (!user) {
+			const err = new Error("Invalid token or token has expired");
+			err.statusCode = 404;
+			throw err;
+		}
+
+		user.password = req.body.password;
+
+		await user.save();
+
+		return res.status(200).json({
+			success: true,
+			message: "Password has been changed",
 		});
 	} catch (err) {
 		if (!err.statusCode) {

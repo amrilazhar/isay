@@ -1,6 +1,6 @@
 module.exports = async (req, res, next) => {
 	try {
-		if (req.user?.customClaims?.admin !== true) {
+		if (req.user?.admin !== true) {
 			const error = new Error('Not authorized!');
 			error.statusCode = 403;
 			throw error;

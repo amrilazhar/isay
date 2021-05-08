@@ -1,4 +1,5 @@
-const admin = require("../../utils/firebase");
+const jwt = require("jsonwebtoken");
+const User = require("../../models/users");
 
 module.exports = async (req, res, next) => {
 	try {
@@ -27,8 +28,8 @@ module.exports = async (req, res, next) => {
 		let user;
 
 		try {
-			const decodedToken = await admin.auth().verifyIdToken(token[1]);
-			user = await admin.auth().getUser(decodedToken.uid);
+			const decodedToken = jwt.verify(token[1], process.env.JWT_SECRET);
+			user = await User.findOne({_id: decodedToken.id});
 			console.log(user);
 		} catch (err) {
 			err.statusCode = 500;

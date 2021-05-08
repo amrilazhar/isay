@@ -19,11 +19,7 @@ const objectId = (value) => {
 };
 
 const userNotExistsById = async (value, { req }) => {
-	const user = admin
-		.auth()
-		.getUser(value)
-		.then(() => true)
-		.catch(() => false);
+	const user = await User.exists({ _id: value });
 
 	if (!user) {
 		return Promise.reject("This User ID is not registered");
@@ -37,11 +33,7 @@ const userExistsByEmail = async (value, { req }) => {
 		return true;
 	}
 
-	const user = await admin
-		.auth()
-		.getUserByEmail(value)
-		.then(() => true)
-		.catch(() => false);
+	const user = await User.exists({ email: value });
 
 	if (user) {
 		return Promise.reject("This e-mail is already registered");
@@ -51,11 +43,7 @@ const userExistsByEmail = async (value, { req }) => {
 };
 
 const userNotExistsByEmail = async (value, { req }) => {
-	const user = await admin
-		.auth()
-		.getUserByEmail(value)
-		.then(() => true)
-		.catch(() => false);
+	const user = await User.exists({ email: value });
 
 	if (!user) {
 		return Promise.reject("This e-mail is not registered");
@@ -78,7 +66,7 @@ exports.signup = [
 ];
 
 exports.login = [
-	body("userName").notEmpty().bail().isEmail(),
+	body("email").isEmail(),
 	body("password").trim().isLength({ min: 6 }),
 ];
 
@@ -87,7 +75,7 @@ exports.getSingleUser = [
 ];
 
 exports.updateUser = [
-	body("email")
+	body("newEmail")
 		.isEmail()
 		.custom(userExistsByEmail)
 		.bail()
@@ -101,4 +89,10 @@ exports.updateUser = [
 
 exports.resetPassword = [
 	body("email").isEmail().normalizeEmail().custom(userNotExistsByEmail),
+];
+
+exports.changePassword = [
+	body("password").trim().isLength({ min: 6 }),
+	body("confirmPassword").custom(comparePassword),
+	body("token").trim(),
 ];

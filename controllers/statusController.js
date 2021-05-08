@@ -150,7 +150,7 @@ class StatusController {
 	//TODO : Get status/post by interest (single)
 	async getSingleInterest(req, res) {
 		try {
-			let statusData = await status.findOne({ _id: req.params.id });
+			let statusData = await status.find({ interest : req.params._id });
 
 			if (!statusData) {
 				return res.status(400).json({

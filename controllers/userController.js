@@ -1,7 +1,21 @@
 const crypto = require("crypto");
 const jwt = require("jsonwebtoken");
+const nodemailer = require("nodemailer");
+const mg = require("nodemailer-mailgun-transport");
 const { OAuth2Client } = require("google-auth-library");
+
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+
+const auth = {
+	auth: {
+		api_key: process.env.MAILGUN_API_KEY,
+		domain: process.env.MAILGUN_DOMAIN,
+	},
+};
+
+const nodemailerMailgun = nodemailer.createTransport(mg(auth));
+
+const SENDER_ADDRESS = "noreply@isay.gabatch11.my.id";
 
 const User = require("../models/users");
 
@@ -42,6 +56,13 @@ exports.signup = async (req, res, next) => {
 
 		// TODO SEND E-MAIL
 		console.log(user.emailToken);
+
+		nodemailerMailgun.sendMail({
+			from: SENDER_ADDRESS,
+			to: user.email,
+			subject: "Welcome to i-Say!",
+			html: `<a href="${process.env.SERVER_URI}/user/verify?action=verifyEmail&token=${user.emailToken}">Click here to verify your e-mail!</a>`,
+		});
 
 		const token = jwt.sign(
 			{
@@ -116,9 +137,15 @@ exports.googleSignIn = async (req, res, next) => {
 			audience: process.env.GOOGLE_CLIENT_ID,
 		});
 
+		if (!ticket) {
+			// TODO
+		}
+
 		const { email } = ticket.getPayload();
 
 		console.log(ticket.getPayload());
+
+		// TODO
 	} catch (err) {
 		if (!err.statusCode) {
 			err.statusCode = 500;
@@ -186,15 +213,13 @@ exports.updateUser = async (req, res, next) => {
 	try {
 		validationErrorHandler(req, res, next);
 
-		let user = await User.findOne({ _id: req.user.id });
-
 		let noFieldUpdated = true;
 
 		userFields.forEach((field) => {
 			if (req.body[field]) {
 				console.log(req.body[field]);
 				noFieldUpdated = false;
-				user[field] = req.body[field];
+				req.user[field] = req.body[field];
 			}
 		});
 
@@ -205,18 +230,25 @@ exports.updateUser = async (req, res, next) => {
 		}
 
 		if (req.body?.newEmail) {
-			user.emailToken = generateToken();
-			user.emailExpiration = Date.now() + 3600000;
+			req.user.emailToken = generateToken();
+			req.user.emailExpiration = Date.now() + 3600000;
 
 			// TODO SEND E-MAIL
-			console.log(user.emailToken);
+			console.log(req.user.emailToken);
+
+			nodemailerMailgun.sendMail({
+				from: SENDER_ADDRESS,
+				to: req.user.newEmail,
+				subject: "i-Say - E-mail Confirmation",
+				html: `<a href="${process.env.SERVER_URI}/user/verify?action=verifyEmail&token=${req.user.emailToken}">Click here to verify your e-mail!</a>`,
+			});
 		}
 
-		await user.save();
+		await req.user.save();
 
-		user = {
-			id: user._id,
-			newEmail: user.newEmail,
+		const user = {
+			id: req.user._id,
+			newEmail: req.user.newEmail,
 			// firstName: user.firstName,
 			// lastName: user.lastName,
 			// photoUrl: user.photoUrl
@@ -249,6 +281,13 @@ exports.resetPassword = async (req, res, next) => {
 
 		// TODO CUSTOM E-MAIL
 		console.log(user.resetPasswordToken);
+
+		nodemailerMailgun.sendMail({
+			from: SENDER_ADDRESS,
+			to: user.email,
+			subject: "i-Say - E-mail Confirmation",
+			html: `<a href="${process.env.SERVER_URI}/verify?action=resetPassword&token=${user.resetPasswordToken}">Click here to reset your password!</a>`,
+		});
 
 		res.status(200).json({
 			success: true,

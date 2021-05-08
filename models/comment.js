@@ -34,3 +34,4 @@ const CommentSchema = new mongoose.Schema(
 InterestSchema.plugin(mongoose_delete, { overrideMethods: "all" });
 
 module.exports = mongoose.model("comment", CommentSchema, "comment");
+

@@ -4,16 +4,19 @@ const bcrypt = require("bcrypt"); // Import bcrypt
 
 const UserSchema = new mongoose.Schema(
   {
+    firstName: {
+      type: String,
+      // required: true,
+    }, 
+    lastName: {
+      type: String,
+      // required: true,
+    }, 
     email: {
       type: String,
       required: true,
       unique: true,
-    },
-    isVerified: {
-      type: String,
-      required : true,
-      default : false,
-    },
+    }
   },
   {
     timestamps: {
@@ -23,8 +26,6 @@ const UserSchema = new mongoose.Schema(
   }
 );
 
-
-
 UserSchema.plugin(mongoose_delete, { overrideMethods: "all" });
 
-module.exports = mongoose.model("user", UserSchema, "user");
+module.exports = mongoose.model("User", UserSchema);

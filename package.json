@@ -7,7 +7,7 @@
   },
   "scripts": {
     "test": "cross-env NODE_ENV=test jest --testTimeout=1000000 --coverage --forceExit",
-    "dev": "NODE_ENV=development nodemon index.js",
+    "dev": "NODE_ENV=development nodemon index.js && firebase emulator:start --only functions",
     "stop": "NODE_ENV=production forever stop index.js || true",
     "start": "NODE_ENV=production forever start index.js"
   },
@@ -28,13 +28,15 @@
     "express-validator": "^6.10.1",
     "firebase": "^8.4.2",
     "firebase-admin": "^9.7.0",
+    "googleapis": "^73.0.0",
     "helmet": "^4.5.0",
     "hpp": "^0.2.3",
     "mongoose": "^5.12.6",
+    "mongoose-delete": "^0.5.3",
     "morgan": "^1.10.0",
+    "nodemon": "^2.0.7",
     "passport": "^0.4.1",
     "xss-clean": "^0.1.1"
   },
-  "devDependencies": {},
   "description": ""
 }

@@ -5,7 +5,7 @@ const router = express.Router();
 const commentController = require("../controllers/commentController");
 
 //IMPORT MIDDLEWARE
-const profileValidator = require("../middlewares/validators/commentValidator");
+const commentValidator = require("../middlewares/validators/commentValidator");
 
 let authDummy = (req, res, next) => {
       req.profile = { id: "608c19b85a4b0b19ccced595" };

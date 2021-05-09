@@ -8,15 +8,17 @@ let authDummy = (req, res, next) => {
 };
 
 // IMPORT MIDDLEWARE HERE
+const statusValidator = require("../middlewares/validators/statusValidator");
 
 // IMPORT CONTROLLER HERE
 const statusController = require("../controllers/statusController");
 
 // SET ROUTER HERE
-router.post("/create/", authDummy, statusController.createStatus);
-router.get("/users/", authDummy, statusController.getStatusByUser);
-router.get("/interest/", authDummy, statusController.getStatusByInterest);
-router.put("/update/:id", statusController.updateStatus);
-router.delete("/delete/:id", statusController.deleteStatus);
+router.post("/create/", authDummy, statusValidator.create, statusController.createStatus);
+router.get("/users/", authDummy, statusValidator.user, statusController.getStatusByUser);
+router.get("/interest/", authDummy, statusValidator.interest, statusController.getStatusByInterest);
+router.get("/interest/:id", authDummy, statusValidator.single, statusController.getSingleInterest);
+router.put("/update/:id", authDummy,statusValidator.update, statusController.updateStatus);
+router.delete("/delete/:id", authDummy,statusValidator.delete, statusController.deleteStatus);
 
 module.exports = router;

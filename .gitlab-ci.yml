@@ -11,7 +11,7 @@ cache:
 # Test job
 test:
   # Docker image
-  image: node:latest
+  image: node:14.6
   # Attach Test job to Test stage
   stage: test
   # Config to use GitLab Shared Runner with Executor Docker

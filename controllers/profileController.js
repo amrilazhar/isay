@@ -3,7 +3,6 @@ const {
   status,
   profile,
   interest,
-  location,
   activities,
 } = require("../models");
 
@@ -23,14 +22,19 @@ class ProfileController {
           select: "province city_type city country",
         })
         .exec();
-      // req.io.emit("my profile:" + dataProfile, dataProfile);
+      req.io.emit("my profile:" + dataProfile, dataProfile);
 
-      return res.status(200).json({ message: "Success", data: dataProfile });
-    } catch (e) {
-      console.log(e);
-      return res
-        .status(500)
-        .json({ message: "Internal Server Error", error: e });
+      res.status(200).json({
+        success: true,
+        message: "Success",
+        data: dataProfile,
+      });
+    } catch (err) {
+      console.log(err);
+      if (!err.statusCode) {
+        err.statusCode = 500;
+      }
+      next(err);
     }
   }
 
@@ -48,7 +52,7 @@ class ProfileController {
         select: "content media comment likeBy",
         sort: { updated_at: -1 },
         page: 1,
-        limit: 5,
+        limit: 10,
         pagination: paginateStatus,
       };
 
@@ -56,13 +60,18 @@ class ProfileController {
         { profile_id: req.query.id },
         options
       );
-      // req.io.emit("my profile's post:" + dataProfile, dataProfile);
-      return res.status(200).json({ message: "Success", data: dataProfile });
-    } catch (e) {
-      console.log(e);
-      return res
-        .status(500)
-        .json({ message: "Internal Server Error", error: e });
+      req.io.emit("my profile's post:" + dataProfile, dataProfile);
+      res.status(200).json({
+        success: true,
+        message: "Success",
+        data: dataProfile,
+      });
+    } catch (err) {
+      console.log(err);
+      if (!err.statusCode) {
+        err.statusCode = 500;
+      }
+      next(err);
     }
   }
   //======================|| my profile activity ||====================//
@@ -89,13 +98,18 @@ class ProfileController {
         { profile_id: req.query.id },
         options
       );
-      // req.io.emit("my profile's activities:" + dataProfile, dataProfile);
-      return res.status(200).json({ message: "Success", data: dataProfile });
-    } catch (e) {
-      console.log(e);
-      return res
-        .status(500)
-        .json({ message: "Internal Server Error", error: e });
+      req.io.emit("my profile's activities:" + dataProfile, dataProfile);
+      res.status(200).json({
+        success: true,
+        message: "Success",
+        data: dataProfile,
+      });
+    } catch (err) {
+      console.log(err);
+      if (!err.statusCode) {
+        err.statusCode = 500;
+      }
+      next(err);
     }
   }
 
@@ -106,8 +120,9 @@ class ProfileController {
         bio: req.body.bio ? req.body.bio : "No description",
         name: req.body.name,
         avatar: req.body.avatar ? req.body.avatar : "defaultAvatar.jpg",
-        user: req.body._id,
+        user: req.body.user,
         activities: req.body.activities,
+        location: req.body.location,
       };
 
       let dataProfile = await profile.findOneAndUpdate(
@@ -115,39 +130,24 @@ class ProfileController {
         profileData,
         { new: true }
       );
+
       if (!dataProfile) {
-        return res.status(402).json({ message: "Data user can't be appeared" });
+        const error = new Error("Data user can't be appeared");
+        error.statusCode = 400;
+        throw error;
       }
-      // req.io.emit("my profile update:" + dataProfile, dataProfile);
-      return res.status(201).json({
-        message: "Success",
+      req.io.emit("my profile update:" + dataProfile, dataProfile);
+      res.status(200).json({
+        success: true,
+        message: "Update Profile Success",
         data: dataProfile,
       });
-    } catch (e) {
-      console.error(e);
-      return res.status(500).json({
-        message: "Internal Server Error",
-        error: e,
-      });
-    }
-  }
-
-  //===========================|| add location ||========================//
-
-  async addLocation(req, res) {
-    try {
-      let findUser = await profile.findOne({ _id: req.params.id });
-      findUser.location.push(req.location._id);
-      let insertUser = findUser.save();
-      if (!insertUser) {
-        return res.status(402).json({ message: "Location can't added" });
-      } else
-        res
-          .status(200)
-          .json({ message: "Location added success", data: findUser }); //.likeBy.sort({ name : -1 } ).limit(5) });
-    } catch (e) {
-      console.log(e);
-      return res.status(500).json({ message: "Internal Server Error" });
+    } catch (err) {
+      console.log(err);
+      if (!err.statusCode) {
+        err.statusCode = 500;
+      }
+      next(err);
     }
   }
 
@@ -156,29 +156,41 @@ class ProfileController {
   async addInterest(req, res) {
     try {
       let findUser = await profile.findOne({ _id: req.params.id });
-      findUser.interest.push(req.interest._id);
-      let insertUser = findUser.save();
+      findUser.interest.push(req.query.id_interest);
+
+      let insertUser = await profile.findOneAndUpdate(
+        { _id: findUser._id },
+        findUser,
+        { new: true }
+      );
       if (!insertUser) {
-        return res.status(402).json({ message: "Interest can't added" });
+        const error = new Error("Interest can't be added");
+        error.statusCode = 400;
+        throw error;
       } else
-        res
-          .status(200)
-          .json({ message: "Interest added success", data: findUser }); //.likeBy.sort({ name : -1 } ).limit(5) });
+        res.status(200).json({
+          success: true,
+          message: "Add Interest Success",
+          data: findUser,
+        });
     } catch (e) {
-      console.log(e);
-      return res.status(500).json({ message: "Internal Server Error" });
+      console.log(err);
+      if (!err.statusCode) {
+        err.statusCode = 500;
+      }
+      next(err);
     }
   }
 
   //===========================|| delete Interest ||========================//
   async deleteInterest(req, res) {
     try {
-      let findUser = await profile.findOne({ _id: req.params.id }); //id belum tahu
-      let indexOfInterest = findUser.interest.indexOf(req.body.interest);
+      let findUser = await profile.findOne({ _id: req.params.id });
+      let indexOfInterest = findUser.interest.indexOf(req.query.id_interest);
       if (indexOfInterest < 0) {
-        return res
-          .status(204)
-          .json({ message: "Interest name has not been added at Interest" });
+        const error = new Error("Interest name has not been added at Interest");
+        error.statusCode = 400;
+        throw error;
       } else {
         findUser.interest.splice(indexOfInterest, 1);
       }
@@ -187,83 +199,26 @@ class ProfileController {
         findUser,
         { new: true }
       );
-      if (!deleteInterest) {
-        return res.status(204).json({ message: "Data user can't be appeared" });
-      }
       let userInterest = deleteInterest.interest;
       if (userInterest == 0) {
-        return res
-          .status(204)
-          .json({ message: "Interest is empty", data: deleteInterest });
+        res.status(400).json({
+          success: true,
+          message: "Interest is empty",
+          data: null,
+        });
       }
-      return res
-        .status(200)
-        .json({ message: "delete interest success", data: deleteInterest });
+      res.status(200).json({
+        success: true,
+        message: "Delete interest Success",
+        data: findUser,
+      });
     } catch (e) {
-      console.log(e);
-      return res
-        .status(500)
-        .json({ message: "Internal Server Error ", error: e });
-    }
-  }
-
-  //===========================|| delete location ||========================//
-  async deleteLocation(req, res) {
-    try {
-      let findUser = await profile.findOne({ _id: req.params.id }); //id belum tahu
-      let indexOfLocation = findUser.location.indexOf(req.body.location);
-      if (indexOfLocation < 0) {
-        return res
-          .status(204)
-          .json({ message: "location name has not been added at Interest" });
-      } else {
-        findUser.location.splice(indexOfLocation, 1);
+      console.log(err);
+      if (!err.statusCode) {
+        err.statusCode = 500;
       }
-      let deletelocation = await profile.findOneAndUpdate(
-        { _id: findUser._id },
-        findUser,
-        { new: true }
-      );
-      if (!deletelocation) {
-        return res.status(204).json({ message: "Data user can't be appeared" });
-      }
-
-      return res
-        .status(200)
-        .json({ message: "delete location success", data: deletelocation });
-    } catch (e) {
-      console.log(e);
-      return res
-        .status(500)
-        .json({ message: "Internal Server Error ", error: e });
-    }
-  }
-
-  //=====================|| Get Interest User ||=================//
-  async getListUserInterest(req, res) {
-    try {
-      //find user id
-      let dataProfile = await profile
-      .findOne({ _id: req.profile.id })
-      .populate({
-        path: "interest",
-        select: "interest category",
-      })
-      .exec();
-       
-      let dataInterest = dataProfile.interest.map(item=>{ if (item.category == 'topic') return item });
-      // req.io.emit("my profile:" + dataProfile, dataProfile);
-
-      return res
-        .status(200)
-        .json({ message: "Success", data: dataInterest });
-    } catch (e) {
-      console.log(e);
-      return res
-        .status(500)
-        .json({ message: "Internal Server Error", error: e });
+      next(err);
     }
   }
 }
-
 module.exports = new ProfileController();

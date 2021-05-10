@@ -20,5 +20,11 @@ router.post("/genProfile", utilsController.generateBasicProfile);
 //     return res.status(200).json({images : req.images[0]})
 // });
 
+const interestController = require("../controllers/interestController");
+// SET ROUTER INTEREST HERE
+router.get("/getInterest", interestController.getAllInterest);
+router.post("/createInterest", interestController.createInterest);
+router.put("/updateInterest/:id", interestController.updateInterest);
+router.delete("/deleteInterest/:id", interestController.deleteInterest);
 
 module.exports = router;

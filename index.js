@@ -17,6 +17,7 @@ const express = require("express");
 const app = express();
 const fileUpload = require("express-fileupload");
 const socketIo = require("socket.io");
+const http = require('http').Server(app);
 
 // COR
 app.use(cors());
@@ -89,6 +90,59 @@ if (process.env.NODE_ENV === "development") {
 	app.use(morgan("combined", { stream: accessLogStream }));
 }
 
+//======================== end security code ==============================//
+
+//======================== Socket IO Server =========================
+const io = socketIo(http, {
+	cors: {
+		origin: "*",
+	},
+	path: "/socket",
+	serveClient: false,
+});
+
+const chatRoutes = require("./routes/chatRoute.js");
+app.use(
+	"/chat",
+	(req, res, next) => {
+		req.io = io;
+		next();
+	},
+	chatRoutes
+);
+
+const commentRoutes = require("./routes/commentRoute.js");
+app.use(
+	"/comment",
+	(req, res, next) => {
+		req.io = io;
+		next();
+	},
+	commentRoutes
+);
+
+const profileRoutes = require("./routes/profileRoute.js");
+app.use(
+	"/profile",
+	(req, res, next) => {
+		req.io = io;
+		next();
+	},
+	profileRoutes
+);
+
+const statusRoutes = require("./routes/statusRoute.js");
+app.use(
+	"/status",
+	(req, res, next) => {
+		req.io = io;
+		next();
+	},
+	statusRoutes
+);
+//======================== END SOCKET IO Server=====================
+
+//========================= Error Handler ==========================
 app.use((err, req, res, next) => {
 	console.log(err);
 	const status = err.statusCode || 500;
@@ -96,63 +150,13 @@ app.use((err, req, res, next) => {
 	const data = err.data;
 	res.status(status).json({ success: false, message: message, data: data });
 });
+//========================= End Error Handler ======================
 
-//======================== end security code ==============================//
-
-// Listen Server
+//======================== Listen Server ===========================
 if (process.env.NODE_ENV !== "test") {
-  let PORT = 3000;
-  let server = app.listen(PORT, () =>
-    console.log(`server running on PORT : ${PORT}`)
-  );
-
-  //======================== Socket IO Server =========================
-  const io = socketIo(server, {
-    cors: {
-      origin: "*",
-    },
-    path: "/socket",
-    serveClient: false,
-  });
-
-  const chatRoutes = require("./routes/chatRoute.js");
-  app.use(
-    "/chat",
-    (req, res, next) => {
-      req.io = io;
-      next();
-    },
-    chatRoutes
-  );
-
-  const commentRoutes = require("./routes/commentRoute.js");
-  app.use(
-    "/comment",
-    (req, res, next) => {
-      req.io = io;
-      next();
-    },
-    commentRoutes
-  );
-
-  const profileRoutes = require("./routes/profileRoute.js");
-  app.use(
-    "/profile",
-    (req, res, next) => {
-      req.io = io;
-      next();
-    },
-    profileRoutes
-  );
-
-  const statusRoutes = require("./routes/statusRoute.js");
-  app.use(
-    "/status",
-    (req, res, next) => {
-      req.io = io;
-      next();
-    },
-    statusRoutes
-  );
-  //======================== END SOCKET IO Server=====================
+	let PORT = 3000;
+	http.listen(PORT, () =>
+		console.log(`server running on PORT : ${PORT}`)
+	);
 } else module.exports = app;
+//======================== End Listen Server =======================

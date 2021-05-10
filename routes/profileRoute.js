@@ -21,4 +21,25 @@ router.put("/:id",authDummy, profileValidator.profileValidate,profileController.
 router.put("/Interest/:id",authDummy, profileController.addInterest);
 router.put("/Interest/:id",authDummy, profileController.deleteInterest);
 
+// SET ROUTER LOCATION HERE
+router.get("/getLocation", locationController.getAllLocation);
+router.post("/createLocation", locationController.createLocation);
+router.put("/updateLocation/:id", locationController.updateLocation);
+router.delete("/deleteLocation/:id", locationController.deleteLocation);
+
+// SET ROUTER PROFILE HERE
+router.get("/getProfile/:id", profileController.myProfile);
+router.get("/getActProfile", profileController.myProfilePost);
+router.get("/getPostProfile", profileController.myProfileActivities);
+router.put(
+  "/updateProfile/:id",
+  profileValidator.profileValidate,
+  profileController.profileUpdate
+);
+router.put("/AddInterest/:id", profileController.addInterest);
+router.put("/AddLocation/:id", profileController.addLocation);
+router.delete("/delInterest/:id", profileController.deleteInterest);
+router.delete("/delLocation/:id", profileController.deleteLocation);
+router.get("/getListUserInterest", authDummy, profileController.getListUserInterest);
+
 module.exports = router;

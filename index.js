@@ -1,6 +1,7 @@
 require("dotenv").config({
-  path: `.env.${process.env.NODE_ENV}`,
+	path: `.env.${process.env.NODE_ENV}`,
 });
+
 // Express
 const mongoSanitize = require("express-mongo-sanitize");
 const xss = require("xss-clean");
@@ -16,13 +17,20 @@ const express = require("express");
 const app = express();
 const fileUpload = require("express-fileupload");
 const socketIo = require("socket.io");
+const http = require('http').Server(app);
+
+// COR
+app.use(cors());
+
+const admin = require("./utils/firebase");
+// const mongooseConnect = require("./utils/database");
 
 //Set body parser for HTTP post operation
 app.use(express.json()); // support json encoded bodies
 app.use(
-  express.urlencoded({
-    extended: true,
-  })
+	express.urlencoded({
+		extended: true,
+	})
 ); // support url encoded bodies
 
 //set fileUpload plugins
@@ -36,16 +44,11 @@ app.use(express.static("public"));
 const userRoutes = require("./routes/userRoute.js");
 app.use("/user", userRoutes);
 
-const statusRoutes = require("./routes/statusRoute.js");
-app.use("/status", statusRoutes);
-
 const activitiesRoutes = require("./routes/activitiesRoute.js");
 app.use("/activity", activitiesRoutes);
 
 const utilsRoutes = require("./routes/utilsRoute.js");
 app.use("/utils", utilsRoutes);
-
-// ROUTES DECLARATION & IMPORT
 
 //======================== security code ==============================//
 // Sanitize data
@@ -56,8 +59,8 @@ app.use(xss());
 
 // Rate limiting
 const limiter = rateLimit({
-  windowMs: 1 * 60 * 1000, // 10 mins
-  max: 100,
+	windowMs: 1 * 60 * 1000, // 10 mins
+	max: 100,
 });
 
 app.use(limiter);
@@ -67,75 +70,93 @@ app.use(hpp());
 
 // Use helmet
 app.use(
-  helmet({
-    contentSecurityPolicy: false,
-  })
+	helmet({
+		contentSecurityPolicy: false,
+	})
 );
 
-// CORS
-app.use(cors());
-
-if (process.env.NODE_ENV === "dev") {
-  app.use(morgan("dev"));
+if (process.env.NODE_ENV === "development") {
+	app.use(morgan("dev"));
 } else {
-  // create a write stream (in append mode)
-  let accessLogStream = fs.createWriteStream(
-    path.join(__dirname, "access.log"),
-    {
-      flags: "a",
-    }
-  );
+	// create a write stream (in append mode)
+	let accessLogStream = fs.createWriteStream(
+		path.join(__dirname, "access.log"),
+		{
+			flags: "a",
+		}
+	);
 
-  // setup the logger
-  app.use(morgan("combined", { stream: accessLogStream }));
+	// setup the logger
+	app.use(morgan("combined", { stream: accessLogStream }));
 }
+
 //======================== end security code ==============================//
 
-// Listen Server
+//======================== Socket IO Server =========================
+const io = socketIo(http, {
+	cors: {
+		origin: "*",
+	},
+	path: "/socket",
+	serveClient: false,
+});
+
+const chatRoutes = require("./routes/chatRoute.js");
+app.use(
+	"/chat",
+	(req, res, next) => {
+		req.io = io;
+		next();
+	},
+	chatRoutes
+);
+
+const commentRoutes = require("./routes/commentRoute.js");
+app.use(
+	"/comment",
+	(req, res, next) => {
+		req.io = io;
+		next();
+	},
+	commentRoutes
+);
+
+const profileRoutes = require("./routes/profileRoute.js");
+app.use(
+	"/profile",
+	(req, res, next) => {
+		req.io = io;
+		next();
+	},
+	profileRoutes
+);
+
+const statusRoutes = require("./routes/statusRoute.js");
+app.use(
+	"/status",
+	(req, res, next) => {
+		req.io = io;
+		next();
+	},
+	statusRoutes
+);
+//======================== END SOCKET IO Server=====================
+
+//========================= Error Handler ==========================
+app.use((err, req, res, next) => {
+	console.log(err);
+	const status = err.statusCode || 500;
+	const message = err.message;
+	const data = err.data;
+	res.status(status).json({ success: false, message: message, data: data });
+});
+//========================= End Error Handler ======================
+
+//======================== Listen Server ===========================
 if (process.env.NODE_ENV !== "test") {
-  let PORT = 3000;
-  let server = app.listen(PORT, () =>
-    console.log(`server running on PORT : ${PORT}`)
-  );
-
-  //======================== Socket IO Server =========================
-  const io = socketIo(server, {
-    cors: {
-      origin: "*",
-    },
-    path: "/socket",
-    serveClient: false,
-  });
-
-  // const chatRoutes = require("./routes/chatRoute.js");
-  // app.use(
-  //   "/chat",
-  //   (req, res, next) => {
-  //     req.io = io;
-  //     next();
-  //   },
-  //   chatRoutes
-  // );
-
-  const commentRoutes = require("./routes/commentRoute.js");
-  app.use(
-    "/comment",
-    (req, res, next) => {
-      req.io = io;
-      next();
-    },
-    commentRoutes
-  );
-
-  const profileRoutes = require("./routes/profileRoute.js");
-  app.use(
-    "/profile",
-    (req, res, next) => {
-      req.io = io;
-      next();
-    },
-    profileRoutes
-  );
-
-  //======================== END SOCKET IO Server=====================
+	let PORT = 3000;
+	http.listen(PORT, () =>
+		console.log(`server running on PORT : ${PORT}`)
+	);
 } else module.exports = app;
+//======================== End Listen Server =======================

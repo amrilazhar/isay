@@ -28,7 +28,7 @@ test:
     - npm run test
   # Defines the names of branches and tags the job runs for
   only:
-    - master
+    - status_darwin
 # Deploy job
 deploy:
   type: deploy
@@ -52,4 +52,4 @@ deploy:
     - npm run stop
     - npm run start
   only:
-    - master
+    - status_darwin

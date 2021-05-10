@@ -16,6 +16,6 @@ let authDummy = (req, res, next) => {
 
 // SET ROUTER HERE
 router.post("/joinRoom", authDummy, chatController.joinRoom, startSocketChat);
-router.get("/getMessageHistory/:chatRoom", authDummy, chatController.getMessageHistory);
+router.get("/messageHistory/:chatRoom", authDummy, chatController.getMessageHistory);
 
 module.exports = router;

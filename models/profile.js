@@ -29,7 +29,7 @@ const ProfileSchema = new mongoose.Schema(
       {
         type: mongoose.Schema.Types.ObjectId,
         ref: "status",
-      }
+      },
     ],
     avatar : {
       type : String,
@@ -41,11 +41,11 @@ const ProfileSchema = new mongoose.Schema(
       required : false,
       ref : "user"
     },
-    location : {
+    location :  {
       type : mongoose.Schema.Types.ObjectId,
       required : false,
       ref: "location"
-    }
+    },
   },
   {
     timestamps: {

@@ -29,7 +29,7 @@ async function upload(req, res, next) {
       file[i].name = `${fileName}${path.parse(file[i].name).ext}`;
 
       let imageUrl = await amazonUpload(file[i]);
-      req.images.push(imageUrl);
+      req.images.push(imageUrl,req.directory);
     }
     next();
   } catch (error) {
@@ -38,14 +38,14 @@ async function upload(req, res, next) {
   }
 }
 
-async function amazonUpload(file) {
+async function amazonUpload(file,dir='images') {
   // Set the AWS region
   const REGION = "ap-southeast-1"; //e.g. "us-east-1"
 
   const uploadParams = {
     ACL: "public-read",
     Bucket: process.env.S3_BUCKET_NAME,
-    Key: `images/chat/${file.name}`,
+    Key: `${dir}${file.name}`,
     Body: file.data,
     ContentType: file.mimetype,
   };

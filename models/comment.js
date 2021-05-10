@@ -22,14 +22,14 @@ const CommentSchema = new mongoose.Schema(
         ref: "profile",
       },
     ],
-    child : [
+    comment : [
       {
         type: mongoose.Schema.Types.ObjectId,
         required: false,
         ref: "comment"
       }
     ]
-  },
+  }, 
   {
     timestamps: {
       createdAt: "created_at",

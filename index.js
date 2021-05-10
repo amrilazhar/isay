@@ -1,6 +1,7 @@
 require("dotenv").config({
 	path: `.env.${process.env.NODE_ENV}`,
 });
+
 // Express
 const mongoSanitize = require("express-mongo-sanitize");
 const xss = require("xss-clean");
@@ -19,6 +20,9 @@ const socketIo = require("socket.io");
 
 // COR
 app.use(cors());
+
+const admin = require("./utils/firebase");
+// const mongooseConnect = require("./utils/database");
 
 //Set body parser for HTTP post operation
 app.use(express.json()); // support json encoded bodies
@@ -39,19 +43,11 @@ app.use(express.static("public"));
 const userRoutes = require("./routes/userRoute.js");
 app.use("/user", userRoutes);
 
-const commentRoutes = require("./routes/commentRoute.js");
-app.use("/comment", commentRoutes);
-
-const profileRoutes = require("./routes/profileRoute.js");
-app.use("/profile", profileRoutes);
-
 const activitiesRoutes = require("./routes/activitiesRoute.js");
 app.use("/activity", activitiesRoutes);
 
 const utilsRoutes = require("./routes/utilsRoute.js");
 app.use("/utils", utilsRoutes);
-
-// ROUTES DECLARATION & IMPORT
 
 //======================== security code ==============================//
 // Sanitize data
@@ -78,7 +74,7 @@ app.use(
 	})
 );
 
-if (process.env.NODE_ENV === "dev") {
+if (process.env.NODE_ENV === "development") {
 	app.use(morgan("dev"));
 } else {
 	// create a write stream (in append mode)
@@ -92,6 +88,15 @@ if (process.env.NODE_ENV === "dev") {
 	// setup the logger
 	app.use(morgan("combined", { stream: accessLogStream }));
 }
+
+app.use((err, req, res, next) => {
+	console.log(err);
+	const status = err.statusCode || 500;
+	const message = err.message;
+	const data = err.data;
+	res.status(status).json({ success: false, message: message, data: data });
+});
+
 //======================== end security code ==============================//
 
 // Listen Server
@@ -149,6 +154,5 @@ if (process.env.NODE_ENV !== "test") {
     },
     statusRoutes
   );
-
   //======================== END SOCKET IO Server=====================
 } else module.exports = app;

@@ -43,3 +43,4 @@ const CommentSchema = new mongoose.Schema(
 CommentSchema.plugin(mongoose_delete, { overrideMethods: "all" });
 
 module.exports = mongoose.model("comment", CommentSchema, "comment");
+

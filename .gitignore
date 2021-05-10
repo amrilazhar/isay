@@ -3,3 +3,5 @@ access.log
 .env.development
 .env.test
 coverage
+.prettierrc
+functions

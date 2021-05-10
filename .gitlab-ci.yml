@@ -24,6 +24,11 @@ test:
     - echo "S3_BUCKET_NAME"=$ENVIRONMENT_TEST_S3_BUCKET_NAME >> .env.test
     - echo "S3_URL"=$ENVIRONMENT_TEST_S3_URL >> .env.test
     - echo "PUBLIC_URL"=$PUBLIC_URL >> .env.test
+    - echo "JWT_SECRET"=$JWT_SECRET >> .env.test
+    - echo "GOOGLE_CLIENT_ID"=$GOOGLE_CLIENT_ID >> .env.test
+    - echo "MAILGUN_API_KEY"=$MAILGUN_API_KEY >> .env.test
+    - echo "MAILGUN_DOMAIN"=$MAILGUN_DOMAIN >> .env.test
+    - echo "SERVER_URI"=$SERVER_URI >> .env.test
     - npm i
     - npm run test
   # Defines the names of branches and tags the job runs for

@@ -14,11 +14,11 @@ const statusValidator = require("../middlewares/validators/statusValidator");
 const statusController = require("../controllers/statusController");
 
 // SET ROUTER HERE
-router.post("/create/", authDummy, statusValidator.create, statusController.createStatus);
+router.post("/", authDummy, statusValidator.create, statusController.createStatus);
 router.get("/users/", authDummy, statusValidator.user, statusController.getStatusByUser);
 router.get("/interest/", authDummy, statusValidator.interest, statusController.getStatusByInterest);
 router.get("/interest/:id", authDummy, statusValidator.single, statusController.getSingleInterest);
-router.put("/update/:id", authDummy,statusValidator.update, statusController.updateStatus);
-router.delete("/delete/:id", authDummy,statusValidator.delete, statusController.deleteStatus);
+router.put("/:id", authDummy,statusValidator.update, statusController.updateStatus);
+router.delete("/:id", authDummy,statusValidator.delete, statusController.deleteStatus);
 
 module.exports = router;

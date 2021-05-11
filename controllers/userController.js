@@ -112,6 +112,7 @@ exports.login = async (req, res, next) => {
 			{
 				id: user._id.toString(),
 				admin: user.admin,
+				profile : user.profile,
 			},
 			process.env.JWT_SECRET,
 			{ expiresIn: "30d" }

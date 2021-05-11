@@ -1,3 +1,5 @@
+const validationErrorHandler = require("../utils/validationErrorHandler");
+
 const { status, comment, profile, interest } = require("../models");
 
 class StatusController {
@@ -10,7 +12,7 @@ class StatusController {
 				media: req.body.media ? req.body.media : "images.jpg",
 				comment: req.body.comment,
 				interest: req.body.interest,
-				likeBy: req.body.likeBy,
+				// likeBy: req.body.likeBy,
 			};
 			let statusCreate = await status.create(data);
 			if (!statusCreate) {
@@ -46,7 +48,7 @@ class StatusController {
 				media: req.body.media ? req.body.media : "images.jpg",
 				comment: req.body.comment,
 				interest: req.body.interest,
-				likeBy: req.body.likeBy,
+				// likeBy: req.body.likeBy,
 			};
 
 			let statusUpdate = await status.findOneAndUpdate(

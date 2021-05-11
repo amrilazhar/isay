@@ -1,60 +1,60 @@
-# We have 2 stage Test and Deploy
-stages:
-  - test
-  - deploy
+# # We have 2 stage Test and Deploy
+# stages:
+#   - test
+#   - deploy
 
-# Config cache
-cache:
-  paths:
-    - node_modules/
+# # Config cache
+# cache:
+#   paths:
+#     - node_modules/
 
-# Test job
-test:
-  # Docker image
-  image: node:14.6
-  # Attach Test job to Test stage
-  stage: test
-  # Config to use GitLab Shared Runner with Executor Docker
-  tags:
-    - docker
-  script:
-    - echo "MONGO_URI"=$ENVIRONMENT_TEST_MONGO_URI > .env.test
-    - echo "S3_ACCESS_KEY"=$ENVIRONMENT_TEST_S3_ACCESS_KEY >> .env.test
-    - echo "S3_SECRET_KEY"=$ENVIRONMENT_TEST_S3_SECRET_KEY >> .env.test
-    - echo "S3_BUCKET_NAME"=$ENVIRONMENT_TEST_S3_BUCKET_NAME >> .env.test
-    - echo "S3_URL"=$ENVIRONMENT_TEST_S3_URL >> .env.test
-    - echo "PUBLIC_URL"=$PUBLIC_URL >> .env.test
-    - echo "JWT_SECRET"=$JWT_SECRET >> .env.test
-    - echo "GOOGLE_CLIENT_ID"=$GOOGLE_CLIENT_ID >> .env.test
-    - echo "MAILGUN_API_KEY"=$MAILGUN_API_KEY >> .env.test
-    - echo "MAILGUN_DOMAIN"=$MAILGUN_DOMAIN >> .env.test
-    - echo "SERVER_URI"=$SERVER_URI >> .env.test
-    - npm i
-    - npm run test
-  # Defines the names of branches and tags the job runs for
-  only:
-    - status_darwin
-# Deploy job
-deploy:
-  type: deploy
-  # Attach Deploy job to Deploy stage
-  stage: deploy
-  # Config to use our Runner with Executor Shell
-  tags:
-    - master
-  script:
-    # Only copy changed files to project folder
-    - cp -r -u * $PROJECT_DIR
-    - cd $PROJECT_DIR
-    - echo "MONGO_URI"=$ENVIRONMENT_PROD_MONGO_URI > .env.production
-    - echo "S3_ACCESS_KEY"=$ENVIRONMENT_PROD_S3_ACCESS_KEY >> .env.production
-    - echo "S3_SECRET_KEY"=$ENVIRONMENT_PROD_S3_SECRET_KEY >> .env.production
-    - echo "S3_BUCKET_NAME"=$ENVIRONMENT_PROD_S3_BUCKET_NAME >> .env.production
-    - echo "S3_URL"=$ENVIRONMENT_PROD_S3_URL >> .env.production
-    - echo "PUBLIC_URL"=$PUBLIC_URL >> .env.production
-    - npm i
-    # Restart NodeJS service
-    - npm run stop
-    - npm run start
-  only:
-    - status_darwin
+# # Test job
+# test:
+#   # Docker image
+#   image: node:14.6
+#   # Attach Test job to Test stage
+#   stage: test
+#   # Config to use GitLab Shared Runner with Executor Docker
+#   tags:
+#     - docker
+#   script:
+#     - echo "MONGO_URI"=$ENVIRONMENT_TEST_MONGO_URI > .env.test
+#     - echo "S3_ACCESS_KEY"=$ENVIRONMENT_TEST_S3_ACCESS_KEY >> .env.test
+#     - echo "S3_SECRET_KEY"=$ENVIRONMENT_TEST_S3_SECRET_KEY >> .env.test
+#     - echo "S3_BUCKET_NAME"=$ENVIRONMENT_TEST_S3_BUCKET_NAME >> .env.test
+#     - echo "S3_URL"=$ENVIRONMENT_TEST_S3_URL >> .env.test
+#     - echo "PUBLIC_URL"=$PUBLIC_URL >> .env.test
+#     - echo "JWT_SECRET"=$JWT_SECRET >> .env.test
+#     - echo "GOOGLE_CLIENT_ID"=$GOOGLE_CLIENT_ID >> .env.test
+#     - echo "MAILGUN_API_KEY"=$MAILGUN_API_KEY >> .env.test
+#     - echo "MAILGUN_DOMAIN"=$MAILGUN_DOMAIN >> .env.test
+#     - echo "SERVER_URI"=$SERVER_URI >> .env.test
+#     - npm i
+#     - npm run test
+#   # Defines the names of branches and tags the job runs for
+#   only:
+#     - status_darwin
+# # Deploy job
+# deploy:
+#   type: deploy
+#   # Attach Deploy job to Deploy stage
+#   stage: deploy
+#   # Config to use our Runner with Executor Shell
+#   tags:
+#     - master
+#   script:
+#     # Only copy changed files to project folder
+#     - cp -r -u * $PROJECT_DIR
+#     - cd $PROJECT_DIR
+#     - echo "MONGO_URI"=$ENVIRONMENT_PROD_MONGO_URI > .env.production
+#     - echo "S3_ACCESS_KEY"=$ENVIRONMENT_PROD_S3_ACCESS_KEY >> .env.production
+#     - echo "S3_SECRET_KEY"=$ENVIRONMENT_PROD_S3_SECRET_KEY >> .env.production
+#     - echo "S3_BUCKET_NAME"=$ENVIRONMENT_PROD_S3_BUCKET_NAME >> .env.production
+#     - echo "S3_URL"=$ENVIRONMENT_PROD_S3_URL >> .env.production
+#     - echo "PUBLIC_URL"=$PUBLIC_URL >> .env.production
+#     - npm i
+#     # Restart NodeJS service
+#     - npm run stop
+#     - npm run start
+#   only:
+#     - status_darwin

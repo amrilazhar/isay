@@ -28,7 +28,7 @@ async function upload(req, res, next) {
       let fileName = crypto.randomBytes(16).toString("hex");
       file[i].name = `${fileName}${path.parse(file[i].name).ext}`;
 
-      let imageUrl = await amazonUpload(file[i]);
+      let imageUrl = await amazonUpload(file[i], req.directory);
       req.images.push(imageUrl,req.directory);
     }
     next();

@@ -6,19 +6,20 @@ const profileController = require("../controllers/profileController");
 
 //IMPORT MIDDLEWARE
 const profileValidator = require("../middlewares/validators/profileValidator");
+const tokenParser = require("../middlewares/authentication/tokenParser");
+const isAuth = require("../middlewares/authentication/isAuth");
 
-let authDummy = (req, res, next) => {
-	req.profile = { id: "608ac628c8d0a1bfded19469" };
-
+//set variabel profile.id
+let setProfileId = (req, res, next) => {
+	req.profile = { id: req.user.profile };  
 	next();
-};
-
+  };
 // SET ROUTER PROFILE HERE
-router.get("/getProfile/:id",authDummy, profileController.myProfile);
-router.get("/Post",authDummy, profileController.myProfilePost);
-router.get("/Activities", authDummy,profileController.myProfileActivities);
-router.put("/:id",authDummy, profileValidator.profileValidate,profileController.profileUpdate);
-router.put("/Interest/:id",authDummy, profileController.addInterest);
-router.put("/Interest/:id",authDummy, profileController.deleteInterest);
+router.get("/getProfile/:id", tokenParser, isAuth, setProfileId, profileController.myProfile);
+router.get("/Post", tokenParser, isAuth, setProfileId, profileController.myProfilePost);
+router.get("/Activities", tokenParser, isAuth, setProfileId, profileController.myProfileActivities);
+router.put("/:id", tokenParser, isAuth, setProfileId, profileValidator.profileValidate,profileController.profileUpdate);
+router.put("/Interest/:id", tokenParser, isAuth, setProfileId, profileController.addInterest);
+router.put("/DeleteInt/:id", tokenParser, isAuth, setProfileId, profileController.deleteInterest);
 
 module.exports = router;

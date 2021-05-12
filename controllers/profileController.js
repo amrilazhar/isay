@@ -12,7 +12,7 @@ class ProfileController {
     try {
       //find user id
       let dataProfile = await profile
-        .findOne({ _id: req.params.id })
+        .findOne({ _id: req.profile.id })
         .populate({
           path: "interest",
           select: "interest category",
@@ -57,7 +57,7 @@ class ProfileController {
       };
 
       let dataProfile = await status.paginate(
-        { profile_id: req.query.id },
+        { profile_id: req.profile.id },
         options
       );
       req.io.emit("my profile's post:" + dataProfile, dataProfile);
@@ -86,16 +86,16 @@ class ProfileController {
       }
 
       const options = {
-        select: "status_id activities_type comment_id",
+        select: "status_id activities_type comment_id owner",
         sort: { updated_at: -1 },
         page: 1,
-        populate: { path: "status_id", select: "content media comment likeBy" },
-        limit: 5,
+        populate: { path: "comment_id", select: "content media owner comment likeBy" },
+        limit: 10,
         pagination: paginateStatus,
       };
 
       let dataProfile = await activities.paginate(
-        { profile_id: req.query.id },
+        { profile_id: req.profile.id },
         options
       );
       req.io.emit("my profile's activities:" + dataProfile, dataProfile);
@@ -126,7 +126,7 @@ class ProfileController {
       };
 
       let dataProfile = await profile.findOneAndUpdate(
-        { _id: req.params.id },
+        { _id: req.profile.id },
         profileData,
         { new: true }
       );
@@ -155,7 +155,7 @@ class ProfileController {
 
   async addInterest(req, res) {
     try {
-      let findUser = await profile.findOne({ _id: req.params.id });
+      let findUser = await profile.findOne({ _id: req.profile.id });
       findUser.interest.push(req.query.id_interest);
 
       let insertUser = await profile.findOneAndUpdate(
@@ -185,7 +185,7 @@ class ProfileController {
   //===========================|| delete Interest ||========================//
   async deleteInterest(req, res) {
     try {
-      let findUser = await profile.findOne({ _id: req.params.id });
+      let findUser = await profile.findOne({ _id: req.profile.id });
       let indexOfInterest = findUser.interest.indexOf(req.query.id_interest);
       if (indexOfInterest < 0) {
         const error = new Error("Interest name has not been added at Interest");

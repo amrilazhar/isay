@@ -27,9 +27,10 @@ class ChatController {
 			}
 		} catch (error) {
 			console.log(error);
-			return res
-				.status(500)
-				.json({ success: true, message: "internal server error" });
+			if (!err.statusCode) {
+        err.statusCode = 500;
+      }
+      next(err);
 		}
 	}
 
@@ -65,9 +66,10 @@ class ChatController {
 			next();
 		} catch (error) {
 			console.log(error);
-			return res
-				.status(500)
-				.json({ success: false, message: "internal serrver error" });
+      if (!err.statusCode) {
+        err.statusCode = 500;
+      }
+      next(err);
 		}
 	}
 
@@ -115,9 +117,10 @@ class ChatController {
 				.json({ success: true, message: "success", data: roomList });
 		} catch (error) {
 			console.log(error);
-			return res
-				.status(500)
-				.json({ success: false, message: "internal serrver error" });
+      if (!err.statusCode) {
+        err.statusCode = 500;
+      }
+      next(err);
 		}
 	}
 }

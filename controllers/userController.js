@@ -100,6 +100,12 @@ exports.login = async (req, res, next) => {
 			throw error;
 		}
 
+		if (!user.emailVerified) {
+			const error = new Error("Email Not Verified");
+			error.statusCode = 401;
+			throw error;
+		}
+
 		const isEqual = await user.comparePassword(password);
 
 		if (!isEqual) {
@@ -112,7 +118,7 @@ exports.login = async (req, res, next) => {
 			{
 				id: user._id.toString(),
 				admin: user.admin,
-				profile : user.profile,
+				profile: user.profile,
 			},
 			process.env.JWT_SECRET,
 			{ expiresIn: "30d" }
@@ -390,6 +396,33 @@ exports.changePassword = async (req, res, next) => {
 		return res.status(200).json({
 			success: true,
 			message: "Password has been changed",
+		});
+	} catch (err) {
+		if (!err.statusCode) {
+			err.statusCode = 500;
+		}
+		next(err);
+	}
+};
+
+exports.statusProfile = async (req, res, next) => {
+	try {
+		const user = await User.findOne({ _id: req.params.userId });
+		
+		if (!user) {
+			const err = new Error("User not found");
+			err.statusCode = 400;
+			throw err;
+		}
+
+		if (!user.profile) {
+			const err = new Error("Profile Not Yet Created");
+			err.statusCode = 400;
+			throw err;
+		}
+		return res.status(200).json({
+			success: true,
+			message: "Profile Has Been Created",
 		});
 	} catch (err) {
 		if (!err.statusCode) {

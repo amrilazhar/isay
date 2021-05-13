@@ -28,8 +28,8 @@ async function upload(req, res, next) {
       let fileName = crypto.randomBytes(16).toString("hex");
       file[i].name = `${fileName}${path.parse(file[i].name).ext}`;
 
-      let imageUrl = await amazonUpload(file[i]);
-      req.images.push(imageUrl,req.directory);
+      let imageUrl = await amazonUpload(file[i],req.directory);
+      req.images.push(imageUrl);
     }
     next();
   } catch (error) {
@@ -38,7 +38,7 @@ async function upload(req, res, next) {
   }
 }
 
-async function amazonUpload(file,dir='images') {
+async function amazonUpload(file,dir='images/') {
   // Set the AWS region
   const REGION = "ap-southeast-1"; //e.g. "us-east-1"
 

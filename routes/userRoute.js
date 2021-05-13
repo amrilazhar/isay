@@ -57,6 +57,14 @@ router.get(
 	userController.getSingleUser
 );
 
+/* GET status profile Created or Not. */
+router.get(
+	"/status_profile/:userId",
+	tokenParser,
+	isAuth,
+	userController.statusProfile
+);
+
 /* PUT single user. */
 router.put(
 	"/",

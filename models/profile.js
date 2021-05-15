@@ -7,7 +7,7 @@ const ProfileSchema = new mongoose.Schema(
     bio: {
       type: String,
       required: false,
-      default : "No description"
+      default : ""
     },
     name: {
       type: String,

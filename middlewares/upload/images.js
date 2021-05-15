@@ -5,6 +5,7 @@ const { S3Client, PutObjectCommand } = require("@aws-sdk/client-s3");
 async function upload(req, res, next) {
 	try {
 		if (req.files) {
+			if (!req.files.images) next();
 			// cek apakah array
 			if (!req.files.images.length) {
 				req.files.images = [req.files.images];
@@ -42,7 +43,7 @@ async function upload(req, res, next) {
 	}
 }
 
-async function amazonUpload(file, dir = "images") {
+async function amazonUpload(file, dir = "images/") {
 	// Set the AWS region
 	const REGION = "ap-southeast-1"; //e.g. "us-east-1"
 

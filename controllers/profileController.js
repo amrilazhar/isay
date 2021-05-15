@@ -220,5 +220,31 @@ class ProfileController {
       next(err);
     }
   }
+
+  //===========================|| List User Interest ||========================//
+
+  async getListUserInterest(req, res) {
+    try {
+      let findUser = await profile.findOne({ _id: req.profile.id }).populate('interest');      
+
+      if (!findUser) {
+        const error = new Error("Interest can't be added");
+        error.statusCode = 400;
+        throw error;
+      } else
+        res.status(200).json({
+          success: true,
+          message: "Get User Interest Success",
+          data: findUser.interest,
+        });
+    } catch (e) {
+      console.log(err);
+      if (!err.statusCode) {
+        err.statusCode = 500;
+      }
+      next(err);
+    }
+  }
+
 }
 module.exports = new ProfileController();

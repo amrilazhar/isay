@@ -1,5 +1,4 @@
 const { profile, comment, post, status, activities } = require("../models");
-const { create } = require("../models/users");
 
 class CommentController {
 	//===============================|| get all comment ||=========================//
@@ -8,13 +7,13 @@ class CommentController {
 		try {
 			let dataComment = await comment
 				.find({ status_id: req.query.status_id })
-				.sort({ updated_at: -1 })
+				.sort({ _id: 1 })
 				.lean()
-				.exec(); //id status
+				.exec(); //id status			
 
 			let rec = (comment, threads) => {
-				for (var thread in threads) {
-					value = threads[thread];
+				for (let thread in threads) {
+					let value = threads[thread];
 
 					if (thread.toString() === comment.parent_id.toString()) {
 						value.children[comment._id] = comment;
@@ -26,16 +25,17 @@ class CommentController {
 					}
 				}
 			};
-			let threads = {},
-				komentar;
+
+			let threads = {}, komentar;
 			for (let i = 0; i < dataComment.length; i++) {
 				komentar = dataComment[i];
 				komentar["children"] = {};
 				let parent_id = komentar.parent_id;
 				if (!parent_id) {
-					threads[comment._id] = komentar;
+					threads[komentar._id] = komentar;
 					continue;
 				}
+				
 				rec(komentar, threads);
 			}
 
@@ -49,8 +49,7 @@ class CommentController {
 				res.status(200).json({
 					success: true,
 					message: "Success",
-					data: { count : dataComment.length,
-					 comments: threads }
+					data: { count: dataComment.length, comments: threads },
 				});
 		} catch (err) {
 			console.log(err);

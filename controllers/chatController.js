@@ -28,9 +28,9 @@ class ChatController {
 		} catch (error) {
 			console.log(error);
 			if (!err.statusCode) {
-        err.statusCode = 500;
-      }
-      next(err);
+				err.statusCode = 500;
+			}
+			next(err);
 		}
 	}
 
@@ -66,10 +66,10 @@ class ChatController {
 			next();
 		} catch (error) {
 			console.log(error);
-      if (!err.statusCode) {
-        err.statusCode = 500;
-      }
-      next(err);
+			if (!err.statusCode) {
+				err.statusCode = 500;
+			}
+			next(err);
 		}
 	}
 
@@ -95,7 +95,7 @@ class ChatController {
 			);
 
 			let lastChat = await Promise.all(getLastChat);
-			
+
 			let idLastChat = lastChat.map((item) => {
 				if (item.length > 0) {
 					//insert item to object container
@@ -105,11 +105,11 @@ class ChatController {
 				} else return null;
 			});
 
-      console.log(idLastChat, "=== last chat");
+			console.log(idLastChat, "=== last chat");
 			idLastChat.sort();
 			idLastChat.reverse();
 			idLastChat.forEach((item) => {
-        if (item)	roomList.push(objCont[item]);
+				if (item) roomList.push(objCont[item]);
 			});
 
 			return res
@@ -117,10 +117,10 @@ class ChatController {
 				.json({ success: true, message: "success", data: roomList });
 		} catch (error) {
 			console.log(error);
-      if (!err.statusCode) {
-        err.statusCode = 500;
-      }
-      next(err);
+			if (!err.statusCode) {
+				err.statusCode = 500;
+			}
+			next(err);
 		}
 	}
 }

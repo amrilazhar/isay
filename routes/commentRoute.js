@@ -23,7 +23,7 @@ let dir = (req,res,next) => {
 }
     
 // SET ROUTER COMMENT HERE
-router.get("/getAllComment", tokenParser, isAuth, setProfileId,commentController.getAllComment);
+router.get("/all", tokenParser, isAuth, setProfileId,commentController.getAllComment);
 router.post("/", tokenParser, isAuth, setProfileId, dir, imageUpload, commentController.postComment);
 router.put("/:id", tokenParser, isAuth,  setProfileId, dir, imageUpload, commentController.updateComment);
 router.delete("/:id", tokenParser, isAuth, setProfileId,commentController.deleteComment);

@@ -3,7 +3,7 @@ const router = express.Router();
 
 // IMPORT CONTROLLER HERE
 const statusController = require("../controllers/statusController");
-
+const imageUpload = require("../middlewares/upload/images")
 // IMPORT MIDDLEWARE HERE
 const statusValidator = require("../middlewares/validators/statusValidator");
 
@@ -13,9 +13,14 @@ const isAuth = require("../middlewares/authentication/isAuth");
 
 // SET VARIABLE PROFILE ID
 let setProfileId = (req, res, next) => {
-  req.profile = { id: req.user.profile };  
-  next();
+    req.profile = { id: req.user.profile };  
+    next();
 };
+
+let dir = (req, res, next) => {
+    req.directory = "images/status"
+    next();
+}
 
 // SET ROUTER HERE
 router.post("/", tokenParser, isAuth, setProfileId, statusValidator.create, statusController.createStatus);

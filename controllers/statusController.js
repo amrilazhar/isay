@@ -1,55 +1,84 @@
 const validationErrorHandler = require("../utils/validationErrorHandler");
 
-const { status, comment, profile, interest } = require("../models");
+const { status, comment, profile, interest, activities } = require("../models");
 
 class StatusController {
 	//TODO : create status/post
-	async createStatus(req, res) {
+	async createStatus(req, res, next) {
 		try {
+			validationErrorHandler(req, res, next);
+
 			let data = {
 				content: req.body.content,
 				owner: req.profile.id,
-				media: req.body.media ? req.body.media : "images.jpg",
+				// media: req.body.media ? req.body.media : "images.jpg",
+				media: [],
 				comment: req.body.comment,
 				interest: req.body.interest,
 				// likeBy: req.body.likeBy,
 			};
+
+			if ("images" in req) {
+				data.media = req.images;
+			}
+
+			if ("parent_id" in req.body) {
+				data.parent_id = req.body.parent_id;
+			}
+			
+			if ("depth" in req.body) {
+				data.depth = req.body.depth;
+			}
+
 			let statusCreate = await status.create(data);
+
 			if (!statusCreate) {
-				return res.status(400).json({
-					message: "Create Status failed",
-					error: statusCreate,
-				});
+				const error = new Error("Create Status failed");
+				error.statusCode = 400;
+				throw error;
 			} else {
 				// Socket io
 				req.io.emit("status:" + req.body.interest, statusCreate);
 
-				return res.status(201).json({
+				await activities.create({
+					type: "post_status",
+					status_id: statusCreate._id,
+					comment_id: null,
+					owner: req.profile.id,
+				});
+
+				res.status(201).json({
 					success: true,
 					message: "Success",
 					data: statusCreate,
 				});
 			}
-		} catch (e) {
-			console.log(e);
-			return res.status(500).json({
-				message: "Internal Server Error",
-				error: e.message,
-			});
+		} catch (err) {
+			console.log(err);
+			if (!err.statusCode) {
+				err.statusCode = 500;
+			}
+			next(err);
 		}
 	}
 
 	//TODO : Update status/post
-	async updateStatus(req, res) {
+	async updateStatus(req, res, next) {
 		try {
+			validationErrorHandler(req, res, next);
+
 			let data = {
 				content: req.body.content,
 				owner: req.body.profile,
-				media: req.body.media ? req.body.media : "images.jpg",
+				// media: req.body.media ? req.body.media : "images.jpg",
 				comment: req.body.comment,
 				interest: req.body.interest,
 				// likeBy: req.body.likeBy,
 			};
+
+			if ("images" in req) {
+				data.media = req.images;
+			}
 
 			let statusUpdate = await status.findOneAndUpdate(
 				{
@@ -61,57 +90,60 @@ class StatusController {
 				}
 			);
 			if (!statusUpdate) {
-				return res.status(400).json({
-					message: "Status data can't be appeared",
-					error: statusUpdate,
-				});
+				const error = new Error("Status data can't be appeared");
+				error.statusCode = 400;
+				throw error;
 			} else {
-				return res.status(200).json({
+				res.status(200).json({
 					success: true,
 					message: "Success",
 					data: statusUpdate,
 				});
 			}
-		} catch (e) {
-			console.log(e);
-			return res.status(500).json({
-				message: "Internal Server Error",
-				error: e.message,
-			});
+		} catch (err) {
+			console.log(err);
+			if (!err.statusCode) {
+				err.statusCode = 500;
+			}
+			next(err);
 		}
 	}
 
 	//TODO : Get status/post by User
-	async getStatusByUser(req, res) {
+	async getStatusByUser(req, res, next) {
 		try {
+			validationErrorHandler(req, res, next);
+
 			let statusUsers = await status
 				.find({ owner: req.profile.id })
 				.sort({ updated_at: -1 })
 				.populate("interest");
 
 			if (!statusUsers) {
-				return res.status(400).json({
-					message: "Status user can't be appeared",
-					error: statusUsers,
-				});
+				const error = new Error("Status user can't be appeared");
+				error.statusCode = 400;
+				throw error;
 			} else {
-				return res.status(200).json({
+				res.status(200).json({
+					success: true,
 					message: "Success",
 					data: statusUsers,
 				});
 			}
-		} catch (e) {
-			console.log(e);
-			return res.status(500).json({
-				message: "Internal Server Error",
-				error: e.message,
-			});
+		} catch (err) {
+			console.log(err);
+			if (!err.statusCode) {
+				err.statusCode = 500;
+			}
+			next(err);
 		}
 	}
 
 	//TODO : Get status/post by interest (all)
-	async getStatusByInterest(req, res) {
+	async getStatusByInterest(req, res, next) {
 		try {
+			validationErrorHandler(req, res, next);
+
 			let limit = req.query.limit ? req.query.limit : 10;
 			let skip = req.query.skip ? req.query.skip : 0;
 			let interestUser = await profile.findOne({ _id: req.profile.id });
@@ -129,72 +161,79 @@ class StatusController {
 				.limit(limit)
 				.skip(skip)
 				.exec();
+
 			if (statusData.length > 0) {
-				return res.status(200).send({
+				res.status(200).send({
+					success: true,
 					message: "success",
 					data: statusData,
 				});
 			} else {
-				return res.status(200).json({
+				res.status(200).json({
+					success: true,
 					message: "success",
 					data: [],
 				});
 			}
-		} catch (e) {
-			console.log(e);
-			return res.status(500).json({
-				message: "Internal Server Error",
-				error: e.message,
-			});
+		} catch (err) {
+			console.log(err);
+			if (!err.statusCode) {
+				err.statusCode = 500;
+			}
+			next(err);
 		}
 	}
 
 	//TODO : Get status/post by interest (single)
-	async getSingleInterest(req, res) {
+	async getSingleInterest(req, res, next) {
 		try {
+			validationErrorHandler(req, res, next);
+
 			let statusData = await status.find({ interest: { $in: [req.params.id] } });
 
 			if (!statusData) {
-				return res.status(400).json({
-					message: "Status data can't be appeared",
-					error: statusData,
-				});
+				const error = new Error("Status data can't be appeared");
+				error.statusCode = 400;
+				throw error;
 			} else {
-				return res.status(200).json({
+				res.status(200).json({
+					success: true,
 					message: "Success",
 					data: statusData,
 				});
 			}
-		} catch (e) {
-			console.log(e);
-			return res.status(500).json({
-				message: "Internal Server Error",
-				error: e.message,
-			});
+		} catch (err) {
+			console.log(err);
+			if (!err.statusCode) {
+				err.statusCode = 500;
+			}
+			next(err);
 		}
 	}
 
 	//TODO : Delete status/post
-	async deleteStatus(req, res) {
+	async deleteStatus(req, res, next) {
 		try {
+			validationErrorHandler(req, res, next);
+
 			let statusDelete = await status.deleteOne({ _id: req.params.id });
+
 			if (!statusDelete) {
-				return res.status(400).json({
-					message: "Delete status failed",
-					error: statusDelete,
-				});
+				const error = new Error("Delete status failed");
+				error.statusCode = 400;
+				throw error;
 			} else {
-				return res.status(200).json({
+				res.status(200).json({
 					success: true,
 					message: "Success",
 				});
 			}
-		} catch (e) {
-			console.log(e);
-			return res.status(500).json({
-				message: "Internal Server Error",
-				error: e.message,
-			});
+		} catch (err) {
+			console.log(err);
+			if (!err.statusCode) {
+				err.statusCode = 500;
+			}
+			next(err);
 		}
 	}
 }

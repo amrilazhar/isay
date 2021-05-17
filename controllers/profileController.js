@@ -92,6 +92,7 @@ class ProfileController {
         populate: { path: "comment_id", select: "content media owner comment likeBy" },
         limit: 10,
         pagination: paginateStatus,
+        
       };
 
       let dataProfile = await activities.paginate(

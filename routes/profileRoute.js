@@ -21,5 +21,6 @@ router.get("/Activities", tokenParser, isAuth, setProfileId, profileController.m
 router.put("/:id", tokenParser, isAuth, setProfileId, profileValidator.profileValidate,profileController.profileUpdate);
 router.put("/Interest/:id", tokenParser, isAuth, setProfileId, profileController.addInterest);
 router.put("/DeleteInt/:id", tokenParser, isAuth, setProfileId, profileController.deleteInterest);
+router.get("/userInterest",tokenParser, isAuth, setProfileId, profileController.getListUserInterest);
 
 module.exports = router;

@@ -17,13 +17,29 @@ const express = require("express");
 const app = express();
 const fileUpload = require("express-fileupload");
 const socketIo = require("socket.io");
-const http = require('http').Server(app);
+const http = require("http").Server(app);
+
+//======================== Socket IO Server =========================
+const io = socketIo(http, {
+	cors: {
+		origin: "*",
+	},
+	path: "/socket",
+	serveClient: false,
+});
+//======================== END SOCKET IO Server=====================
 
 // COR
 app.use(cors());
 
 const admin = require("./utils/firebase");
 // const mongooseConnect = require("./utils/database");
+
+// Assign socket object to every request
+app.use((req, res, next) => {
+	req.io = io;
+	next();
+});
 
 //Set body parser for HTTP post operation
 app.use(express.json()); // support json encoded bodies
@@ -38,17 +54,6 @@ app.use(fileUpload()); //support Form Data
 
 //set static assets to public directory
 app.use(express.static("public"));
-
-// ROUTES DECLARATION & IMPORT
-
-const userRoutes = require("./routes/userRoute.js");
-app.use("/user", userRoutes);
-
-const activitiesRoutes = require("./routes/activitiesRoute.js");
-app.use("/activity", activitiesRoutes);
-
-const utilsRoutes = require("./routes/utilsRoute.js");
-app.use("/utils", utilsRoutes);
 
 //======================== security code ==============================//
 // Sanitize data
@@ -92,55 +97,30 @@ if (process.env.NODE_ENV === "development") {
 
 //======================== end security code ==============================//
 
-//======================== Socket IO Server =========================
-const io = socketIo(http, {
-	cors: {
-		origin: "*",
-	},
-	path: "/socket",
-	serveClient: false,
-});
+// ============== ROUTES DECLARATION & IMPORT ====================== //
+
+const userRoutes = require("./routes/userRoute.js");
+app.use("/user", userRoutes);
+
+const activitiesRoutes = require("./routes/activitiesRoute.js");
+app.use("/activity", activitiesRoutes);
+
+const utilsRoutes = require("./routes/utilsRoute.js");
+app.use("/utils", utilsRoutes);
 
 const chatRoutes = require("./routes/chatRoute.js");
-app.use(
-	"/chat",
-	(req, res, next) => {
-		req.io = io;
-		next();
-	},
-	chatRoutes
-);
+app.use("/chat", chatRoutes);
 
 const commentRoutes = require("./routes/commentRoute.js");
-app.use(
-	"/comment",
-	(req, res, next) => {
-		req.io = io;
-		next();
-	},
-	commentRoutes
-);
+app.use("/comment",	commentRoutes);
 
 const profileRoutes = require("./routes/profileRoute.js");
-app.use(
-	"/profile",
-	(req, res, next) => {
-		req.io = io;
-		next();
-	},
-	profileRoutes
-);
+app.use("/profile",	profileRoutes);
 
 const statusRoutes = require("./routes/statusRoute.js");
-app.use(
-	"/status",
-	(req, res, next) => {
-		req.io = io;
-		next();
-	},
-	statusRoutes
-);
-//======================== END SOCKET IO Server=====================
+app.use("/status", statusRoutes);
+
+// ============== END ROUTES DECLARATION & IMPORT ====================== //
 
 //========================= Error Handler ==========================
 app.use((err, req, res, next) => {
@@ -155,8 +135,6 @@ app.use((err, req, res, next) => {
 //======================== Listen Server ===========================
 if (process.env.NODE_ENV !== "test") {
 	let PORT = 3000;
-	http.listen(PORT, () =>
-		console.log(`server running on PORT : ${PORT}`)
-	);
+	http.listen(PORT, () => console.log(`server running on PORT : ${PORT}`));
 } else module.exports = app;
 //======================== End Listen Server =======================

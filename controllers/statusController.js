@@ -22,14 +22,6 @@ class StatusController {
 				data.media = req.images;
 			}
 
-			if ("parent_id" in req.body) {
-				data.parent_id = req.body.parent_id;
-			}
-			
-			if ("depth" in req.body) {
-				data.depth = req.body.depth;
-			}
-
 			let statusCreate = await status.create(data);
 
 			if (!statusCreate) {

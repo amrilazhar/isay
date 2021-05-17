@@ -30,12 +30,11 @@ class StatusController {
 				throw error;
 			} else {
 				// Socket io
-				req.io.emit("status:" + req.body.interest, statusCreate);
+				req.io.emit("create status:" + statusCreate, statusCreate);
 
 				await activities.create({
 					type: "post_status",
 					status_id: statusCreate._id,
-					comment_id: null,
 					owner: req.profile.id,
 				});
 
@@ -86,6 +85,9 @@ class StatusController {
 				error.statusCode = 400;
 				throw error;
 			} else {
+				// Socket io
+				req.io.emit("update status:" + statusUpdate, statusUpdate);
+
 				res.status(200).json({
 					success: true,
 					message: "Success",
@@ -116,6 +118,9 @@ class StatusController {
 				error.statusCode = 400;
 				throw error;
 			} else {
+				// Socket io
+				req.io.emit("show all user status:" + statusUsers, statusUsers);
+
 				res.status(200).json({
 					success: true,
 					message: "Success",
@@ -161,6 +166,9 @@ class StatusController {
 					data: statusData,
 				});
 			} else {
+				// Socket io
+				req.io.emit("show all interest status:" + statusData, statusData);
+
 				res.status(200).json({
 					success: true,
 					message: "success",
@@ -188,6 +196,9 @@ class StatusController {
 				error.statusCode = 400;
 				throw error;
 			} else {
+				// Socket io
+				req.io.emit("show single interest status:" + statusData, statusData);
+
 				res.status(200).json({
 					success: true,
 					message: "Success",
@@ -215,6 +226,9 @@ class StatusController {
 				error.statusCode = 400;
 				throw error;
 			} else {
+				// Socket io
+				req.io.emit("delete status:" + statusDelete, statusDelete);
+				
 				res.status(200).json({
 					success: true,
 					message: "Success",

@@ -4,7 +4,7 @@ const mongoosePaginate = require('mongoose-paginate-v2');
 
 const ActivitiesSchema = new mongoose.Schema(
   {
-    type: {
+    activities_type: {
       type: String,
       required: false,
     },

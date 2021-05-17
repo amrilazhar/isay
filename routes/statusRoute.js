@@ -3,7 +3,6 @@ const router = express.Router();
 
 // IMPORT CONTROLLER HERE
 const statusController = require("../controllers/statusController");
-const activitiesController = require("../controllers/activitiesController");
 const imageUpload = require("../middlewares/upload/images");
 // IMPORT MIDDLEWARE HERE
 const statusValidator = require("../middlewares/validators/statusValidator");
@@ -29,9 +28,10 @@ router.post(
 	tokenParser,
 	isAuth,
 	setProfileId,
+	dir,
+	imageUpload,
 	statusValidator.create,
-	statusController.createStatus,
-	activitiesController.createActivity
+	statusController.createStatus
 );
 router.get(
 	"/users/",
@@ -62,6 +62,8 @@ router.put(
 	tokenParser,
 	isAuth,
 	setProfileId,
+	dir,
+	imageUpload,
 	statusValidator.update,
 	statusController.updateStatus
 );

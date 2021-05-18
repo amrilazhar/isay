@@ -1,24 +1,80 @@
 const express = require("express");
 const router = express.Router();
 
-// IMPORT AUTH HERE
-let authDummy = (req, res, next) => {
-	req.profile = { id: "608ac628c8d0a1bfded19469" };
-	next();
-};
-
+// IMPORT CONTROLLER HERE
+const statusController = require("../controllers/statusController");
+const imageUpload = require("../middlewares/upload/images");
 // IMPORT MIDDLEWARE HERE
 const statusValidator = require("../middlewares/validators/statusValidator");
 
-// IMPORT CONTROLLER HERE
-const statusController = require("../controllers/statusController");
+// IMPORT AUTH HERE
+const tokenParser = require("../middlewares/authentication/tokenParser");
+const isAuth = require("../middlewares/authentication/isAuth");
+
+// SET VARIABLE PROFILE ID
+let setProfileId = (req, res, next) => {
+	req.profile = { id: req.user.profile };
+	next();
+};
+
+let dir = (req, res, next) => {
+	req.directory = "images/status";
+	next();
+};
 
 // SET ROUTER HERE
-router.post("/", authDummy, statusValidator.create, statusController.createStatus);
-router.get("/users/", authDummy, statusValidator.user, statusController.getStatusByUser);
-router.get("/interest/", authDummy, statusValidator.interest, statusController.getStatusByInterest);
-router.get("/interest/:id", authDummy, statusValidator.single, statusController.getSingleInterest);
-router.put("/:id", authDummy,statusValidator.update, statusController.updateStatus);
-router.delete("/:id", authDummy,statusValidator.delete, statusController.deleteStatus);
+router.post(
+	"/",
+	tokenParser,
+	isAuth,
+	setProfileId,
+	dir,
+	imageUpload,
+	statusValidator.create,
+	statusController.createStatus
+);
+router.get(
+	"/users/",
+	tokenParser,
+	isAuth,
+	setProfileId,
+	statusValidator.user,
+	statusController.getStatusByUser
+);
+router.get(
+	"/interest/",
+	tokenParser,
+	isAuth,
+	setProfileId,
+	statusValidator.interest,
+	statusController.getStatusByInterest
+);
+router.get(
+	"/interest/:id",
+	tokenParser,
+	isAuth,
+	setProfileId,
+	statusValidator.single,
+	statusController.getSingleInterest
+);
+router.put(
+	"/:id",
+	tokenParser,
+	isAuth,
+	setProfileId,
+	dir,
+	imageUpload,
+	statusValidator.update,
+	statusController.updateStatus
+);
+router.delete(
+	"/:id",
+	tokenParser,
+	isAuth,
+	setProfileId,
+	statusValidator.delete,
+	statusController.deleteStatus
+);
 
+// EXPORTS MODULE HERE
 module.exports = router;

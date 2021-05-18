@@ -15,8 +15,8 @@ let setProfileId = (req, res, next) => {
 };
 
 // SET ROUTER HERE
-router.post("/joinRoom", tokenParser, isAuth, setProfileId, chatController.joinRoom, startSocketChat);
-router.get("/messageHistory/:chatRoom", tokenParser, isAuth, setProfileId, chatController.getMessageHistory);
+router.post("/joinRoom", tokenParser, isAuth, setProfileId, chatController.joinRoom);
+router.get("/messageHistory/:chatRoom", tokenParser, isAuth, setProfileId, chatController.getMessageHistory,startSocketChat);
 router.get("/roomList",tokenParser, isAuth, setProfileId, chatController.getRoomList )
 
 module.exports = router;

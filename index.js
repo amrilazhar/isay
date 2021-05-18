@@ -38,6 +38,13 @@ const admin = require("./utils/firebase");
 // Assign socket object to every request
 app.use((req, res, next) => {
 	req.io = io;
+
+	//remove all listener before start connection, it's useful when user refresh page multiple times,
+    //becaus if it's not removed then the other listener will emit the same thing to the user that can cause multiple message send
+	req.io.removeAllListeners("connection");
+	req.io.on('connection', (socket)=>{
+		req.socket = socket;
+	})
 	next();
 });
 
@@ -112,10 +119,10 @@ const chatRoutes = require("./routes/chatRoute.js");
 app.use("/chat", chatRoutes);
 
 const commentRoutes = require("./routes/commentRoute.js");
-app.use("/comment",	commentRoutes);
+app.use("/comment", commentRoutes);
 
 const profileRoutes = require("./routes/profileRoute.js");
-app.use("/profile",	profileRoutes);
+app.use("/profile", profileRoutes);
 
 const statusRoutes = require("./routes/statusRoute.js");
 app.use("/status", statusRoutes);

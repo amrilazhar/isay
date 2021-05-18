@@ -6,3 +6,4 @@ coverage
 .prettierrc
 functions
 .gitlab-ci.yml
+yarn.lock

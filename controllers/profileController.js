@@ -57,7 +57,7 @@ class ProfileController {
       };
 
       let dataProfile = await status.paginate(
-        { profile_id: req.profile.id },
+        { owner: req.profile.id },
         options
       );
       req.io.emit("my profile's post:" + dataProfile, dataProfile);
@@ -86,16 +86,16 @@ class ProfileController {
       }
 
       const options = {
-        select: "status_id activities_type comment_id owner",
+        select: "activities_type status_id comment_id owner",
         sort: { updated_at: -1 },
         page: 1,
-        populate: { path: "comment_id", select: "content media owner comment likeBy" },
         limit: 10,
         pagination: paginateStatus,
+        
       };
 
       let dataProfile = await activities.paginate(
-        { profile_id: req.profile.id },
+        { owner : req.profile.id },
         options
       );
       req.io.emit("my profile's activities:" + dataProfile, dataProfile);

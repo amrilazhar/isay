@@ -14,15 +14,15 @@ class ProfileValidator {
           );
         }
 
-        // if (!validator.isAlpha(validator.blacklist(req.body.name, " "))) {
-        //   errors.push("Name must be alphabet");
-        // }
+        if (!validator.isAlpha(validator.blacklist(req.body.name, " "))) {
+          errors.push("Name must be alphabet");
+        }
 
-        // if (!mongoose.Types.ObjectId.isValid(req.body.user)) {
-        //   errors.push(
-        //     "id user is not valid and must be 24 character & hexadecimal"
-        //   );
-        // }
+        if (!mongoose.Types.ObjectId.isValid(req.body.user)) {
+          errors.push(
+            "id user is not valid and must be 24 character & hexadecimal"
+          );
+        }
       }
 
       if (errors.length > 0) {

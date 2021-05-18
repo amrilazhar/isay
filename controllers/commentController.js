@@ -175,7 +175,7 @@ class CommentController {
 		}
 	}
 
-	//===============================|| add like ||=========================//
+	//===============================|| remove like ||=========================//
 
 	async removeLike(req, res, next) {
 		try {

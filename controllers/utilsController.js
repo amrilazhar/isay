@@ -1,6 +1,7 @@
 const { interest, location } = require("../models");
 const file = require("fs");
 const brain = require("brain.js");
+const { nextTick } = require("process");
 
 class UtilsController {
   async getAllLocation(req, res) {
@@ -113,14 +114,20 @@ class UtilsController {
         iii: interestThree,
       });
       let tempS = sapaan.run({ g: genderParam, p: province });
-      console.log(Math.floor(tempS.sapa * 100)," ", Math.floor(tempN.name * 1000));
+      console.log(
+        Math.floor(tempS.sapa * 100),
+        " ",
+        Math.floor(tempN.name * 1000)
+      );
       const generatedName = `${greeting[Math.floor(tempS.sapa * 100)]}.${
-        charName[Math.floor(tempN.name * 1000)]}.#${Math.floor(Math.random()*9999)}`;
+        charName[Math.floor(tempN.name * 1000)]
+      }.#${Math.floor(Math.random() * 9999)}`;
 
       let avatar = "https://robohash.org/avatar" + randomTen;
 
-      return res.status(200).json({ name: generatedName, avatar: avatar });
-
+      req.body.name = generatedName;
+      req.body.avatar = avatar;
+      next();
     } catch (error) {
       console.log(error);
       return res.status(500).json({ message: "internal server error" });

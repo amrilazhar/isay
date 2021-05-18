@@ -6,6 +6,7 @@ const userController = require("../controllers/userController");
 const tokenParser = require("../middlewares/authentication/tokenParser");
 const isAuth = require("../middlewares/authentication/isAuth");
 const isLoggedIn = require("../middlewares/authentication/isLoggedIn");
+const utilsController = require("../controllers/utilsController");
 
 const userValidator = require("../middlewares/validators/userValidator");
 
@@ -72,6 +73,15 @@ router.put(
 	isAuth,
 	userValidator.updateUser,
 	userController.updateUser
+);
+
+/* POST create first Profile.*/
+router.post(
+	"/first_profile",
+	tokenParser,
+	isAuth,
+	utilsController.generateBasicProfile,
+	userController.createFirstProfile
 );
 
 module.exports = router;

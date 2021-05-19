@@ -4,19 +4,17 @@ const mongoose = require("mongoose");
 class CommentValidator {
 	async commentValidate(req, res, next) {
 		try {
+			console.log();
 			let act = req.route.path;
 			let errors = [];
 
 			if (act === "/") {
-        
 				if (req.body.owner.toString() !== req.profile.id.toString()) {
-					errors.push(
-						"id owner is not same"
-					);
+					errors.push("id owner is not same");
 				}
-      }
+			}
 
-			if ((errors.length > 0)) {
+			if (errors.length > 0) {
 				return res.status(400).json({
 					message: errors,
 				});

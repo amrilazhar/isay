@@ -57,7 +57,7 @@ class ProfileController {
       };
 
       let dataProfile = await status.paginate(
-        { owner: req.query.profile.id },
+        { owner: req.profile.id },
         options
       );
       req.io.emit("my profile's post:" + dataProfile, dataProfile);
@@ -96,7 +96,7 @@ class ProfileController {
       };
       
       let dataProfile = await activities.paginate(
-        { owner : req.query.profile.id },
+        { owner : req.profile.id },
         options
       );
       console.log(dataProfile)

@@ -202,7 +202,7 @@ class CommentController {
 					message: "Success",
 					data: deleteLike,
 				});
-				else await activities.deleteOne({ _id: req.params.id })
+				await activities.deleteOne({ _id: req.params.id });
 			next();
 		} catch (err) {
 			console.log(err);

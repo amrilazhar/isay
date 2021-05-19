@@ -9,7 +9,7 @@ class CommentValidator {
 
 			if (act === "/") {
         
-				if (req.body.owner !== req.profile.id) {
+				if (req.body.owner.toString() !== req.profile.id.toString()) {
 					errors.push(
 						"id owner is not same"
 					);

@@ -40,7 +40,7 @@ class UtilsController {
     }
   }
 
-  async generateBasicProfile(req, res) {
+  async generateBasicProfile(req, res, next) {
     try {
       //create parameter for generate name
       let genderParam = Math.floor(Math.random() * 2);
@@ -64,12 +64,15 @@ class UtilsController {
 
       //convert interest to number that can be use by model
       if (!req.body.interest) {
+        let interestAll = await interest.find({}).exec();
         let interestParam = JSON.parse(req.body.interest);
         let interestCont = [];
 
-        interestParam.forEach(async (element) => {
-          let item = await interest.findById(element);
-          interestCont.push(item);
+        interestParam.forEach((element) => {
+          let idx = interesAll.indexOf(element) ;
+          if (idx > -1) {
+            interestCont.push(interestAll[idx]); 
+          }          
         });
 
         interestOne = interestCont[0]

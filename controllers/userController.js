@@ -461,24 +461,18 @@ exports.createFirstProfile = async (req, res, next) => {
       err.statusCode = 400;
       throw err;
     }
-
-    if (typeof req.body.interest == "string") {
-      req.body.interest = [req.body.interest];
-    }
-
-    if (typeof req.body.interest == "string") {
-      req.body.interest = [req.body.activity];
-    }
+    let interest = JSON.parse(req.body.interest);
+    let activity = JSON.parse(req.body.activity);
 
     let profileData = {
       name: req.body.name,
       avatar: req.body.avatar,
       location: req.body.location,
-      interest: req.body.interest,
+      interest: interest,
       user: req.user._id,
     };
 
-	//create first profile data
+    //create first profile data
     let createProfile = await Profile.create(profileData);
 
     if (!createProfile) {
@@ -486,16 +480,35 @@ exports.createFirstProfile = async (req, res, next) => {
       err.statusCode = 400;
       throw err;
     }
-
-	// update profile id on user table
-    await user.findOneAndUpdate(
+    createProfile.populate('interest').execPopulate();
+    // update profile id on user table
+    let updatedProfile = await User.findOneAndUpdate(
       { _id: req.user._id },
-      { profile: createProfile._id }
+      { profile: createProfile._id },
+      { new: true }
+    );
+
+    // create new token for auth in application
+    const token = jwt.sign(
+      {
+        id: updatedProfile._id.toString(),
+        admin: user.admin,
+        profile: updatedProfile.profile,
+      },
+      process.env.JWT_SECRET,
+      { expiresIn: "30d" }
     );
 
     return res.status(200).json({
       success: true,
       message: "Profile Created",
+      data: {
+        token: token,
+        id: updatedProfile._id,
+        name: createProfile.name,
+        avatar: createProfile.avatar,
+        interest : createProfile.interest,
+      },
     });
   } catch (err) {
     if (!err.statusCode) {

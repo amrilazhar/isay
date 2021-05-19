@@ -228,12 +228,68 @@ class StatusController {
 			} else {
 				// Socket io
 				req.io.emit("delete status:" + statusDelete, statusDelete);
-				
+
 				res.status(200).json({
 					success: true,
 					message: "Success",
 				});
 			}
+		} catch (err) {
+			console.log(err);
+			if (!err.statusCode) {
+				err.statusCode = 500;
+			}
+			next(err);
+		}
+	}
+
+	//TODO : Like Status
+	async likeStatus(req, res, next) {
+		try {
+			let findUser = await status.findOne({ _id: req.query.status_id });
+			findUser.likeBy.push(req.profile.id);
+			let insertUser = findUser.save();
+			if (!insertUser) {
+				const error = new Error("Can't like");
+				error.statusCode = 400;
+				throw error;
+			} else
+				res.status(200).json({
+					success: true,
+					message: "Success",
+					data: findUser,
+				});
+		} catch (err) {
+			console.log(err);
+			if (!err.statusCode) {
+				err.statusCode = 500;
+			}
+			next(err);
+		}
+	}
+
+	//TODO : Unlike Status
+	async unlikeStatus(req, res, next) {
+		try {
+			let findUser = await status.findOne({ _id: req.query.status_id });
+			let indexOfLike = findUser.likeBy.indexOf(req.profile.id);
+			findUser.likeBy.splice(indexOfLike, 1);
+			let deleteLike = await status.findOneAndUpdate(
+				{ _id: findUser._id },
+				findUser,
+				{ new: true }
+			);
+			if (!insertUser) {
+				const error = new Error("Data User can't be appeared");
+				error.statusCode = 400;
+				throw error;
+			} else
+				res.status(200).json({
+					success: true,
+					message: "Success",
+					data: deleteLike,
+				});
+			next();
 		} catch (err) {
 			console.log(err);
 			if (!err.statusCode) {

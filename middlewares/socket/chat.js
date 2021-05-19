@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-const { chat } = require("../../models");
+const { chat, notification } = require("../../models");
 const crypto = require("crypto");
 const { S3Client, PutObjectCommand } = require("@aws-sdk/client-s3");
 
@@ -53,6 +53,19 @@ async function startSocketChat(req, res, next) {
             req.io
               .to(req.socket.handshake.query.roomID)
               .emit("messageFromServer", sendMess);
+
+            //emit notification to user
+            let notificationData = {
+              notification_type : 'chat',
+              status_id: null,
+              chatMsg_id: query._id,
+              comment_id: null,
+              owner: message.to,
+              from : from,
+            }
+            await notification.create(notificationData);
+            req.io.emit("chat:"+message.to, notificationData);
+            
           })
           .catch((e) => {
             //emit to specific room if message create message error

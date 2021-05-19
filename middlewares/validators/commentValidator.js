@@ -8,15 +8,12 @@ class CommentValidator {
 			let errors = [];
 
 			if (act === "/") {
-        
-				if (req.data owner !== req.profile.id) {
-					errors.push(
-						"id owner is not same"
-					);
+				if (req.data.owner !== req.profile.id) {
+					errors.push("id owner is not same");
 				}
-      }
+			}
 
-			if ((errors.length > 0)) {
+			if (errors.length > 0) {
 				return res.status(400).json({
 					message: errors,
 				});

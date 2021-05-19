@@ -229,6 +229,8 @@ class StatusController {
 				// Socket io
 				req.io.emit("delete status:" + statusDelete, statusDelete);
 
+				await activities.deleteOne({ _id: req.params.id });
+
 				res.status(200).json({
 					success: true,
 					message: "Success",
@@ -249,16 +251,25 @@ class StatusController {
 			let findUser = await status.findOne({ _id: req.query.status_id });
 			findUser.likeBy.push(req.profile.id);
 			let insertUser = findUser.save();
+
 			if (!insertUser) {
 				const error = new Error("Can't like");
 				error.statusCode = 400;
 				throw error;
-			} else
+			} else {
+
+				await activities.create({
+					type: "like_status",
+					status_id: findUser._id,
+					owner: req.profile.id,
+				});
+
 				res.status(200).json({
 					success: true,
 					message: "Success",
 					data: findUser,
 				});
+			}
 		} catch (err) {
 			console.log(err);
 			if (!err.statusCode) {
@@ -283,12 +294,14 @@ class StatusController {
 				const error = new Error("Data User can't be appeared");
 				error.statusCode = 400;
 				throw error;
-			} else
+			} else {
+				await activities.deleteOne({ _id: req.params.id });
 				res.status(200).json({
 					success: true,
 					message: "Success",
 					data: deleteLike,
 				});
+			}
 			next();
 		} catch (err) {
 			console.log(err);

@@ -9,7 +9,7 @@ class CommentController {
 				.find({ status_id: req.query.status_id })
 				.sort({ _id: 1 })
 				.lean()
-				.exec(); //id status			
+				.exec(); //id status
 
 			let rec = (comment, threads) => {
 				for (let thread in threads) {
@@ -26,7 +26,8 @@ class CommentController {
 				}
 			};
 
-			let threads = {}, komentar;
+			let threads = {},
+				komentar;
 			for (let i = 0; i < dataComment.length; i++) {
 				komentar = dataComment[i];
 				komentar["children"] = {};
@@ -35,7 +36,7 @@ class CommentController {
 					threads[komentar._id] = komentar;
 					continue;
 				}
-				
+
 				rec(komentar, threads);
 			}
 
@@ -166,11 +167,11 @@ class CommentController {
 					message: "Success",
 					data: findUser,
 				});
-				await activities.create({
-					type: "like_comment",
-					comment_id: findUser._id,
-					owner: req.profile.id,
-				});
+			await activities.create({
+				type: "like_comment",
+				comment_id: findUser._id,
+				owner: req.profile.id,
+			});
 		} catch (err) {
 			console.log(err);
 			if (!err.statusCode) {
@@ -196,13 +197,15 @@ class CommentController {
 				const error = new Error("Data User can't be appeared");
 				error.statusCode = 400;
 				throw error;
-			} else
+			} else {
+				await activities.deleteOne({ _id: req.params.id });
+
 				res.status(200).json({
 					success: true,
 					message: "Success",
 					data: deleteLike,
 				});
-				else await activities.deleteOne({ _id: req.params.id })
+			}
 			next();
 		} catch (err) {
 			console.log(err);

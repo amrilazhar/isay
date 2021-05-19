@@ -38,7 +38,7 @@ router.get(
 	tokenParser,
 	isAuth,
 	setProfileId,
-	statusValidator.user,
+	// statusValidator.user,
 	statusController.getStatusByUser
 );
 router.get(
@@ -46,7 +46,7 @@ router.get(
 	tokenParser,
 	isAuth,
 	setProfileId,
-	statusValidator.interest,
+	// statusValidator.interest,
 	statusController.getStatusByInterest
 );
 router.get(

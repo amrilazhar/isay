@@ -88,16 +88,18 @@ class ProfileController {
       const options = {
         select: "activities_type status_id comment_id owner",
         sort: { updated_at: -1 },
+       populate: { path: "status_id", select: "content owner media comment interest likeBy timestamps" },
+       populate: {path: "comment_id", select: "content owner media comment likeBy timestamps"},
         page: 1,
         limit: 10,
         pagination: paginateStatus,
-        
       };
-
+      
       let dataProfile = await activities.paginate(
         { owner : req.profile.id },
         options
       );
+      console.log(dataProfile)
       req.io.emit("my profile's activities:" + dataProfile, dataProfile);
       res.status(200).json({
         success: true,

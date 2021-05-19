@@ -57,7 +57,7 @@ class ProfileController {
       };
 
       let dataProfile = await status.paginate(
-        { owner: req.profile.id },
+        { owner: req.query.profile.id },
         options
       );
       req.io.emit("my profile's post:" + dataProfile, dataProfile);
@@ -96,7 +96,7 @@ class ProfileController {
       };
       
       let dataProfile = await activities.paginate(
-        { owner : req.profile.id },
+        { owner : req.query.profile.id },
         options
       );
       console.log(dataProfile)
@@ -128,7 +128,7 @@ class ProfileController {
       };
 
       let dataProfile = await profile.findOneAndUpdate(
-        { _id: req.profile.id },
+        { _id: req.params.id },
         profileData,
         { new: true }
       );
@@ -157,7 +157,7 @@ class ProfileController {
 
   async addInterest(req, res) {
     try {
-      let findUser = await profile.findOne({ _id: req.profile.id });
+      let findUser = await profile.findOne({ _id: req.params.id });
       findUser.interest.push(req.query.id_interest);
 
       let insertUser = await profile.findOneAndUpdate(
@@ -187,7 +187,7 @@ class ProfileController {
   //===========================|| delete Interest ||========================//
   async deleteInterest(req, res) {
     try {
-      let findUser = await profile.findOne({ _id: req.profile.id });
+      let findUser = await profile.findOne({ _id: req.params.id });
       let indexOfInterest = findUser.interest.indexOf(req.query.id_interest);
       if (indexOfInterest < 0) {
         const error = new Error("Interest name has not been added at Interest");

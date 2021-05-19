@@ -9,9 +9,9 @@ class CommentValidator {
 
 			if (act === "/") {
         
-				if (!mongoose.Types.ObjectId.isValid(req.body.status_id)) {
+				if (req.data owner !== req.profile.id) {
 					errors.push(
-						"id status is not valid and must be 24 character & hexadecimal"
+						"id owner is not same"
 					);
 				}
       }

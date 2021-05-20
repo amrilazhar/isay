@@ -1,7 +1,6 @@
 const { interest, location } = require("../models");
 const file = require("fs");
 const brain = require("brain.js");
-const { nextTick } = require("process");
 
 class UtilsController {
   async getAllLocation(req, res) {
@@ -10,12 +9,21 @@ class UtilsController {
       let dataLoc = await location.find().exec();
 
       //check if data empty
-      if (!dataLoc) return res.status(400).json({ message: "data empty" });
+      if (!dataLoc) {
+        const err = new Error("Data Location Empty");
+        err.statusCode = 400;
+        throw err;
+      }
 
       //send data
-      return res.status(200).json({ message: "success", data: dataLoc });
+      return res
+        .status(200)
+        .json({ success: true, message: "success", data: dataLoc });
     } catch (error) {
-      return res.status(500).json({ message: "internal server error" });
+      if (!error.statusCode) {
+        error.statusCode = 500;
+      }
+      next(error);
     }
   }
 
@@ -30,13 +38,21 @@ class UtilsController {
       let dataLoc = await interest.find(category).exec();
 
       //check if data empty
-      if (!dataLoc) return res.status(400).json({ message: "data empty" });
+      if (!dataLoc) {
+        const err = new Error("Data Interest Empty");
+        err.statusCode = 400;
+        throw err;
+      }
 
       //send data
-      return res.status(200).json({ message: "success", data: dataLoc });
+      return res
+        .status(200)
+        .json({ success: true, message: "success", data: dataLoc });
     } catch (error) {
-      console.log(error);
-      return res.status(500).json({ message: "internal server error" });
+      if (!error.statusCode) {
+        error.statusCode = 500;
+      }
+      next(error);
     }
   }
 
@@ -69,10 +85,10 @@ class UtilsController {
         let interestCont = [];
 
         interestParam.forEach((element) => {
-          let idx = interesAll.indexOf(element) ;
+          let idx = interesAll.indexOf(element);
           if (idx > -1) {
-            interestCont.push(interestAll[idx]); 
-          }          
+            interestCont.push(interestAll[idx]);
+          }
         });
 
         interestOne = interestCont[0]
@@ -133,7 +149,10 @@ class UtilsController {
       next();
     } catch (error) {
       console.log(error);
-      return res.status(500).json({ message: "internal server error" });
+      if (!error.statusCode) {
+        error.statusCode = 500;
+      }
+      next(error);
     }
   }
 }

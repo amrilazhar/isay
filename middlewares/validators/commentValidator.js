@@ -11,14 +11,25 @@ class CommentValidator {
 			if (act === "/") {
 				if (req.body.owner.toString() !== req.profile.id.toString()) {
 					errors.push("id owner is not same");
-				}
-			}
+				};
+				if (!mongoose.Types.ObjectId.isValid(req.body.status_id)) {
+					errors.push(
+						"id status is not valid and must be 24 character & hexadecimal"
+					);
+				};
+			};
 
-			if (errors.length > 0) {
+			
+			if (errors.length == 1) {
 				return res.status(400).json({
 					message: errors,
 				});
-			}
+			}; 
+			if (errors.length > 1) {
+				return res.status(400).json({
+					message: errors.join(",and "),
+				});
+			};
 			// Go to next
 			next();
 		} catch (err) {

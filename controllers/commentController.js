@@ -9,7 +9,7 @@ class CommentController {
 				.find({ status_id: req.query.status_id })
 				.sort({ _id: 1 })
 				.lean()
-				.exec(); //id status			
+				.exec(); //id status
 
 			let rec = (comment, threads) => {
 				for (let thread in threads) {
@@ -26,7 +26,8 @@ class CommentController {
 				}
 			};
 
-			let threads = {}, komentar;
+			let threads = {},
+				komentar;
 			for (let i = 0; i < dataComment.length; i++) {
 				komentar = dataComment[i];
 				komentar["children"] = {};
@@ -35,7 +36,7 @@ class CommentController {
 					threads[komentar._id] = komentar;
 					continue;
 				}
-				
+
 				rec(komentar, threads);
 			}
 
@@ -60,6 +61,33 @@ class CommentController {
 		}
 	}
 
+	//===============================|| get one  comment ||=========================//
+
+	async getOneComment(req, res, next) {
+		try {
+			//find user id
+			let dataComment = await comment
+				.findOne({ _id: req.params.id })
+				.populate({
+					path: "status",
+					select: "content owner media interest likeBy",
+				})
+				.exec();
+			req.io.emit("comment " + dataProfile, dataProfile);
+
+			res.status(200).json({
+				success: true,
+				message: "Success",
+				data: dataComment,
+			});
+		} catch (err) {
+			console.log(err);
+			if (!err.statusCode) {
+				err.statusCode = 500;
+			}
+			next(err);
+		}
+	}
 	//===============================|| create  comment ||=========================//
 	async postComment(req, res, next) {
 		try {
@@ -115,7 +143,6 @@ class CommentController {
 	async updateComment(req, res, next) {
 		try {
 			let data = {
-				status_id: req.body.status_id,
 				content: req.body.content,
 				owner: req.profile.id,
 			};
@@ -154,23 +181,23 @@ class CommentController {
 	async addLike(req, res, next) {
 		try {
 			let findUser = await comment.findOne({ _id: req.params.id });
-			findUser.likeBy.push(req.query.profile.id);
-			let insertUser = findUser.save();
-			if (!insertUser) {
-				const error = new Error("Can't like");
+			if (findUser.likeBy.includes(req.profile.id)) {
+				const error = new Error("You can't like twice");
 				error.statusCode = 400;
 				throw error;
-			} else
-				res.status(200).json({
-					success: true,
-					message: "Success",
-					data: findUser,
-				});
-				await activities.create({
-					type: "like_comment",
-					comment_id: findUser._id,
-					owner: req.profile.id,
-				});
+			  } else
+			  findUser.likeBy.push(req.profile.id);
+			  findUser.save();
+			res.status(200).json({
+				success: true,
+				message: "Success",
+				data: findUser,
+			});
+			await activities.create({
+				type: "like_comment",
+				comment_id: findUser._id,
+				owner: req.profile.id,
+			});
 		} catch (err) {
 			console.log(err);
 			if (!err.statusCode) {
@@ -185,24 +212,19 @@ class CommentController {
 	async removeLike(req, res, next) {
 		try {
 			let findUser = await comment.findOne({ _id: req.params.id });
-			let indexOfLike = findUser.likeBy.indexOf(req.query.profile.id);
+			let indexOfLike = findUser.likeBy.indexOf(req.profile.id);
 			findUser.likeBy.splice(indexOfLike, 1);
 			let deleteLike = await comment.findOneAndUpdate(
 				{ _id: findUser._id },
 				findUser,
 				{ new: true }
 			);
-			if (!insertUser) {
-				const error = new Error("Data User can't be appeared");
-				error.statusCode = 400;
-				throw error;
-			} else
-				res.status(200).json({
-					success: true,
-					message: "Success",
-					data: deleteLike,
-				});
-				await activities.deleteOne({ _id: req.params.id });
+			res.status(200).json({
+				success: true,
+				message: "Success",
+				data: deleteLike,
+			});
+			await activities.deleteOne({ _id: req.params.id });
 			next();
 		} catch (err) {
 			console.log(err);

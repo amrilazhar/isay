@@ -25,9 +25,9 @@ let dir = (req,res,next) => {
 // SET ROUTER COMMENT HERE
 router.get("/", tokenParser, isAuth, setProfileId,commentController.getAllComment);
 router.post("/", tokenParser, isAuth, setProfileId, dir, imageUpload, commentValidator.commentValidate, commentController.postComment);
-router.put("/:id", tokenParser, isAuth,  setProfileId, dir, imageUpload, commentController.updateComment);
+router.put("/:id", tokenParser, isAuth,  setProfileId, dir, imageUpload, commentValidator.updateValidate, commentController.updateComment);
 router.delete("/:id", tokenParser, isAuth, setProfileId,commentController.deleteComment);
-router.put("/addLike", tokenParser, isAuth, setProfileId,commentController.addLike);
-router.put("/removeLike", tokenParser, isAuth, setProfileId,commentController.removeLike);
+router.put("/addLike/:id", tokenParser, isAuth, setProfileId,commentValidator.likeValidate,commentController.addLike);
+router.put("/removeLike/:id", tokenParser, isAuth, setProfileId,commentController.removeLike);
 
 module.exports = router;

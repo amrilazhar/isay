@@ -153,8 +153,8 @@ class CommentController {
 
 	async addLike(req, res, next) {
 		try {
-			let findUser = await comment.findOne({ _id: req.query.id_comment });
-			findUser.likeBy.push(req.profile.id);
+			let findUser = await comment.findOne({ _id: req.params.id });
+			findUser.likeBy.push(req.query.profile.id);
 			let insertUser = findUser.save();
 			if (!insertUser) {
 				const error = new Error("Can't like");
@@ -184,8 +184,8 @@ class CommentController {
 
 	async removeLike(req, res, next) {
 		try {
-			let findUser = await comment.findOne({ _id: req.query.id_comment });
-			let indexOfLike = findUser.likeBy.indexOf(req.profile.id);
+			let findUser = await comment.findOne({ _id: req.params.id });
+			let indexOfLike = findUser.likeBy.indexOf(req.query.profile.id);
 			findUser.likeBy.splice(indexOfLike, 1);
 			let deleteLike = await comment.findOneAndUpdate(
 				{ _id: findUser._id },

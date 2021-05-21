@@ -65,15 +65,14 @@ class CommentController {
 
 	async getOneComment(req, res, next) {
 		try {
-			//find user id
 			let dataComment = await comment
 				.findOne({ _id: req.params.id })
 				.populate({
-					path: "status",
+					path: "status_id",
 					select: "content owner media interest likeBy",
 				})
 				.exec();
-			req.io.emit("comment " + dataProfile, dataProfile);
+			req.io.emit("comment " + dataComment, dataComment);
 
 			res.status(200).json({
 				success: true,

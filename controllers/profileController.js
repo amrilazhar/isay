@@ -114,7 +114,7 @@ class ProfileController {
 	}
 
 		//=====================|| view another profile ||=================//
-		async anotherProfile(req, res) {
+		async anotherProfile(req, res, next) {
 			try {
 				//find user id
 				let dataProfile = await profile
@@ -145,7 +145,7 @@ class ProfileController {
 		}
 	
 		//=====================|| my profile post ||=================//
-		async anotherProfilePost(req, res) {
+		async anotherProfilePost(req, res, next) {
 			try {
 				let paginateStatus = true;
 				if (req.query.pagination) {
@@ -155,6 +155,7 @@ class ProfileController {
 				}
 	
 				const options = {
+					path: "status",
 					select: "content media comment likeBy",
 					sort: { updated_at: -1 },
 					page: 1,
@@ -179,7 +180,7 @@ class ProfileController {
 		}
 		//======================|| my profile activity ||====================//
 	
-		async anotherProfileActivities(req, res) {
+		async anotherProfileActivities(req, res, next) {
 			try {
 				let paginateStatus = true;
 				if (req.query.pagination) {
@@ -189,6 +190,7 @@ class ProfileController {
 				}
 	
 				const options = {
+					path: "activities",
 					select: "activities_type status_id comment_id owner",
 					sort: { updated_at: -1 },
 					populate: {

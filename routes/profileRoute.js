@@ -15,9 +15,18 @@ let setProfileId = (req, res, next) => {
 	next();
   };
 // SET ROUTER PROFILE HERE
+
+//view our profile
 router.get("/getProfile/:id", tokenParser, isAuth, setProfileId, profileController.myProfile);
 router.get("/Post", tokenParser, isAuth, setProfileId, profileController.myProfilePost);
 router.get("/Activities", tokenParser, isAuth, setProfileId, profileController.myProfileActivities);
+
+//view another profile
+router.get("/an/:id", tokenParser, isAuth, setProfileId, profileController.anotherProfile);
+router.get("/an/Post/:id", tokenParser, isAuth, setProfileId, profileController.anotherProfilePost);
+router.get("/an/Activities/:id", tokenParser, isAuth, setProfileId, profileController.anotherProfileActivities);
+
+//edit our profile
 router.put("/:id", tokenParser, isAuth, setProfileId, profileValidator.profileValidate,profileController.profileUpdate);
 router.put("/Interest/:id", tokenParser, isAuth, setProfileId, profileController.addInterest);
 router.put("/DeleteInt/:id", tokenParser, isAuth, setProfileId, profileController.deleteInterest);

@@ -10,14 +10,11 @@ class CommentValidator {
 			if (act === "/") {
 				if (req.body.owner.toString() !== req.profile.id.toString()) {
 					errors.push("id owner is not same");
-<<<<<<< HEAD
-=======
 				}
 				if (!mongoose.Types.ObjectId.isValid(req.body.status_id)) {
 					errors.push(
 						"id owner is not same"
 					);
->>>>>>> 088f3b232abce169c4f04a6e2393d72bf28f5af5
 				}
 			}
 

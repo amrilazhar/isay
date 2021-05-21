@@ -316,7 +316,7 @@ class StatusController {
 
         statusData = await status
           .find({
-            content: { $regex: regex, $options: "gi" },
+            content: { $regex: regex, $options: "i" },
             owner: req.params.id,
           })
           .sort({ updated_at: -1 })

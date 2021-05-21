@@ -5,11 +5,11 @@ class ChatController {
   //get message history when starting conversation
   async getMessageHistory(req, res, next) {
     try {
-      let limit = req.query.limit ? req.query.limit : 30;
-      let skip = req.query.skip ? req.query.skip : 0;
+      let limit = eval(req.query.limit) ? eval(req.query.limit) : 100;
+      let skip = eval(req.query.skip) ? eval(req.query.skip) : 0;
       let dataMessage = await chat.message
         .find({ chatRoom: req.params.chatRoom })
-        .sort({ updated_at: 1 })
+        .sort({ created_at: -1 })
         .populate("from", "name avatar")
         .populate("to", "name avatar")
         .limit(limit)
@@ -17,15 +17,15 @@ class ChatController {
         .exec();
 
       if (dataMessage.length > 0) {
-		res
-          .status(200)
-          .send({ success: true, message: "success", data: dataMessage });
+        res.status(200).send({
+          success: true,
+          message: "success",
+          data: dataMessage.reverse(),
+        });
       } else {
-        res
-          .status(200)
-          .json({ success: true, message: "success", data: [] });
+        res.status(200).json({ success: true, message: "success", data: [] });
       }
-	  next();
+      next();
     } catch (error) {
       console.log(error);
       if (!err.statusCode) {
@@ -115,6 +115,49 @@ class ChatController {
       return res
         .status(200)
         .json({ success: true, message: "success", data: roomList });
+    } catch (error) {
+      console.log(error);
+      if (!err.statusCode) {
+        err.statusCode = 500;
+      }
+      next(err);
+    }
+  }
+
+  async loadOlderMessage(req, res, next) {
+    try {
+      let limit = eval(req.query.limit) ? eval(req.query.limit) : 30;
+      let dataMessage = await chat.message
+        .find({
+          _id: { $lt: req.query.lastMessage },
+          chatRoom: req.query.chatRoom,
+        })
+        .sort({ created_at: -1 })
+        .populate("from", "name avatar")
+        .populate("to", "name avatar")
+        .limit(limit)
+        .exec();
+      let lastLoad = false;
+      if (dataMessage.length < limit) {
+        lastLoad = true;
+      }
+      if (dataMessage.length > 0) {
+        res.status(200).send({
+          success: true,
+          message: "success",
+          data: dataMessage.reverse(),
+          last: lastLoad,
+        });
+      } else {
+        res
+          .status(200)
+          .json({
+            success: true,
+            message: "success",
+            data: [],
+            last: lastLoad,
+          });
+      }
     } catch (error) {
       console.log(error);
       if (!err.statusCode) {

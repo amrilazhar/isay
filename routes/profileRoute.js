@@ -22,9 +22,9 @@ router.get("/Post", tokenParser, isAuth, setProfileId, profileController.myProfi
 router.get("/Activities", tokenParser, isAuth, setProfileId, profileController.myProfileActivities);
 
 //view another profile
-router.get("/an/:id", tokenParser, isAuth, setProfileId, profileController.anotherProfile);
-router.get("/an/Post", tokenParser, isAuth, setProfileId, profileController.anotherProfilePost);
-router.get("/an/Activities", tokenParser, isAuth, setProfileId, profileController.anotherProfileActivities);
+router.get("/an/:id", tokenParser, isAuth, profileController.anotherProfile);
+router.get("/an/Post/:id", tokenParser, isAuth, profileController.anotherProfilePost);
+router.get("/an/Activities/:id", tokenParser, isAuth, profileController.anotherProfileActivities);
 
 //edit our profile
 router.put("/:id", tokenParser, isAuth, setProfileId, profileValidator.profileValidate,profileController.profileUpdate);

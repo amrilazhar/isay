@@ -117,7 +117,7 @@ class ProfileController {
 		async anotherProfile(req, res, next) {
 			try {
 				//find user id
-				let dataProfile = await profile
+				let dataProfiles = await profile
 					.findOne({ _id: req.params.id })
 					.populate({
 						path: "interest",
@@ -128,12 +128,12 @@ class ProfileController {
 						select: "province city_type city country",
 					})
 					.exec();
-				req.io.emit("my friend profile:" + dataProfile, dataProfile);
+				req.io.emit("my friend profile:" + dataProfiles, dataProfiles);
 	
 				res.status(200).json({
 					success: true,
 					message: "Success",
-					data: dataProfile,
+					data: dataProfiles,
 				});
 			} catch (err) {
 				console.log(err);
@@ -147,28 +147,15 @@ class ProfileController {
 		//=====================|| my profile post ||=================//
 		async anotherProfilePost(req, res, next) {
 			try {
-				let paginateStatus = true;
-				if (req.query.pagination) {
-					if (req.query.pagination == "false") {
-						paginateStatus = false;
-					}
-				}
+				//find user id
+				let dataProfiles = await status
+				.find({ owner : req.params.id });
+				req.io.emit("my friend profile:" + dataProfiles, dataProfiles);
 	
-				const options = {
-					path: "status",
-					select: "content media comment likeBy",
-					sort: { updated_at: -1 },
-					page: 1,
-					limit: 10,
-					pagination: paginateStatus,
-				};
-	
-				let dataProfile = await status.paginate({ owner: req.query.owner }, options);
-				req.io.emit("myfriend's profile post:" + dataProfile, dataProfile);
 				res.status(200).json({
 					success: true,
 					message: "Success",
-					data: dataProfile,
+					data: dataProfiles,
 				});
 			} catch (err) {
 				console.log(err);
@@ -182,40 +169,15 @@ class ProfileController {
 	
 		async anotherProfileActivities(req, res, next) {
 			try {
-				let paginateStatus = true;
-				if (req.query.pagination) {
-					if (req.query.pagination == "false") {
-						paginateStatus = false;
-					}
-				}
+				//find user id
+				let dataProfiles = await activities
+				.find({ owner : req.params.id });
+				req.io.emit("my friend profile:" + dataProfiles, dataProfiles);
 	
-				const options = {
-					path: "activities",
-					select: "activities_type status_id comment_id owner",
-					sort: { updated_at: -1 },
-					populate: {
-						path: "status_id",
-						select: "content owner media comment interest likeBy timestamps",
-					},
-					populate: {
-						path: "comment_id",
-						select: "content owner media comment likeBy timestamps",
-					},
-					page: 1,
-					limit: 10,
-					pagination: paginateStatus,
-				};
-	
-				let dataProfile = await activities.paginate(
-					{ owner: req.query.owner },
-					options
-				);
-				console.log(dataProfile);
-				req.io.emit("my friends profile activities:" + dataProfile, dataProfile);
 				res.status(200).json({
 					success: true,
 					message: "Success",
-					data: dataProfile,
+					data: dataProfiles,
 				});
 			} catch (err) {
 				console.log(err);

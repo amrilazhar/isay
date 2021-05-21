@@ -13,9 +13,7 @@ const matchWords = (words) => {
 };
 
 const matchWordsForHtml = (words) => {
-  console.log(words);
   const regex = new RegExp("(" + words.join("|") + ")", "gi");
-  console.log(regex);
   return regex;
 };
 
@@ -288,7 +286,7 @@ class StatusController {
           .exec();
 
         regex = matchWordsForHtml([...query]);
-        
+
         statusData.forEach((status, index) => {
           statusData[index].content = status.content.replace(
             regex,

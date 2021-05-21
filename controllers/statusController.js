@@ -273,7 +273,7 @@ class StatusController {
         const regex = matchWords(query);
 
         statusData = await status
-          .find({ content: { $regex: regex, $options: "gi" } })
+          .find({ content: { $regex: regex, $options: "i" } })
           .sort({ updated_at: -1 })
           .populate("interest")
           .populate("owner", "name avatar id location")

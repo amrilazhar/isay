@@ -13,67 +13,87 @@ const isAuth = require("../middlewares/authentication/isAuth");
 
 // SET VARIABLE PROFILE ID
 let setProfileId = (req, res, next) => {
-	req.profile = { id: req.user.profile };
-	next();
+  req.profile = { id: req.user.profile };
+  next();
 };
 
 let dir = (req, res, next) => {
-	req.directory = "images/status";
-	next();
+  req.directory = "images/status";
+  next();
 };
 
 // SET ROUTER HERE
 router.post(
-	"/",
-	tokenParser,
-	isAuth,
-	setProfileId,
-	dir,
-	imageUpload,
-	statusValidator.create,
-	statusController.createStatus
+  "/",
+  tokenParser,
+  isAuth,
+  setProfileId,
+  dir,
+  imageUpload,
+  statusValidator.create,
+  statusController.createStatus
+);
+
+router.get(
+  "/search",
+  tokenParser,
+  isAuth,
+  setProfileId,
+  statusValidator.searchAll,
+  statusController.searchAll
+);
+
+router.get(
+  "/users/:id/search",
+  tokenParser,
+  isAuth,
+  setProfileId,
+  statusValidator.searchByUser,
+  statusController.searchByUser
+);
+
+router.get(
+  "/users/",
+  tokenParser,
+  isAuth,
+  setProfileId,
+  statusValidator.user,
+  statusController.getStatusByUser
+);
+
+router.get(
+  "/interest/",
+  tokenParser,
+  isAuth,
+  setProfileId,
+  statusValidator.interest,
+  statusController.getStatusByInterest
 );
 router.get(
-	"/users/",
-	tokenParser,
-	isAuth,
-	setProfileId,
-	statusValidator.user,
-	statusController.getStatusByUser
-);
-router.get(
-	"/interest/",
-	tokenParser,
-	isAuth,
-	setProfileId,
-	statusValidator.interest,
-	statusController.getStatusByInterest
-);
-router.get(
-	"/interest/:id",
-	tokenParser,
-	isAuth,
-	setProfileId,
-	statusValidator.single,
-	statusController.getSingleInterest
+  "/interest/:id",
+  tokenParser,
+  isAuth,
+  setProfileId,
+  statusValidator.single,
+  statusController.getSingleInterest
 );
 router.put(
-	"/:id",
-	tokenParser,
-	isAuth,
-	setProfileId,
-	dir,
-	imageUpload,
-	statusValidator.update,
-	statusController.updateStatus
+  "/:id",
+  tokenParser,
+  isAuth,
+  setProfileId,
+  dir,
+  imageUpload,
+  statusValidator.update,
+  statusController.updateStatus
 );
 router.delete(
-	"/:id",
-	tokenParser,
-	isAuth,
-	setProfileId,
-	statusValidator.delete,
-	statusController.deleteStatus
+  "/:id",
+  tokenParser,
+  isAuth,
+  setProfileId,
+  statusValidator.delete,
+  statusController.deleteStatus
 );
 
 // EXPORTS MODULE HERE

@@ -13,7 +13,7 @@ class CommentValidator {
 				}
 				if (!mongoose.Types.ObjectId.isValid(req.body.status_id)) {
 					errors.push(
-						"id status is not valid and must be 24 character & hexadecimal"
+						"id owner is not same"
 					);
 				}
 			}

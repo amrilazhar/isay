@@ -3,12 +3,11 @@ const router = express.Router();
 
 // IMPORT HERE
 const utilsController = require("../controllers/utilsController");
-const imageUpload = require("../middlewares/upload/images")
 
 // SET ROUTER HERE
 router.get("/location/", utilsController.getAllLocation);
 router.get("/interest/:category", utilsController.getInterest);
-router.post("/genProfile", utilsController.generateBasicProfile);
+// router.post("/genProfile", utilsController.generateBasicProfile);
 
 // // example image upload
 // let dir = (req,res,next){

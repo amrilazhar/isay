@@ -9,12 +9,21 @@ class UtilsController {
       let dataLoc = await location.find().exec();
 
       //check if data empty
-      if (!dataLoc) return res.status(400).json({ message: "data empty" });
+      if (!dataLoc) {
+        const err = new Error("Data Location Empty");
+        err.statusCode = 400;
+        throw err;
+      }
 
       //send data
-      return res.status(200).json({ message: "success", data: dataLoc });
+      return res
+        .status(200)
+        .json({ success: true, message: "success", data: dataLoc });
     } catch (error) {
-      return res.status(500).json({ message: "internal server error" });
+      if (!error.statusCode) {
+        error.statusCode = 500;
+      }
+      next(error);
     }
   }
 
@@ -29,17 +38,25 @@ class UtilsController {
       let dataLoc = await interest.find(category).exec();
 
       //check if data empty
-      if (!dataLoc) return res.status(400).json({ message: "data empty" });
+      if (!dataLoc) {
+        const err = new Error("Data Interest Empty");
+        err.statusCode = 400;
+        throw err;
+      }
 
       //send data
-      return res.status(200).json({ message: "success", data: dataLoc });
+      return res
+        .status(200)
+        .json({ success: true, message: "success", data: dataLoc });
     } catch (error) {
-      console.log(error);
-      return res.status(500).json({ message: "internal server error" });
+      if (!error.statusCode) {
+        error.statusCode = 500;
+      }
+      next(error);
     }
   }
 
-  async generateBasicProfile(req, res) {
+  async generateBasicProfile(req, res, next) {
     try {
       //create parameter for generate name
       let genderParam = Math.floor(Math.random() * 2);
@@ -63,12 +80,15 @@ class UtilsController {
 
       //convert interest to number that can be use by model
       if (!req.body.interest) {
+        let interestAll = await interest.find({}).exec();
         let interestParam = JSON.parse(req.body.interest);
         let interestCont = [];
 
-        interestParam.forEach(async (element) => {
-          let item = await interest.findById(element);
-          interestCont.push(item);
+        interestParam.forEach((element) => {
+          let idx = interesAll.indexOf(element);
+          if (idx > -1) {
+            interestCont.push(interestAll[idx]);
+          }
         });
 
         interestOne = interestCont[0]
@@ -113,17 +133,26 @@ class UtilsController {
         iii: interestThree,
       });
       let tempS = sapaan.run({ g: genderParam, p: province });
-      console.log(Math.floor(tempS.sapa * 100)," ", Math.floor(tempN.name * 1000));
+      console.log(
+        Math.floor(tempS.sapa * 100),
+        " ",
+        Math.floor(tempN.name * 1000)
+      );
       const generatedName = `${greeting[Math.floor(tempS.sapa * 100)]}.${
-        charName[Math.floor(tempN.name * 1000)]}.#${Math.floor(Math.random()*9999)}`;
+        charName[Math.floor(tempN.name * 1000)]
+      }.#${Math.floor(Math.random() * 9999)}`;
 
       let avatar = "https://robohash.org/avatar" + randomTen;
 
-      return res.status(200).json({ name: generatedName, avatar: avatar });
-
+      req.body.name = generatedName;
+      req.body.avatar = avatar;
+      next();
     } catch (error) {
       console.log(error);
-      return res.status(500).json({ message: "internal server error" });
+      if (!error.statusCode) {
+        error.statusCode = 500;
+      }
+      next(error);
     }
   }
 }

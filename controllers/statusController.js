@@ -3,10 +3,8 @@ const validationErrorHandler = require("../utils/validationErrorHandler");
 const { status, comment, profile, interest, activities } = require("../models");
 
 const matchWords = (words) => {
-  let regexMetachars = /[(){[*+?.\\^$|]/g;
 
   for (let i = 0; i < words.length; i++) {
-    words[i] = words[i].replace(regexMetachars, "\\$&");
     words[i] = `(?=.*${words[i]}\\b)`;
   }
 
@@ -267,8 +265,14 @@ class StatusController {
 
       let statusData = [];
 
-      if (req.query.query) {
-        const query = req.query.query.split(" ");
+      const query = req.query.query
+        .split(" ")
+        .filter((word) => word.length > 1);
+
+      if (query.length) {
+        const query = req.query.query
+          .split(" ")
+          .filter((word) => word.length > 1);
 
         const regex = matchWords(query);
 
@@ -307,9 +311,11 @@ class StatusController {
 
       let statusData = [];
 
-      if (req.query.query) {
-        const query = req.query.query.split(" ");
+      const query = req.query.query
+        .split(" ")
+        .filter((word) => word.length > 1);
 
+      if (query.length) {
         const regex = matchWords(query);
 
         console.log(regex);

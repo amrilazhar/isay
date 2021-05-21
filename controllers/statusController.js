@@ -3,13 +3,19 @@ const validationErrorHandler = require("../utils/validationErrorHandler");
 const { status, comment, profile, interest, activities } = require("../models");
 
 const matchWords = (words) => {
-
   for (let i = 0; i < words.length; i++) {
     words[i] = `(?=.*${words[i]}\\b)`;
   }
 
-  let regex = new RegExp(words.join(""));
+  const regex = new RegExp(words.join(""));
 
+  return regex;
+};
+
+const matchWordsForHtml = (words) => {
+  console.log(words);
+  const regex = new RegExp("(" + words.join("|") + ")", "gi");
+  console.log(regex);
   return regex;
 };
 
@@ -270,7 +276,7 @@ class StatusController {
         .filter((word) => word.length > 1);
 
       if (query.length) {
-        const regex = matchWords(query);
+        let regex = matchWords([...query]);
 
         statusData = await status
           .find({ content: { $regex: regex, $options: "i" } })
@@ -280,6 +286,15 @@ class StatusController {
           .limit(limit)
           .skip(skip)
           .exec();
+
+        regex = matchWordsForHtml([...query]);
+        
+        statusData.forEach((status, index) => {
+          statusData[index].content = status.content.replace(
+            regex,
+            "<b>$1</b>"
+          );
+        });
       }
 
       res.status(200).send({
@@ -310,9 +325,7 @@ class StatusController {
         .filter((word) => word.length > 1);
 
       if (query.length) {
-        const regex = matchWords(query);
-
-        console.log(regex);
+        const regex = matchWords([...query]);
 
         statusData = await status
           .find({
@@ -325,6 +338,15 @@ class StatusController {
           .limit(limit)
           .skip(skip)
           .exec();
+
+        regex = matchWordsForHtml([...query]);
+
+        statusData.forEach((status, index) => {
+          statusData[index].content = status.content.replace(
+            regex,
+            "<b>$1</b>"
+          );
+        });
       }
 
       res.status(200).send({

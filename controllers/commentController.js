@@ -166,6 +166,11 @@ class CommentController {
 					message: "Success",
 					data: findUser,
 				});
+				await activities.create({
+					type: "like_comment",
+					comment_id: findUser._id,
+					owner: req.profile.id,
+				});
 		} catch (err) {
 			console.log(err);
 			if (!err.statusCode) {
@@ -197,6 +202,7 @@ class CommentController {
 					message: "Success",
 					data: deleteLike,
 				});
+				await activities.deleteOne({ _id: req.params.id });
 			next();
 		} catch (err) {
 			console.log(err);

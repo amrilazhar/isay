@@ -204,7 +204,7 @@ class StatusController {
 					message: "Success",
 					data: statusUpdate,
 				});
-			}
+			}o
 		} catch (err) {
 			console.log(err);
 			if (!err.statusCode) {
@@ -217,27 +217,36 @@ class StatusController {
 	//TODO-PUT : Like Status/post
 	async likeStatus(req, res, next) {
 		try {
-			let findUser = await status.findOne({ _id: req.query.status_id });
-			findUser.likeBy.push(req.profile.id);
-			let insertUser = findUser.save();
+			let findStatusByUser = await status.findOne({ _id: req.params.id });
 
-			if (!insertUser) {
-				const error = new Error("Can't like");
+			if (!findStatusByUser) {
+				const error = new Error("Status Not Found");
 				error.statusCode = 400;
 				throw error;
-			} else {
-				await activities.create({
-					type: "like_status",
-					status_id: findUser._id,
-					owner: req.profile.id,
-				});
-
-				res.status(200).json({
-					success: true,
-					message: "Success",
-					data: findUser,
-				});
 			}
+
+			if (findStatusByUser.likeBy.includes(req.profile.id)) {
+				const error = new Error("You can't like status twice");
+				error.statusCode = 400;
+				throw error;
+			}
+
+			findStatusByUser.likeBy.push(req.profile.id);
+
+			await findStatusByUser.save();
+
+			await activities.create({
+				type: "like_status",
+				status_id: findStatusByUser._id,
+				owner: req.profile.id,
+			});
+
+			res.status(200).json({
+				success: true,
+				message: "Success",
+				data: findStatusByUser,
+			});
+
 		} catch (err) {
 			console.log(err);
 			if (!err.statusCode) {
@@ -250,26 +259,39 @@ class StatusController {
 	//TODO-PUT : Unlike Status/post
 	async unlikeStatus(req, res, next) {
 		try {
-			let findUser = await status.findOne({ _id: req.query.status_id });
-			let indexOfLike = findUser.likeBy.indexOf(req.profile.id);
-			findUser.likeBy.splice(indexOfLike, 1);
-			let deleteLike = await status.findOneAndUpdate(
-				{ _id: findUser._id },
-				findUser,
-				{ new: true }
-			);
-			if (!insertUser) {
-				const error = new Error("Data User can't be appeared");
+			let findStatusByUser = await status.findOne({ _id: req.params.id });
+
+			if (!findStatusByUser) {
+				const error = new Error("Status Not Found");
 				error.statusCode = 400;
 				throw error;
-			} else {
-				await activities.deleteOne({ _id: req.params.id });
-				res.status(200).json({
-					success: true,
-					message: "Success",
-					data: deleteLike,
-				});
 			}
+
+			let indexOfLike = findStatusByUser.likeBy.indexOf(req.profile.id);
+			console.log(indexOfLike)
+
+			if (!indexOfLike) {
+				const error = new Error("Status not liked yet");
+				error.statusCode = 400;
+				throw error;
+			}
+
+			findStatusByUser.likeBy.splice(indexOfLike, 1);
+
+			let deleteLike = await status.findOneAndUpdate(
+				{ _id: findStatusByUser._id },
+				findStatusByUser,
+				{ new: true }
+			);
+
+			await activities.deleteOne({ _id: req.params.id });
+
+			res.status(200).json({
+				success: true,
+				message: "Success",
+				data: deleteLike,
+			});
+
 			next();
 		} catch (err) {
 			console.log(err);

@@ -66,14 +66,14 @@ router.put(
 	statusController.updateStatus
 );
 router.put(
-	"/like",
+	"/like/:id",
 	tokenParser,
 	isAuth,
 	setProfileId,
 	statusController.likeStatus
 );
 router.put(
-	"/unlike",
+	"/unlike/:id",
 	tokenParser,
 	isAuth,
 	setProfileId,

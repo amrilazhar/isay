@@ -22,7 +22,6 @@ const isProfileExists = async (value, { req }) => {
 
 const objectId = (value) => {
   if (value) {
-    console.log("PROFILE", value);
     return mongoose.Types.ObjectId(value);
   }
 };

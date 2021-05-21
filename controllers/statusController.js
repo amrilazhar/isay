@@ -266,17 +266,11 @@ class StatusController {
       let statusData = [];
 
       const query = req.query.query
-        .split(" ")
+        .split(/[\ +]/)
         .filter((word) => word.length > 1);
 
       if (query.length) {
-        const query = req.query.query
-          .split(" ")
-          .filter((word) => word.length > 1);
-
         const regex = matchWords(query);
-
-        console.log(regex);
 
         statusData = await status
           .find({ content: { $regex: regex, $options: "gi" } })
@@ -312,7 +306,7 @@ class StatusController {
       let statusData = [];
 
       const query = req.query.query
-        .split(" ")
+        .split(/[\ +]/)
         .filter((word) => word.length > 1);
 
       if (query.length) {

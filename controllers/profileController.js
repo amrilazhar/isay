@@ -94,10 +94,10 @@ class ProfileController {
 			};
 
 			let dataProfile = await activities.paginate(
-				{ owner: req.query.owner },
+				{ owner: req.profile.id },
 				options
 			);
-
+			console.log(dataProfile);
 			req.io.emit("my profile's activities:" + dataProfile, dataProfile);
 			res.status(200).json({
 				success: true,
@@ -113,11 +113,85 @@ class ProfileController {
 		}
 	}
 
+		//=====================|| view another profile ||=================//
+		async anotherProfile(req, res, next) {
+			try {
+				//find user id
+				let dataProfiles = await profile
+					.findOne({ _id: req.params.id })
+					.populate({
+						path: "interest",
+						select: "interest category",
+					})
+					.populate({
+						path: "location",
+						select: "province city_type city country",
+					})
+					.exec();
+				req.io.emit("my friend profile:" + dataProfiles, dataProfiles);
+	
+				res.status(200).json({
+					success: true,
+					message: "Success",
+					data: dataProfiles,
+				});
+			} catch (err) {
+				console.log(err);
+				if (!err.statusCode) {
+					err.statusCode = 500;
+				}
+				next(err);
+			}
+		}
+	
+		//=====================|| my profile post ||=================//
+		async anotherProfilePost(req, res, next) {
+			try {
+				//find user id
+				let dataProfiles = await status
+				.find({ owner : req.params.id });
+				req.io.emit("my friend profile:" + dataProfiles, dataProfiles);
+	
+				res.status(200).json({
+					success: true,
+					message: "Success",
+					data: dataProfiles,
+				});
+			} catch (err) {
+				console.log(err);
+				if (!err.statusCode) {
+					err.statusCode = 500;
+				}
+				next(err);
+			}
+		}
+		//======================|| my profile activity ||====================//
+	
+		async anotherProfileActivities(req, res, next) {
+			try {
+				//find user id
+				let dataProfiles = await activities
+				.find({ owner : req.params.id });
+				req.io.emit("my friend profile:" + dataProfiles, dataProfiles);
+	
+				res.status(200).json({
+					success: true,
+					message: "Success",
+					data: dataProfiles,
+				});
+			} catch (err) {
+				console.log(err);
+				if (!err.statusCode) {
+					err.statusCode = 500;
+				}
+				next(err);
+			}
+		}
 	// =======================|| Update Profile ||================//
 	async profileUpdate(req, res) {
 		try {
 			let profileData = {
-				bio: req.body.bio ? req.body.bio : "No description",
+				bio: req.body.bio,
 				name: req.body.name,
 				avatar: req.body.avatar ? req.body.avatar : "defaultAvatar.jpg",
 				user: req.body.user,

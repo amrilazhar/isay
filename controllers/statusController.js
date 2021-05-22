@@ -142,10 +142,8 @@ class StatusController {
 		try {
 			validationErrorHandler(req, res, next);
 
-			let statusData = await status.find({
-				interest: { $in: [req.params.id] },
-			});
-
+			let statusData = await status.find({ interest: { $in: [req.params.id] } }).populate('owner interest');
+	
 			if (!statusData) {
 				const error = new Error("Status data can't be appeared");
 				error.statusCode = 400;

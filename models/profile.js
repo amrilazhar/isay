@@ -39,7 +39,7 @@ const ProfileSchema = new mongoose.Schema(
     user : {
       type : mongoose.Schema.Types.ObjectId,
       required : false,
-      ref : "user"
+      ref : "users"
     },
     location :  {
       type : mongoose.Schema.Types.ObjectId,

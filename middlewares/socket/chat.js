@@ -116,7 +116,7 @@ async function socketImageUpload(req, res) {
     const uploadParams = {
       ACL: "public-read",
       Bucket: process.env.S3_BUCKET_NAME,
-      Key: `images/chat/${fileName}.${mimeType}`,
+      Key: `images/chat/${req.utils.handshake}/${fileName}.${mimeType}`,
       Body: imageBuffer,
       ContentEncoding: "base64",
       ContentType: contentType,

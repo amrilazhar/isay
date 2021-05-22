@@ -5,7 +5,7 @@ class ChatController {
   //get message history when starting conversation
   async getMessageHistory(req, res, next) {
     try {
-      let limit = eval(req.query.limit) ? eval(req.query.limit) : 100;
+      let limit = eval(req.query.limit) ? eval(req.query.limit) : 30;
       let skip = eval(req.query.skip) ? eval(req.query.skip) : 0;
       let dataMessage = await chat.message
         .find({ chatRoom: req.params.chatRoom })
@@ -126,7 +126,7 @@ class ChatController {
 
   async loadOlderMessage(req, res, next) {
     try {
-      let limit = eval(req.query.limit) ? eval(req.query.limit) : 30;
+      let limit = eval(req.query.limit) ? eval(req.query.limit) : 2;
       let dataMessage = await chat.message
         .find({
           _id: { $lt: req.query.lastMessage },

@@ -200,7 +200,7 @@ class ProfileController {
 			};
 
 			let dataProfile = await profile.findOneAndUpdate(
-				{ _id: req.params.id },
+				{ _id: req.profile.id },
 				profileData,
 				{ new: true }
 			);
@@ -229,7 +229,7 @@ class ProfileController {
 
 	async addInterest(req, res) {
 		try {
-			let findUser = await profile.findOne({ _id: req.params.id });
+			let findUser = await profile.findOne({ _id: req.profile.id });
 			findUser.interest.push(req.query.id_interest);
 
 			let insertUser = await profile.findOneAndUpdate(
@@ -259,7 +259,7 @@ class ProfileController {
 	//===========================|| delete Interest ||========================//
 	async deleteInterest(req, res) {
 		try {
-			let findUser = await profile.findOne({ _id: req.params.id });
+			let findUser = await profile.findOne({ _id: req.profile.id });
 			let indexOfInterest = findUser.interest.indexOf(req.query.id_interest);
 			if (indexOfInterest < 0) {
 				const error = new Error("Interest name has not been added at Interest");

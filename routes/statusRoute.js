@@ -38,7 +38,6 @@ router.get(
 	tokenParser,
 	isAuth,
 	setProfileId,
-	// statusValidator.user,
 	statusController.getStatusByUser
 );
 router.get(
@@ -46,7 +45,6 @@ router.get(
 	tokenParser,
 	isAuth,
 	setProfileId,
-	// statusValidator.interest,
 	statusController.getStatusByInterest
 );
 router.get(
@@ -66,6 +64,20 @@ router.put(
 	imageUpload,
 	statusValidator.update,
 	statusController.updateStatus
+);
+router.put(
+	"/like/:id",
+	tokenParser,
+	isAuth,
+	setProfileId,
+	statusController.likeStatus
+);
+router.put(
+	"/unlike/:id",
+	tokenParser,
+	isAuth,
+	setProfileId,
+	statusController.unlikeStatus
 );
 router.delete(
 	"/:id",

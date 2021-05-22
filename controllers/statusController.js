@@ -3,7 +3,7 @@ const validationErrorHandler = require("../utils/validationErrorHandler");
 const { status, comment, profile, interest, activities } = require("../models");
 
 class StatusController {
-	//TODO : create status/post
+	//TODO-POST : create status/post
 	async createStatus(req, res, next) {
 		try {
 			validationErrorHandler(req, res, next);
@@ -53,7 +53,124 @@ class StatusController {
 		}
 	}
 
-	//TODO : Update status/post
+	//TODO-GET : Get status/post by User
+	async getStatusByUser(req, res, next) {
+		try {
+			validationErrorHandler(req, res, next);
+
+			let statusUsers = await status
+				.find({ owner: req.profile.id })
+				.sort({ updated_at: -1 })
+				.populate("interest");
+
+			if (!statusUsers) {
+				const error = new Error("Status user can't be appeared");
+				error.statusCode = 400;
+				throw error;
+			} else {
+				// Socket io
+				req.io.emit("show all user status:" + statusUsers, statusUsers);
+
+				res.status(200).json({
+					success: true,
+					message: "Success",
+					data: statusUsers,
+				});
+			}
+		} catch (err) {
+			console.log(err);
+			if (!err.statusCode) {
+				err.statusCode = 500;
+			}
+			next(err);
+		}
+	}
+
+	//TODO-GET : Get status/post by interest (all)
+	async getStatusByInterest(req, res, next) {
+		try {
+			validationErrorHandler(req, res, next);
+
+			let limit = req.query.limit ? req.query.limit : 10;
+			let skip = req.query.skip ? req.query.skip : 0;
+			let interestUser = await profile.findOne({ _id: req.profile.id });
+			let stringFind = { $or: [] };
+
+			interestUser.interest.forEach((item) => {
+				stringFind["$or"].push({ interest: item });
+			});
+
+			let statusData = await status
+				.find(stringFind)
+				.sort({ updated_at: -1 })
+				.populate("interest")
+				.populate("owner", "name avatar id location")
+				.limit(limit)
+				.skip(skip)
+				.exec();
+
+			if (statusData.length > 0) {
+				res.status(200).send({
+					success: true,
+					message: "success",
+					data: statusData,
+				});
+			} else {
+				// Socket io
+				req.io.emit(
+					"show all interest status:" + statusData,
+					statusData
+				);
+
+				res.status(200).json({
+					success: true,
+					message: "success",
+					data: [],
+				});
+			}
+		} catch (err) {
+			console.log(err);
+			if (!err.statusCode) {
+				err.statusCode = 500;
+			}
+			next(err);
+		}
+	}
+
+	//TODO-GET : Get status/post by interest (single)
+	async getSingleInterest(req, res, next) {
+		try {
+			validationErrorHandler(req, res, next);
+
+			let statusData = await status.find({ interest: { $in: [req.params.id] } }).populate('owner interest');
+	
+			if (!statusData) {
+				const error = new Error("Status data can't be appeared");
+				error.statusCode = 400;
+				throw error;
+			} else {
+				// Socket io
+				req.io.emit(
+					"show single interest status:" + statusData,
+					statusData
+				);
+
+				res.status(200).json({
+					success: true,
+					message: "Success",
+					data: statusData,
+				});
+			}
+		} catch (err) {
+			console.log(err);
+			if (!err.statusCode) {
+				err.statusCode = 500;
+			}
+			next(err);
+		}
+	}
+
+	//TODO-PUT : Update status/post
 	async updateStatus(req, res, next) {
 		try {
 			validationErrorHandler(req, res, next);
@@ -94,6 +211,7 @@ class StatusController {
 					data: statusUpdate,
 				});
 			}
+			o;
 		} catch (err) {
 			console.log(err);
 			if (!err.statusCode) {
@@ -103,78 +221,38 @@ class StatusController {
 		}
 	}
 
-	//TODO : Get status/post by User
-	async getStatusByUser(req, res, next) {
+	//TODO-PUT : Like Status/post
+	async likeStatus(req, res, next) {
 		try {
-			validationErrorHandler(req, res, next);
+			let findStatusByUser = await status.findOne({ _id: req.params.id });
 
-			let statusUsers = await status
-				.find({ owner: req.profile.id })
-				.sort({ updated_at: -1 })
-				.populate("interest");
-
-			if (!statusUsers) {
-				const error = new Error("Status user can't be appeared");
+			if (!findStatusByUser) {
+				const error = new Error("Status Not Found");
 				error.statusCode = 400;
 				throw error;
-			} else {
-				// Socket io
-				req.io.emit("show all user status:" + statusUsers, statusUsers);
-
-				res.status(200).json({
-					success: true,
-					message: "Success",
-					data: statusUsers,
-				});
 			}
-		} catch (err) {
-			console.log(err);
-			if (!err.statusCode) {
-				err.statusCode = 500;
+
+			if (findStatusByUser.likeBy.includes(req.profile.id)) {
+				const error = new Error("You can't like status twice");
+				error.statusCode = 400;
+				throw error;
 			}
-			next(err);
-		}
-	}
 
-	//TODO : Get status/post by interest (all)
-	async getStatusByInterest(req, res, next) {
-		try {
-			validationErrorHandler(req, res, next);
+			findStatusByUser.likeBy.push(req.profile.id);
 
-			let limit = req.query.limit ? req.query.limit : 10;
-			let skip = req.query.skip ? req.query.skip : 0;
-			let interestUser = await profile.findOne({ _id: req.profile.id });
-			let stringFind = { $or: [] };
+			await findStatusByUser.save();
 
-			interestUser.interest.forEach((item) => {
-				stringFind["$or"].push({ interest: item });
+			await activities.create({
+				type: "like_status",
+				status_id: findStatusByUser._id,
+				owner: req.profile.id,
 			});
 
-			let statusData = await status
-				.find(stringFind)
-				.sort({ updated_at: -1 })
-				.populate("interest")
-				.populate("owner", "name avatar id location")
-				.limit(limit)
-				.skip(skip)
-				.exec();
-
-			if (statusData.length > 0) {
-				res.status(200).send({
-					success: true,
-					message: "success",
-					data: statusData,
-				});
-			} else {
-				// Socket io
-				req.io.emit("show all interest status:" + statusData, statusData);
-
-				res.status(200).json({
-					success: true,
-					message: "success",
-					data: [],
-				});
-			}
+			res.status(200).json({
+				success: true,
+				message: "Success",
+				data: findStatusByUser,
+			});
 		} catch (err) {
 			console.log(err);
 			if (!err.statusCode) {
@@ -184,27 +262,44 @@ class StatusController {
 		}
 	}
 
-	//TODO : Get status/post by interest (single)
-	async getSingleInterest(req, res, next) {
+	//TODO-PUT : Unlike Status/post
+	async unlikeStatus(req, res, next) {
 		try {
-			validationErrorHandler(req, res, next);
+			let findStatusByUser = await status.findOne({ _id: req.params.id });
 
-			let statusData = await status.find({ interest: { $in: [req.params.id] } }).populate('owner interest');
-	
-			if (!statusData) {
-				const error = new Error("Status data can't be appeared");
+			if (!findStatusByUser) {
+				const error = new Error("Status Not Found");
 				error.statusCode = 400;
 				throw error;
-			} else {
-				// Socket io
-				req.io.emit("show single interest status:" + statusData, statusData);
-
-				res.status(200).json({
-					success: true,
-					message: "Success",
-					data: statusData,
-				});
 			}
+
+			let indexOfLike = findStatusByUser.likeBy.indexOf(req.profile.id);
+			console.log(indexOfLike);
+
+			if (indexOfLike == -1) {
+				console.log(indexOfLike);
+				const error = new Error("Status not liked yet");
+				error.statusCode = 400;
+				throw error;
+			}
+
+			findStatusByUser.likeBy.splice(indexOfLike, 1);
+
+			let deleteLike = await status.findOneAndUpdate(
+				{ _id: findStatusByUser._id },
+				findStatusByUser,
+				{ new: true }
+			);
+
+			await activities.deleteOne({ _id: req.params.id });
+
+			res.status(200).json({
+				success: true,
+				message: "Success",
+				data: deleteLike,
+			});
+
+			next();
 		} catch (err) {
 			console.log(err);
 			if (!err.statusCode) {
@@ -214,7 +309,7 @@ class StatusController {
 		}
 	}
 
-	//TODO : Delete status/post
+	//TODO-DELETE : Delete status/post
 	async deleteStatus(req, res, next) {
 		try {
 			validationErrorHandler(req, res, next);
@@ -228,7 +323,9 @@ class StatusController {
 			} else {
 				// Socket io
 				req.io.emit("delete status:" + statusDelete, statusDelete);
-				
+
+				await activities.deleteOne({ _id: req.params.id });
+
 				res.status(200).json({
 					success: true,
 					message: "Success",

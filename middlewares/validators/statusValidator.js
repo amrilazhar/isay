@@ -6,7 +6,7 @@ const { status, comment, profile, interest } = require("../../models");
 const isValidObjectId = async (value, { req }) => {
 	const isValidObjectId = mongoose.isValidObjectId(value);
 	if (!isValidObjectId) {
-		return Promise.reject("Profile ID is not valid");
+		return Promise.reject("ID is not valid");
 	}
 	return true;
 };
@@ -57,22 +57,6 @@ exports.update = [
 		.customSanitizer(objectId),
 	body("likeBy").trim().custom(isValidObjectId).bail().customSanitizer(objectId),
 ];
-
-// exports.user = [
-// 	param("id")
-// 		.stripLow()
-// 		.custom(isValidObjectId)
-// 		.bail()
-// 		.customSanitizer(objectId),
-// ];
-
-// exports.interest = [
-// 	param("id")
-// 		.stripLow()
-// 		.custom(isValidObjectId)
-// 		.bail()
-// 		.customSanitizer(objectId),
-// ];
 
 exports.single = [
 	param("id")

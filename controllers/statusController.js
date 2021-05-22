@@ -117,7 +117,10 @@ class StatusController {
 				});
 			} else {
 				// Socket io
-				req.io.emit("show all interest status:" + statusData, statusData);
+				req.io.emit(
+					"show all interest status:" + statusData,
+					statusData
+				);
 
 				res.status(200).json({
 					success: true,
@@ -139,7 +142,9 @@ class StatusController {
 		try {
 			validationErrorHandler(req, res, next);
 
-			let statusData = await status.find({ interest: { $in: [req.params.id] } });
+			let statusData = await status.find({
+				interest: { $in: [req.params.id] },
+			});
 
 			if (!statusData) {
 				const error = new Error("Status data can't be appeared");
@@ -147,7 +152,10 @@ class StatusController {
 				throw error;
 			} else {
 				// Socket io
-				req.io.emit("show single interest status:" + statusData, statusData);
+				req.io.emit(
+					"show single interest status:" + statusData,
+					statusData
+				);
 
 				res.status(200).json({
 					success: true,
@@ -204,7 +212,8 @@ class StatusController {
 					message: "Success",
 					data: statusUpdate,
 				});
-			}o
+			}
+			o;
 		} catch (err) {
 			console.log(err);
 			if (!err.statusCode) {
@@ -246,7 +255,6 @@ class StatusController {
 				message: "Success",
 				data: findStatusByUser,
 			});
-
 		} catch (err) {
 			console.log(err);
 			if (!err.statusCode) {
@@ -268,9 +276,10 @@ class StatusController {
 			}
 
 			let indexOfLike = findStatusByUser.likeBy.indexOf(req.profile.id);
-			console.log(indexOfLike)
+			console.log(indexOfLike);
 
-			if (!indexOfLike) {
+			if (indexOfLike == -1) {
+				console.log(indexOfLike);
 				const error = new Error("Status not liked yet");
 				error.statusCode = 400;
 				throw error;

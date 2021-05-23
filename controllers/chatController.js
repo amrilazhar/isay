@@ -12,15 +12,20 @@ class ChatController {
         .sort({ created_at: -1 })
         .populate("from", "name avatar")
         .populate("to", "name avatar")
-        .limit(limit)
+        .limit(limit + 1)
         .skip(skip)
         .exec();
+      let lastLoad = false;
+      if (dataMessage.length < limit) {
+        lastLoad = true;
+      } else dataMessage.splice(limit, 1);
 
       if (dataMessage.length > 0) {
         res.status(200).send({
           success: true,
           message: "success",
           data: dataMessage.reverse(),
+          last: lastLoad,
         });
       } else {
         res.status(200).json({ success: true, message: "success", data: [] });
@@ -126,7 +131,7 @@ class ChatController {
 
   async loadOlderMessage(req, res, next) {
     try {
-      let limit = eval(req.query.limit) ? eval(req.query.limit) : 2;
+      let limit = eval(req.query.limit) ? eval(req.query.limit) : 30;
       let dataMessage = await chat.message
         .find({
           _id: { $lt: req.query.lastMessage },
@@ -135,12 +140,14 @@ class ChatController {
         .sort({ created_at: -1 })
         .populate("from", "name avatar")
         .populate("to", "name avatar")
-        .limit(limit)
+        .limit(limit + 1)
         .exec();
+
       let lastLoad = false;
       if (dataMessage.length < limit) {
         lastLoad = true;
-      }
+      } else dataMessage.splice(limit, 1);
+
       if (dataMessage.length > 0) {
         res.status(200).send({
           success: true,
@@ -149,14 +156,12 @@ class ChatController {
           last: lastLoad,
         });
       } else {
-        res
-          .status(200)
-          .json({
-            success: true,
-            message: "success",
-            data: [],
-            last: lastLoad,
-          });
+        res.status(200).json({
+          success: true,
+          message: "success",
+          data: [],
+          last: lastLoad,
+        });
       }
     } catch (error) {
       console.log(error);

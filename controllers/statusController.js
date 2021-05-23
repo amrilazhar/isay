@@ -141,7 +141,7 @@ class StatusController {
 
       const options = {
         sort: { created_at: -1 },
-        page: req.query.page ? req.query.page : 1,
+        page: req.query.page ? (req.query.page < 20 ? req.query.page : 20) : 1,
         limit: req.query.limit ? req.query.limit : 8,
         populate: [
           { path: "owner", populate: "location" },

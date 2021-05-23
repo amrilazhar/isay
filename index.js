@@ -1,5 +1,5 @@
 require("dotenv").config({
-	path: `.env.${process.env.NODE_ENV}`,
+  path: `.env.${process.env.NODE_ENV}`,
 });
 
 // Express
@@ -21,11 +21,11 @@ const http = require("http").Server(app);
 
 //======================== Socket IO Server =========================
 const io = socketIo(http, {
-	cors: {
-		origin: "*",
-	},
-	path: "/socket",
-	serveClient: false,
+  cors: {
+    origin: "*",
+  },
+  path: "/socket",
+  serveClient: false,
 });
 //======================== END SOCKET IO Server=====================
 
@@ -37,23 +37,23 @@ const admin = require("./utils/firebase");
 
 // Assign socket object to every request
 app.use((req, res, next) => {
-	req.io = io;
+  req.io = io;
 
-	//remove all listener before start connection, it's useful when user refresh page multiple times,
-    //becaus if it's not removed then the other listener will emit the same thing to the user that can cause multiple message send
-	req.io.removeAllListeners("connection");
-	req.io.on('connection', (socket)=>{
-		req.socket = socket;
-	})
-	next();
+  //remove all listener before start connection, it's useful when user refresh page multiple times,
+  //becaus if it's not removed then the other listener will emit the same thing to the user that can cause multiple message send
+  req.io.removeAllListeners("connection");
+  req.io.on("connection", (socket) => {
+    req.socket = socket;
+  });
+  next();
 });
 
 //Set body parser for HTTP post operation
 app.use(express.json()); // support json encoded bodies
 app.use(
-	express.urlencoded({
-		extended: true,
-	})
+  express.urlencoded({
+    extended: true,
+  })
 ); // support url encoded bodies
 
 //set fileUpload plugins
@@ -71,8 +71,8 @@ app.use(xss());
 
 // Rate limiting
 const limiter = rateLimit({
-	windowMs: 1 * 60 * 1000, // 10 mins
-	max: 100,
+  windowMs: 1 * 60 * 1000, // 10 mins
+  max: 100,
 });
 
 app.use(limiter);
@@ -82,24 +82,24 @@ app.use(hpp());
 
 // Use helmet
 app.use(
-	helmet({
-		contentSecurityPolicy: false,
-	})
+  helmet({
+    contentSecurityPolicy: false,
+  })
 );
 
 if (process.env.NODE_ENV === "development") {
-	app.use(morgan("dev"));
+  app.use(morgan("dev"));
 } else {
-	// create a write stream (in append mode)
-	let accessLogStream = fs.createWriteStream(
-		path.join(__dirname, "access.log"),
-		{
-			flags: "a",
-		}
-	);
+  // create a write stream (in append mode)
+  let accessLogStream = fs.createWriteStream(
+    path.join(__dirname, "access.log"),
+    {
+      flags: "a",
+    }
+  );
 
-	// setup the logger
-	app.use(morgan("combined", { stream: accessLogStream }));
+  // setup the logger
+  app.use(morgan("combined", { stream: accessLogStream }));
 }
 
 //======================== end security code ==============================//
@@ -131,17 +131,17 @@ app.use("/status", statusRoutes);
 
 //========================= Error Handler ==========================
 app.use((err, req, res, next) => {
-	console.log(err);
-	const status = err.statusCode || 500;
-	const message = err.message;
-	const data = err.data;
-	res.status(status).json({ success: false, message: message, data: data });
+  console.log(err);
+  const status = err.statusCode || 500;
+  const message = err.message;
+  const data = err.data;
+  res.status(status).json({ success: false, message: message, data: data });
 });
 //========================= End Error Handler ======================
 
 //======================== Listen Server ===========================
 if (process.env.NODE_ENV !== "test") {
-	let PORT = 3000;
-	http.listen(PORT, () => console.log(`server running on PORT : ${PORT}`));
+  let PORT = 3000;
+  http.listen(PORT, () => console.log(`server running on PORT : ${PORT}`));
 } else module.exports = app;
 //======================== End Listen Server =======================

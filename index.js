@@ -1,6 +1,7 @@
 require("dotenv").config({
   path: `.env.${process.env.NODE_ENV}`,
 });
+
 // Express
 const mongoSanitize = require("express-mongo-sanitize");
 const xss = require("xss-clean");
@@ -16,6 +17,36 @@ const express = require("express");
 const app = express();
 const fileUpload = require("express-fileupload");
 const socketIo = require("socket.io");
+const http = require("http").Server(app);
+
+//======================== Socket IO Server =========================
+const io = socketIo(http, {
+  cors: {
+    origin: "*",
+  },
+  path: "/socket",
+  serveClient: false,
+});
+//======================== END SOCKET IO Server=====================
+
+// COR
+app.use(cors());
+
+const admin = require("./utils/firebase");
+// const mongooseConnect = require("./utils/database");
+
+// Assign socket object to every request
+app.use((req, res, next) => {
+  req.io = io;
+
+  //remove all listener before start connection, it's useful when user refresh page multiple times,
+  //becaus if it's not removed then the other listener will emit the same thing to the user that can cause multiple message send
+  req.io.removeAllListeners("connection");
+  req.io.on("connection", (socket) => {
+    req.socket = socket;
+  });
+  next();
+});
 
 //Set body parser for HTTP post operation
 app.use(express.json()); // support json encoded bodies
@@ -30,28 +61,6 @@ app.use(fileUpload()); //support Form Data
 
 //set static assets to public directory
 app.use(express.static("public"));
-
-// ROUTES DECLARATION & IMPORT
-
-const userRoutes = require("./routes/userRoute.js");
-app.use("/user", userRoutes);
-
-const commentRoutes = require("./routes/commentRoute.js");
-app.use("/comment", commentRoutes);
-
-const statusRoutes = require("./routes/statusRoute.js");
-app.use("/status", statusRoutes);
-
-const profileRoutes = require("./routes/profileRoute.js");
-app.use("/profile", profileRoutes);
-
-const activitiesRoutes = require("./routes/activitiesRoute.js");
-app.use("/activity", activitiesRoutes);
-
-const utilsRoutes = require("./routes/utilsRoute.js");
-app.use("/utils", utilsRoutes);
-
-// ROUTES DECLARATION & IMPORT
 
 //======================== security code ==============================//
 // Sanitize data
@@ -78,10 +87,7 @@ app.use(
   })
 );
 
-// CORS
-app.use(cors());
-
-if (process.env.NODE_ENV === "dev") {
+if (process.env.NODE_ENV === "development") {
   app.use(morgan("dev"));
 } else {
   // create a write stream (in append mode)
@@ -95,34 +101,47 @@ if (process.env.NODE_ENV === "dev") {
   // setup the logger
   app.use(morgan("combined", { stream: accessLogStream }));
 }
+
 //======================== end security code ==============================//
 
-// Listen Server
+// ============== ROUTES DECLARATION & IMPORT ====================== //
+
+const userRoutes = require("./routes/userRoute.js");
+app.use("/user", userRoutes);
+
+const activitiesRoutes = require("./routes/activitiesRoute.js");
+app.use("/activity", activitiesRoutes);
+
+const utilsRoutes = require("./routes/utilsRoute.js");
+app.use("/utils", utilsRoutes);
+
+const chatRoutes = require("./routes/chatRoute.js");
+app.use("/chat", chatRoutes);
+
+const commentRoutes = require("./routes/commentRoute.js");
+app.use("/comment", commentRoutes);
+
+const profileRoutes = require("./routes/profileRoute.js");
+app.use("/profile", profileRoutes);
+
+const statusRoutes = require("./routes/statusRoute.js");
+app.use("/status", statusRoutes);
+
+// ============== END ROUTES DECLARATION & IMPORT ====================== //
+
+//========================= Error Handler ==========================
+app.use((err, req, res, next) => {
+  console.log(err);
+  const status = err.statusCode || 500;
+  const message = err.message;
+  const data = err.data;
+  res.status(status).json({ success: false, message: message, data: data });
+});
+//========================= End Error Handler ======================
+
+//======================== Listen Server ===========================
 if (process.env.NODE_ENV !== "test") {
   let PORT = 3000;
-  let server = app.listen(PORT, () =>
-    console.log(`server running on PORT : ${PORT}`)
-  );
-
-  //======================== Socket IO Server =========================
-  const io = socketIo(server, {
-    cors: {
-      origin: "*",
-    },
-    path: "/socket",
-    serveClient: false,
-  });
-  
-  
-  const chatRoutes = require("./routes/chatRoute.js");
-  app.use(
-    "/chat",
-    (req, res, next) => {
-      req.io = io;
-      next();
-    },
-    chatRoutes
-  );
-
-  //======================== END SOCKET IO Server=====================
+  http.listen(PORT, () => console.log(`server running on PORT : ${PORT}`));
 } else module.exports = app;
+//======================== End Listen Server =======================

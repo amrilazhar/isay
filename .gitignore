@@ -1,3 +1,9 @@
 node_modules
 access.log
 .env.development
+.env.test
+coverage
+.prettierrc
+functions
+.gitlab-ci.yml
+yarn.lock

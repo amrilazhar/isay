@@ -1,10 +1,9 @@
 const mongoose = require("mongoose");
 const mongoose_delete = require("mongoose-delete");
-const mongoosePaginate = require('mongoose-paginate-v2');
 
-const ActivitiesSchema = new mongoose.Schema(
+const NotificationSchema = new mongoose.Schema(
   {
-    activities_type: {
+    notification_type: {
       type: String,
       required: false,
     },
@@ -13,15 +12,29 @@ const ActivitiesSchema = new mongoose.Schema(
       required: false,
       ref: "status",
     },
+    chatMsg_id: {
+      type: mongoose.Schema.Types.ObjectId,
+      required: false,
+      ref: "chatData",
+    },
     comment_id: {
       type: mongoose.Schema.Types.ObjectId,
       required: false,
       ref: "comment",
     },
+    from: {
+      type: mongoose.Schema.Types.ObjectId,
+      required: true,
+      ref: "profile",
+    },
     owner: {
       type: mongoose.Schema.Types.ObjectId,
       required: true,
-      ref : "profile"
+      ref: "profile",
+    },
+    readed: {
+      type: Boolean,
+      default: false,
     },
   },
   {
@@ -32,8 +45,10 @@ const ActivitiesSchema = new mongoose.Schema(
   }
 );
 
+NotificationSchema.plugin(mongoose_delete, { overrideMethods: "all" });
 
-ActivitiesSchema.plugin(mongoosePaginate);
-ActivitiesSchema.plugin(mongoose_delete, { overrideMethods: "all" });
-
-module.exports = mongoose.model("activities", ActivitiesSchema, "activities");
+module.exports = mongoose.model(
+  "notification",
+  NotificationSchema,
+  "notification"
+);

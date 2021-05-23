@@ -1,6 +1,14 @@
 const validationErrorHandler = require("../utils/validationErrorHandler");
 
-const { status, comment, profile, interest, activities } = require("../models");
+const {
+  status,
+  comment,
+  profile,
+  interest,
+  activities,
+  notification,
+  location,
+} = require("../models");
 
 class StatusController {
   //TODO-POST : create status/post
@@ -11,11 +19,8 @@ class StatusController {
       let data = {
         content: req.body.content,
         owner: req.profile.id,
-        // media: req.body.media ? req.body.media : "images.jpg",
-        media: [],
-        // comment: req.body.comment,
         interest: req.body.interest,
-        // likeBy: req.body.likeBy,
+        media: [],
       };
 
       if ("images" in req) {
@@ -61,7 +66,8 @@ class StatusController {
       let statusUsers = await status
         .find({ owner: req.profile.id })
         .sort({ updated_at: -1 })
-        .populate("interest");
+        .populate("interest")
+        .populate("owner location");
 
       if (!statusUsers) {
         const error = new Error("Status user can't be appeared");
@@ -188,10 +194,8 @@ class StatusController {
       let data = {
         content: req.body.content,
         owner: req.body.profile,
-        // media: req.body.media ? req.body.media : "images.jpg",
-        // comment: req.body.comment ? req.body.comment : [],
         interest: req.body.interest,
-        // likeBy: req.body.likeBy ? req.body.likeBy : [],
+        media: [],
       };
 
       if ("images" in req) {
@@ -256,6 +260,12 @@ class StatusController {
         type: "like_status",
         status_id: findStatusByUser._id,
         owner: req.profile.id,
+      });
+
+      await notification.create({
+        type: "like_status",
+        status_id: findStatusByUser._id,
+        from: req.profile.id,
       });
 
       res.status(200).json({

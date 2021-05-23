@@ -11,11 +11,8 @@ class StatusController {
 			let data = {
 				content: req.body.content,
 				owner: req.profile.id,
-				// media: req.body.media ? req.body.media : "images.jpg",
-				media: [],
-				comment: req.body.comment,
 				interest: req.body.interest,
-				// likeBy: req.body.likeBy,
+				media: [],
 			};
 
 			if ("images" in req) {
@@ -142,8 +139,10 @@ class StatusController {
 		try {
 			validationErrorHandler(req, res, next);
 
-			let statusData = await status.find({ interest: { $in: [req.params.id] } }).populate('owner interest');
-	
+			let statusData = await status
+				.find({ interest: { $in: [req.params.id] } })
+				.populate("owner interest");
+
 			if (!statusData) {
 				const error = new Error("Status data can't be appeared");
 				error.statusCode = 400;
@@ -178,10 +177,8 @@ class StatusController {
 			let data = {
 				content: req.body.content,
 				owner: req.body.profile,
-				// media: req.body.media ? req.body.media : "images.jpg",
-				comment: req.body.comment,
 				interest: req.body.interest,
-				// likeBy: req.body.likeBy,
+				media: [],
 			};
 
 			if ("images" in req) {

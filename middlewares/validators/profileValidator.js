@@ -13,12 +13,16 @@ class ProfileValidator {
             "id profile is not valid and must be 24 character & hexadecimal"
           );
         }
-
-        if (!validator.isAlpha(validator.blacklist(req.body.name, " "))) {
+        if (req.body.name == null ) {
+          req.body.name == req.body.name;
+        }
+        else if (!validator.isAlpha(validator.blacklist(req.body.name, " "))) {
           errors.push("Name must be alphabet");
         }
-
-        if (!mongoose.Types.ObjectId.isValid(req.body.user)) {
+        if ( req.body.user == null) {
+         req.body.user == req.body.user;
+        }
+        else if (!mongoose.Types.ObjectId.isValid(req.body.user)) {
           errors.push(
             "id user is not valid and must be 24 character & hexadecimal"
           );

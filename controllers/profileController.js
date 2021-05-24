@@ -199,6 +199,7 @@ class ProfileController {
 				location: req.body.location,
 			};
 
+
 			let dataProfile = await profile.findOneAndUpdate(
 				{ _id: req.params.id },
 				profileData,

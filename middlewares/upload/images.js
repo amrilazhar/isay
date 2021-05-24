@@ -5,12 +5,12 @@ const { S3Client, PutObjectCommand } = require("@aws-sdk/client-s3");
 async function upload(req, res, next) {
 	try {
 		if (req.files) {
-			if (!req.files.images) next();
+			if (!req.files.media) next();
 			// cek apakah array
-			if (!req.files.images.length) {
-				req.files.images = [req.files.images];
+			if (!req.files.media.length) {
+				req.files.media = [req.files.media];
 			}
-			const file = req.files.images;
+			const file = req.files.media;
 			req.images = [];
 			for (let i = 0; i < file.length; i++) {
 				if (!file[i].mimetype.startsWith("image")) {
@@ -30,7 +30,10 @@ async function upload(req, res, next) {
 				let fileName = crypto.randomBytes(16).toString("hex");
 				file[i].name = `${fileName}${path.parse(file[i].name).ext}`;
 
-				let imageUrl = await amazonUpload(file[i], `${req.directory}${req.user.profile}/`);
+				let imageUrl = await amazonUpload(
+					file[i],
+					`${req.directory}${req.user.profile}/`
+				);
 				req.images.push(imageUrl);
 			}
 		}

@@ -56,16 +56,15 @@ async function startSocketChat(req, res, next) {
 
             //emit notification to user
             let notificationData = {
-              notification_type : 'chat',
+              notification_type: "chat",
               status_id: null,
               chatMsg_id: query._id,
               comment_id: null,
               owner: message.to,
-              from : from,
-            }
+              from: from,
+            };
             await notification.create(notificationData);
-            req.io.emit("chat:"+message.to, notificationData);
-            
+            req.io.emit("chat:" + message.to, notificationData);
           })
           .catch((e) => {
             //emit to specific room if message create message error

@@ -1,10 +1,10 @@
 const mongoose = require("mongoose");
 const mongoose_delete = require("mongoose-delete");
-const mongoosePaginate = require('mongoose-paginate-v2');
+const mongoosePaginate = require("mongoose-paginate-v2");
 
 const ActivitiesSchema = new mongoose.Schema(
   {
-    activities_type: {
+    type: {
       type: String,
       required: false,
     },
@@ -21,7 +21,7 @@ const ActivitiesSchema = new mongoose.Schema(
     owner: {
       type: mongoose.Schema.Types.ObjectId,
       required: true,
-      ref : "profile"
+      ref: "profile",
     },
   },
   {
@@ -31,7 +31,6 @@ const ActivitiesSchema = new mongoose.Schema(
     },
   }
 );
-
 
 ActivitiesSchema.plugin(mongoosePaginate);
 ActivitiesSchema.plugin(mongoose_delete, { overrideMethods: "all" });

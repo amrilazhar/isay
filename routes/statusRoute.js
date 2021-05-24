@@ -87,6 +87,32 @@ router.delete(
 	statusValidator.delete,
 	statusController.deleteStatus
 );
+//========== ENDPOINT "GET" FOR MOBILE ==========//
+//TODO : Endpoint Get Status By User (Loadmore)
+router.get(
+	"/users/loadmore/",
+	tokenParser,
+	isAuth,
+	setProfileId,
+	statusController.loadMoreStatusByUser
+);
+//TODO : Endpoint Get Status By Interest (All) (Loadmore)
+router.get(
+	"/interest/loadmore/",
+	tokenParser,
+	isAuth,
+	setProfileId,
+	statusController.loadMoreStatusByInterest
+);
+//TODO : Endpoint Get Status By Interest (Single) (Loadmore)
+router.get(
+	"/interest/:id/loadmore/",
+	tokenParser,
+	isAuth,
+	setProfileId,
+	statusValidator.single,
+	statusController.loadMoreSingleInterest
+);
 
 // EXPORTS MODULE HERE
 module.exports = router;

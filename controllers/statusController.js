@@ -72,7 +72,11 @@ class StatusController {
 					: 1,
 				limit: req.query.limit ? req.query.limit : 8,
 				populate: [
-					{ path: "owner", populate: "location" },
+					{
+						path: "owner",
+						select: "id name avatar",
+						populate: "location",
+					},
 					{ path: "interest", select: "interest category" },
 				],
 			};
@@ -128,7 +132,11 @@ class StatusController {
 					: 1,
 				limit: req.query.limit ? req.query.limit : 8,
 				populate: [
-					{ path: "owner", populate: "location" },
+					{
+						path: "owner",
+						select: "id name avatar",
+						populate: "location",
+					},
 					{ path: "interest", select: "interest category" },
 				],
 			};
@@ -173,7 +181,11 @@ class StatusController {
 					: 1,
 				limit: req.query.limit ? req.query.limit : 8,
 				populate: [
-					{ path: "owner", populate: "location" },
+					{
+						path: "owner",
+						select: "id name avatar",
+						populate: "location",
+					},
 					{ path: "interest", select: "interest category" },
 				],
 			};
@@ -378,6 +390,157 @@ class StatusController {
 				res.status(200).json({
 					success: true,
 					message: "Success",
+				});
+			}
+		} catch (err) {
+			console.log(err);
+			if (!err.statusCode) {
+				err.statusCode = 500;
+			}
+			next(err);
+		}
+	}
+
+	//TODO-GET : Loadmore Get Status/Post By User
+	async loadMoreStatusByUser(req, res, next) {
+		try {
+			validationErrorHandler(req, res, next);
+
+			let limit = eval(req.query.limit) ? eval(req.query.limit) : 8;
+			let statusUsers = await status
+				.find({ owner: req.profile.id })
+				.sort({ created_at: -1 })
+				.populate({
+					path: "owner",
+					select: "id name avatar",
+					populate: "location",
+				})
+				.populate({ path: "interest", select: "interest category" })
+				.limit(limit + 1)
+				.exec();
+
+			let lastLoad = false;
+			if (statusUsers.length < limit) {
+				lastLoad = true;
+			} else statusUsers.splice(limit, 1);
+
+			if (statusUsers.length > 0) {
+				res.status(200).send({
+					success: true,
+					message: "success",
+					data: statusUsers.reverse(),
+					last: lastLoad,
+				});
+			} else {
+				res.status(200).json({
+					success: true,
+					message: "success",
+					data: [],
+					last: lastLoad,
+				});
+			}
+		} catch (err) {
+			console.log(err);
+			if (!err.statusCode) {
+				err.statusCode = 500;
+			}
+			next(err);
+		}
+	}
+
+	//TODO-GET : Loadmore Get Status/Post By Interest (all)
+	//!ERROR
+	async loadMoreStatusByInterest(req, res, next) {
+		try {
+			validationErrorHandler(req, res, next);
+
+			let limit = eval(req.query.limit) ? eval(req.query.limit) : 8;
+
+			let interestUser = await profile.findOne({ _id: req.profile.id });
+			let stringFind = { $or: [] };
+
+			interestUser.interest.forEach((item) => {
+				stringFind["$or"].push({ interest: item });
+			});
+
+			let statusInterest = await status
+				.find(stringFind)
+				.sort({ created_at: -1 })
+				.populate({
+					path: "owner",
+					select: "id name avatar",
+					populate: "location",
+				})
+				.populate({ path: "interest", select: "interest category" })
+				.limit(limit + 1)
+				.exec();
+
+			let lastLoad = false;
+			if (statusInterest.length < limit) {
+				lastLoad = true;
+			} else statusInterest.splice(limit, 1);
+
+			if (statusInterest.length > 0) {
+				res.status(200).send({
+					success: true,
+					message: "success",
+					data: statusInterest.reverse(),
+					last: lastLoad,
+				});
+			} else {
+				res.status(200).json({
+					success: true,
+					message: "success",
+					data: [],
+					last: lastLoad,
+				});
+			}
+		} catch (err) {
+			console.log(err);
+			if (!err.statusCode) {
+				err.statusCode = 500;
+			}
+			next(err);
+		}
+	}
+
+	//TODO-GET : Loadmore Get Status/Post By Interest (single)
+	async loadMoreSingleInterest(req, res, next) {
+		try {
+			validationErrorHandler(req, res, next);
+
+			let limit = eval(req.query.limit) ? eval(req.query.limit) : 8;
+
+			let singleInterest = await status
+				.find({ interest: { $in: [req.params.id] } })
+				.sort({ created_at: -1 })
+				.populate({
+					path: "owner",
+					select: "id name avatar",
+					populate: "location",
+				})
+				.populate({ path: "interest", select: "interest category" })
+				.limit(limit + 1)
+				.exec();
+
+			let lastLoad = false;
+			if (singleInterest.length < limit) {
+				lastLoad = true;
+			} else singleInterest.splice(limit, 1);
+
+			if (singleInterest.length > 0) {
+				res.status(200).send({
+					success: true,
+					message: "success",
+					data: singleInterest.reverse(),
+					last: lastLoad,
+				});
+			} else {
+				res.status(200).json({
+					success: true,
+					message: "success",
+					data: [],
+					last: lastLoad,
 				});
 			}
 		} catch (err) {

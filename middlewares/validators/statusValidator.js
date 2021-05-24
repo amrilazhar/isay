@@ -22,11 +22,6 @@ exports.create = [
 		.trim()
 		.isLength({ min: 5, max: 1000 })
 		.withMessage("Content must be 5 more character"),
-	body("owner")
-		.trim()
-		.custom(isValidObjectId)
-		.bail()
-		.customSanitizer(objectId),
 	body("media").trim(),
 	body("interest")
 		.trim()
@@ -41,11 +36,6 @@ exports.update = [
 		.trim()
 		.isLength({ min: 5, max: 1000 })
 		.withMessage("Content must be 5 more character"),
-	body("owner")
-		.trim()
-		.custom(isValidObjectId)
-		.bail()
-		.customSanitizer(objectId),
 	body("media").trim(),
 	body("interest")
 		.trim()

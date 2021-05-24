@@ -35,7 +35,7 @@ class StatusController {
 				throw error;
 			} else {
 				// Socket io
-				req.io.emit("create:" + statusCreate, statusCreate);
+				req.io.emit("post:" + req.body.interest, statusCreate);
 
 				await activities.create({
 					type: "post_status",
@@ -92,9 +92,6 @@ class StatusController {
 				error.statusCode = 400;
 				throw error;
 			} else {
-				// Socket io
-				req.io.emit("users:" + statusUsers, statusUsers);
-
 				res.status(200).json({
 					success: true,
 					message: "Success",
@@ -147,9 +144,6 @@ class StatusController {
 				error.statusCode = 400;
 				throw error;
 			} else {
-				// Socket io
-				req.io.emit("interest:" + statusData, statusData);
-
 				res.status(200).json({
 					success: true,
 					message: "Success",
@@ -200,9 +194,6 @@ class StatusController {
 				error.statusCode = 400;
 				throw error;
 			} else {
-				// Socket io
-				req.io.emit("interest:" + statusData, statusData);
-
 				res.status(200).json({
 					success: true,
 					message: "Success",
@@ -225,14 +216,8 @@ class StatusController {
 
 			let data = {
 				content: req.body.content,
-				owner: req.body.profile,
 				interest: req.body.interest,
-				media: [],
 			};
-
-			if ("images" in req) {
-				data.media = req.images;
-			}
 
 			let statusUpdate = await status.findOneAndUpdate(
 				{
@@ -243,14 +228,19 @@ class StatusController {
 					new: true,
 				}
 			);
+
+			let oldImage = statusUpdate.media.map((item) =>
+				item.replace(process.env.S3_URL, "")
+			);
+
+			statusUpdate.media = [...oldImage, ...req.images];
+			await statusUpdate.save();
+
 			if (!statusUpdate) {
 				const error = new Error("Update status failed");
 				error.statusCode = 400;
 				throw error;
 			} else {
-				// Socket io
-				req.io.emit("update:" + statusUpdate, statusUpdate);
-
 				res.status(200).json({
 					success: true,
 					message: "Success",
@@ -293,11 +283,16 @@ class StatusController {
 				owner: req.profile.id,
 			});
 
-			await notification.create({
+			let notif = await notification.create({
 				type: "like_status",
 				status_id: findStatusByUser._id,
 				from: req.profile.id,
+				to: findStatusByUser.owner,
 			});
+
+			notif.populate("status_id from to").execPopulate();
+
+			req.io.emit("notif:" + findStatusByUser.owner, notif);
 
 			res.status(200).json({
 				success: true,
@@ -342,7 +337,10 @@ class StatusController {
 				{ new: true }
 			);
 
-			await activities.deleteOne({ _id: req.params.id });
+			await activities.deleteOne({
+				status_id: req.params.id,
+				type: "like_status",
+			});
 
 			res.status(200).json({
 				success: true,
@@ -372,10 +370,10 @@ class StatusController {
 				error.statusCode = 400;
 				throw error;
 			} else {
-				// Socket io
-				req.io.emit("delete status:" + statusDelete, statusDelete);
-
-				await activities.deleteOne({ _id: req.params.id });
+				await activities.deleteOne({
+					status_id: req.params.id,
+					type: "post_status",
+				});
 
 				res.status(200).json({
 					success: true,

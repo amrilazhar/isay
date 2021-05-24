@@ -1,4 +1,4 @@
-const { interest, location } = require("../models");
+const { interest, location, funfact } = require("../models");
 const file = require("fs");
 const brain = require("brain.js");
 
@@ -142,7 +142,13 @@ class UtilsController {
         charName[Math.floor(tempN.name * 1000)]
       }.#${Math.floor(Math.random() * 9999)}`;
 
+      //set avatar
       let avatar = "https://robohash.org/avatar" + randomTen;
+
+      //selecting fun fact
+      req.body.funfact = (await funfact.find({}).populate("interest").exec())[
+        randomTen
+      ];
 
       req.body.name = generatedName;
       req.body.avatar = avatar;

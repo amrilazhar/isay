@@ -6,7 +6,7 @@ const statusController = require("../controllers/statusController");
 const imageUpload = require("../middlewares/upload/images");
 // IMPORT MIDDLEWARE HERE
 const statusValidator = require("../middlewares/validators/statusValidator");
-
+const imageDeletes = require("../middlewares/delete/image");
 // IMPORT AUTH HERE
 const tokenParser = require("../middlewares/authentication/tokenParser");
 const isAuth = require("../middlewares/authentication/isAuth");
@@ -80,6 +80,8 @@ router.get(
 	statusValidator.single,
 	statusController.loadMoreSingleInterest
 );
+//DELETE IMAGE
+router.put("/delim/", tokenParser, isAuth, setProfileId, dir, imageDeletes);
 router.put(
 	"/:id",
 	tokenParser,
@@ -106,14 +108,6 @@ router.put(
 );
 router.delete(
 	"/:id",
-	tokenParser,
-	isAuth,
-	setProfileId,
-	statusValidator.delete,
-	statusController.deleteStatus
-);
-router.delete(
-	"/:id/image/:params",
 	tokenParser,
 	isAuth,
 	setProfileId,

@@ -1,5 +1,4 @@
 const validationErrorHandler = require("../utils/validationErrorHandler");
-const { S3Client, PutObjectCommand } = require("@aws-sdk/client-s3");
 
 const {
 	status,
@@ -539,63 +538,6 @@ class StatusController {
 					message: "success",
 					data: [],
 					last: lastLoad,
-				});
-			}
-		} catch (err) {
-			console.log(err);
-			if (!err.statusCode) {
-				err.statusCode = 500;
-			}
-			next(err);
-		}
-	}
-
-	//TODO-DELETE : Delete Image in AWS S3
-	async deleteImageS3(req, res, next) {
-		try {
-			validationErrorHandler(req, res, next);
-
-			const s3 = new AWS.S3({
-				accessKeyId: process.env.S3_ACCESS_KEY,
-				secretAccessKey: process.env.S3_SECRET_KEY,
-			});
-
-			const s3 = new S3Client({
-				region: REGION,
-				credentials: {
-					accessKeyId: process.env.S3_ACCESS_KEY,
-					secretAccessKey: process.env.S3_SECRET_KEY,
-				},
-			});
-
-			const imageS3 = {
-				Bucket: process.env.S3_BUCKET_NAME,
-				//?: keluarin image without url https klo bisa (mas reza)
-				Key: `${dir}${params}`,
-			};
-
-			if (!imageS3) {
-				const error = new Error("Cannot find image");
-				error.statusCode = 400;
-				throw error;
-			} else {
-				res.status(200).json({
-					success: true,
-					message: "Success",
-					data: imageS3,
-				});
-			}
-
-			let removeImageS3 = await s3.deleteObject(imageS3);
-
-			if (!removeImageS3) {
-				const error = new Error("Cannot delete image");
-				error.statusCode = 400;
-				throw error;
-			} else {
-				res.status(200).json({
-					success: true,
-					message: "Success",
 				});
 			}
 		} catch (err) {

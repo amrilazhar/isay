@@ -449,7 +449,6 @@ class StatusController {
 	}
 
 	//TODO-GET : Loadmore Get Status/Post By Interest (all)
-	//!ERROR
 	async loadMoreStatusByInterest(req, res, next) {
 		try {
 			validationErrorHandler(req, res, next);

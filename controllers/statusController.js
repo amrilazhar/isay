@@ -242,14 +242,12 @@ class StatusController {
 				}
 			);
 
-			let oldImage = statusUpdate.media.map((item) =>
-				item.replace(process.env.S3_URL, "")
-			);
-
-			statusUpdate.media = [...oldImage, ...req.images];
+			req.images.forEach((item) => statusUpdate.media.push(item));
 			await statusUpdate.save();
 
-			if (!statusUpdate) {
+			let returnData = await status.findOne({ _id: req.params.id });
+
+			if (!returnData) {
 				const error = new Error("Update status failed");
 				error.statusCode = 400;
 				throw error;
@@ -257,7 +255,7 @@ class StatusController {
 				res.status(200).json({
 					success: true,
 					message: "Success",
-					data: statusUpdate,
+					data: returnData,
 				});
 			}
 		} catch (err) {

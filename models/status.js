@@ -13,11 +13,13 @@ const StatusSchema = new mongoose.Schema(
 			required: false,
 			ref: "profile",
 		},
-		media: {
-			type: Array,
-			required: false,
-			get: getMedia,
-		},
+		media: [
+			{
+				type: String,
+				required: false,
+				get: getMedia,
+			},
+		],
 		comment: [
 			{
 				type: mongoose.Schema.Types.ObjectId,
@@ -43,13 +45,12 @@ const StatusSchema = new mongoose.Schema(
 			updatedAt: "updated_at",
 		},
 		toJSON: { getters: true },
+		toObject: { getters: false },
 	}
 );
 
-function getMedia(arr) {
-	return arr.map((item) => {
-		return process.env.S3_URL + item;
-	});
+function getMedia(image) {
+	return process.env.S3_URL + image;
 }
 
 StatusSchema.plugin(mongoosePaginate);

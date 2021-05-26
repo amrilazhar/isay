@@ -170,7 +170,7 @@ async function socketImageUpload(req, res) {
           status_id: null,
           chatMsg_id: query._id,
           comment_id: null,
-          to : message.to,
+          to : req.utils.message.to,
           from: from,
         };
 
@@ -182,7 +182,7 @@ async function socketImageUpload(req, res) {
         console.log(e);
         req.io
           .to(req.utils.handshake)
-          .emit("messageFromServer", "something wrong");
+          .emit("messageFromServer", "something wrong in image upload");
       });
   } catch (error) {
     console.log(error);

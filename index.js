@@ -43,6 +43,7 @@ app.use((req, res, next) => {
   //becaus if it's not removed then the other listener will emit the same thing to the user that can cause multiple message send
   req.io.removeAllListeners("connection");
   req.io.on("connection", (socket) => {
+    socket.emit("firstConnect","connected to server");
     req.socket = socket;
   });
   next();

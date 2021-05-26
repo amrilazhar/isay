@@ -3,9 +3,10 @@ const { chat, notification } = require("../../models");
 const crypto = require("crypto");
 const { S3Client, PutObjectCommand } = require("@aws-sdk/client-s3");
 
-async function startSocketChat(req, res, next) {
+async function startSocketChat(req, res) {
   try {
     console.log("connect controller");
+
     let from = mongoose.Types.ObjectId(req.profile.id);
 
     req.socket.join(req.socket.handshake.query.roomID);

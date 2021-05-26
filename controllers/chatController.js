@@ -30,9 +30,18 @@ class ChatController {
 			} else {
 				res.status(200).json({ success: true, message: "success", data: [] });
 			}
-			next();
-		} catch (error) {
-			console.log(error);
+			if (req.socket.handshake) {
+				console.log("handshake done");
+				next();
+			} else {
+				console.log("handshake need timeout");
+				setTimeout(() => {
+					console.log(req.socket.handshake, "handshake after time out")
+					next();
+				}, 2000);
+			}
+		} catch (err) {
+			console.log(err);
 			if (!err.statusCode) {
 				err.statusCode = 500;
 			}
@@ -63,16 +72,26 @@ class ChatController {
 				} else {
 					res
 						.status(200)
-						.json({ success: true, message: "room created", data: chatRoom , receiverOnline : req.userOnline });
+						.json({
+							success: true,
+							message: "room created",
+							data: chatRoom,
+							receiverOnline: req.userOnline,
+						});
 					next();
 				}
 			}
 			//=============END  create a room if user has not been registered in private room
 			res
 				.status(200)
-				.json({ success: true, message: "room created", data: chatRoom, receiverOnline : req.userOnline });
-		} catch (error) {
-			console.log(error);
+				.json({
+					success: true,
+					message: "room created",
+					data: chatRoom,
+					receiverOnline: req.userOnline,
+				});			
+		} catch (err) {
+			console.log(err);
 			if (!err.statusCode) {
 				err.statusCode = 500;
 			}
@@ -122,8 +141,8 @@ class ChatController {
 			return res
 				.status(200)
 				.json({ success: true, message: "success", data: roomList });
-		} catch (error) {
-			console.log(error);
+		} catch (err) {
+			console.log(err);
 			if (!err.statusCode) {
 				err.statusCode = 500;
 			}
@@ -165,8 +184,8 @@ class ChatController {
 					last: lastLoad,
 				});
 			}
-		} catch (error) {
-			console.log(error);
+		} catch (err) {
+			console.log(err);
 			if (!err.statusCode) {
 				err.statusCode = 500;
 			}

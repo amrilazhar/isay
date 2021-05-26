@@ -17,15 +17,16 @@ router.post(
 	isAuth,
 	setProfileId,
   getOnlineStatus,
-	chatController.joinRoom
+	chatController.joinRoom,
 );
 router.get(
 	"/messageHistory/:chatRoom",
 	tokenParser,
 	isAuth,
 	setProfileId,
+  getOnlineStatus,
 	chatController.getMessageHistory,
-	startSocketChat
+  startSocketChat,
 );
 router.get(
 	"/roomList",

@@ -10,6 +10,9 @@ async function startSocketChat(req, res, next) {
 
     req.socket.join(req.socket.handshake.query.roomID);
 
+    //set user status as Online
+    req.io.emit("online:" + req.user.profile, true);
+
     //start listening event set read status
     req.socket.on("readMessage", async (data) => {
       await chat.message.findByIdAndUpdate(data.message_id, { readed: true });
@@ -22,6 +25,10 @@ async function startSocketChat(req, res, next) {
     req.socket.on("disconnect", () => {
       console.log("user disconnect");
       req.socket.leave(req.socket.handshake.query.roomID);
+
+      //set user status as Offline when disconnect
+      req.io.emit("online:" + req.profile.id, false);
+
       req.socket.disconnect();
     });
 

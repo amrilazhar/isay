@@ -6,7 +6,7 @@ const statusController = require("../controllers/statusController");
 const imageUpload = require("../middlewares/upload/images");
 // IMPORT MIDDLEWARE HERE
 const statusValidator = require("../middlewares/validators/statusValidator");
-
+const imageDeletes = require("../middlewares/delete/image");
 // IMPORT AUTH HERE
 const tokenParser = require("../middlewares/authentication/tokenParser");
 const isAuth = require("../middlewares/authentication/isAuth");
@@ -40,12 +40,28 @@ router.get(
 	setProfileId,
 	statusController.getStatusByUser
 );
+//TODO : Endpoint Get Status By User (Loadmore)
+router.get(
+	"/users/loadmore/",
+	tokenParser,
+	isAuth,
+	setProfileId,
+	statusController.loadMoreStatusByUser
+);
 router.get(
 	"/interest/",
 	tokenParser,
 	isAuth,
 	setProfileId,
 	statusController.getStatusByInterest
+);
+//TODO : Endpoint Get Status By Interest (All) (Loadmore)
+router.get(
+	"/interest/loadmore",
+	tokenParser,
+	isAuth,
+	setProfileId,
+	statusController.loadMoreStatusByInterest
 );
 router.get(
 	"/interest/:id",
@@ -54,6 +70,15 @@ router.get(
 	setProfileId,
 	statusValidator.single,
 	statusController.getSingleInterest
+);
+//TODO : Endpoint Get Status By Interest (Single) (Loadmore)
+router.get(
+	"/interest/:id/loadmore/",
+	tokenParser,
+	isAuth,
+	setProfileId,
+	statusValidator.single,
+	statusController.loadMoreSingleInterest
 );
 router.put(
 	"/:id",
@@ -79,6 +104,8 @@ router.put(
 	setProfileId,
 	statusController.unlikeStatus
 );
+//DELETE IMAGE
+router.delete("/delim/", tokenParser, isAuth, setProfileId, dir, imageDeletes);
 router.delete(
 	"/:id",
 	tokenParser,

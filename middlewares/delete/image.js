@@ -22,7 +22,7 @@ async function amazonDelete(req, res, next) {
 			error.statusCode = 400;
 			throw error;
 		}
-		console.log(s3, "---------------------- ini s3");
+		// console.log(s3, "---------------------- ini s3");
 
 		let removeImages = await s3.send(new DeleteObjectCommand(deleteParams));
 

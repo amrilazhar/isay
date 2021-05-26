@@ -18,7 +18,7 @@ let setProfileId = (req, res, next) => {
 };
 
 let dir = (req, res, next) => {
-	req.directory = "images/status";
+	req.directory = "images/status/";
 	next();
 };
 

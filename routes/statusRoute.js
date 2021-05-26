@@ -119,6 +119,7 @@ router.get(
 	tokenParser,
 	isAuth,
 	setProfileId,
+	statusValidator.single,
 	statusController.getStatusByID
 );
 

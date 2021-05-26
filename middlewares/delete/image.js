@@ -1,21 +1,8 @@
-const { S3Client } = require("@aws-sdk/client-s3");
+const { S3Client, DeleteObjectCommand } = require("@aws-sdk/client-s3");
 
 async function amazonDelete(req, res, next) {
 	try {
 		const REGION = "ap-southeast-1";
-
-		const deleteParams = {
-			ACL: "public-read",
-			Bucket: process.env.S3_BUCKET_NAME,
-			Delete: {
-				Objects: [
-					{
-						Key: req.query.media.toString(),
-					},
-				],
-				Quiet: false,
-			},
-		};
 
 		const s3 = new S3Client({
 			region: REGION,
@@ -25,13 +12,19 @@ async function amazonDelete(req, res, next) {
 			},
 		});
 
+		const deleteParams = {
+			Bucket: process.env.S3_BUCKET_NAME,
+			Key: req.query.media.toString().replace(process.env.S3_URL, ""),
+		};
+
 		if (!deleteParams) {
 			const error = new Error("can't find images");
 			error.statusCode = 400;
 			throw error;
 		}
+		console.log(s3, "---------------------- ini s3");
 
-		let removeImages = await s3.deleteObject(deleteParams);
+		let removeImages = await s3.send(new DeleteObjectCommand(deleteParams));
 
 		if (removeImages) {
 			res.status(200).json({
@@ -39,7 +32,6 @@ async function amazonDelete(req, res, next) {
 				message: "Delete images Success",
 			});
 		}
-		next();
 	} catch (err) {
 		console.log(err);
 		if (!err.statusCode) {
@@ -48,5 +40,4 @@ async function amazonDelete(req, res, next) {
 		next(err);
 	}
 }
-
 module.exports = amazonDelete;

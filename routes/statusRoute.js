@@ -80,8 +80,6 @@ router.get(
 	statusValidator.single,
 	statusController.loadMoreSingleInterest
 );
-//DELETE IMAGE
-router.put("/delim/", tokenParser, isAuth, setProfileId, dir, imageDeletes);
 router.put(
 	"/:id",
 	tokenParser,
@@ -106,6 +104,8 @@ router.put(
 	setProfileId,
 	statusController.unlikeStatus
 );
+//DELETE IMAGE
+router.delete("/delim/", tokenParser, isAuth, setProfileId, dir, imageDeletes);
 router.delete(
 	"/:id",
 	tokenParser,

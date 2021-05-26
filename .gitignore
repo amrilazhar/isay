@@ -7,3 +7,4 @@ coverage
 functions
 .gitlab-ci.yml
 yarn.lock
+.vscode

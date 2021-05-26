@@ -104,8 +104,15 @@ router.put(
 	setProfileId,
 	statusController.unlikeStatus
 );
-//DELETE IMAGE
-router.delete("/delim/", tokenParser, isAuth, setProfileId, dir, imageDeletes);
+//TODO : DELETE IMAGE
+router.delete(
+	"/delim/", 
+	tokenParser, 
+	isAuth, 
+	setProfileId, 
+	dir, 
+	imageDeletes
+);
 router.delete(
 	"/:id",
 	tokenParser,

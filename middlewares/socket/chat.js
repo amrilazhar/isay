@@ -53,8 +53,8 @@ async function startSocketChat(req, res) {
           .then(async (query) => {
             //populate the data with user profile data
             let sendMess = await query
-              .populate("from", "name")
-              .populate("to", "name")
+              .populate("from", "name avatar")
+              .populate("to", "name avatar")
               .execPopulate();
 
             //emit to specific room if message create message success
@@ -160,8 +160,8 @@ async function socketImageUpload(req, res) {
       .then(async (query) => {
         //populate the data with user profile data
         let sendMess = await query
-          .populate("from", "name")
-          .populate("to", "name")
+          .populate("from", "name avatar")
+          .populate("to", "name avatar")
           .execPopulate();
 
         //emit notification to user

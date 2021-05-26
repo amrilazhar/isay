@@ -536,6 +536,41 @@ class StatusController {
 			next(err);
 		}
 	}
+
+	//TODO-GET : Get status/post by ID : No Pagination
+	async getStatusByID(req, res, next) {
+		try {
+			validationErrorHandler(req, res, next);
+
+			let statusData = await status.findOne({ _id: req.params.id }).populate([
+				{
+					path: "owner",
+					select: "id name avatar",
+					populate: "location",
+				},
+				{ path: "interest", select: "interest category icon" },
+				// { path: "likeBy" , select : "name avatar"}
+			]);
+
+			if (!statusData) {
+				const error = new Error("Status Data can't be appeared");
+				error.statusCode = 400;
+				throw error;
+			} else {
+				res.status(200).json({
+					success: true,
+					message: "Success",
+					data: statusData,
+				});
+			}
+		} catch (err) {
+			console.log(err);
+			if (!err.statusCode) {
+				err.statusCode = 500;
+			}
+			next(err);
+		}
+	}
 }
 
 module.exports = new StatusController();

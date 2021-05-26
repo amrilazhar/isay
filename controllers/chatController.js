@@ -59,18 +59,18 @@ class ChatController {
 				if (!chatRoom) {
 					return res
 						.status(400)
-						.json({ success: true, message: "error create room" });
+						.json({ success: false, message: "error create room" });
 				} else {
 					res
 						.status(200)
-						.json({ success: true, message: "room created", data: chatRoom });
+						.json({ success: true, message: "room created", data: chatRoom , receiverOnline : req.userOnline });
 					next();
 				}
 			}
 			//=============END  create a room if user has not been registered in private room
 			res
 				.status(200)
-				.json({ success: true, message: "room created", data: chatRoom });
+				.json({ success: true, message: "room created", data: chatRoom, receiverOnline : req.userOnline });
 		} catch (error) {
 			console.log(error);
 			if (!err.statusCode) {

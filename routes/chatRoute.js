@@ -8,6 +8,7 @@ const { startSocketChat } = require("../middlewares/socket/chat");
 const tokenParser = require("../middlewares/authentication/tokenParser");
 const isAuth = require("../middlewares/authentication/isAuth");
 const setProfileId = require("../utils/setProfileId");
+const { getOnlineStatus } = require("../utils/onlineStatus");
 
 // SET ROUTER HERE
 router.post(
@@ -15,6 +16,7 @@ router.post(
 	tokenParser,
 	isAuth,
 	setProfileId,
+  getOnlineStatus,
 	chatController.joinRoom
 );
 router.get(

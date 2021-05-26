@@ -114,6 +114,13 @@ router.delete(
 	statusValidator.delete,
 	statusController.deleteStatus
 );
+router.get(
+	"/:id",
+	tokenParser,
+	isAuth,
+	setProfileId,
+	statusController.getStatusByID
+);
 
 // EXPORTS MODULE HERE
 module.exports = router;

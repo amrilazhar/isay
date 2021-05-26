@@ -16,7 +16,7 @@ async function startSocketChat(req, res, next) {
     //start listening event set read status
     req.socket.on("readMessage", async (data) => {
       await chat.message.findByIdAndUpdate(data.message_id, { readed: true });
-      let emit = req.io
+      req.io
         .to(req.socket.handshake.query.roomID)
         .emit("updatedReadMessage", data.message_id);
     });
@@ -67,7 +67,7 @@ async function startSocketChat(req, res, next) {
               status_id: null,
               chatMsg_id: query._id,
               comment_id: null,
-              owner: message.to,
+              to : message.to,
               from: from,
             };
             await notification.create(notificationData);
@@ -162,6 +162,16 @@ async function socketImageUpload(req, res) {
           .populate("from", "name")
           .populate("to", "name")
           .execPopulate();
+
+        //emit notification to user
+        let notificationData = {
+          notification_type: "chat",
+          status_id: null,
+          chatMsg_id: query._id,
+          comment_id: null,
+          to : message.to,
+          from: from,
+        };
 
         //emit to specific room if message create message success
         req.io.to(req.utils.handshake).emit("messageFromServer", sendMess);

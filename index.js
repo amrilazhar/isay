@@ -46,7 +46,6 @@ app.use((req, res, next) => {
 	req.io.on("connection", (socket) => {
 		req.socket = socket;
 		if (socket.handshake.query.roomID) {
-			socket.offAny();
 			startSocketChat(req, res);
 		}
 	});

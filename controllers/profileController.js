@@ -374,7 +374,7 @@ class ProfileController {
 					? Math.floor(Math.random() * 11)
 					: req.params.avatar
 				: Math.floor(Math.random() * 11);
-				
+
 			let setProfilePic = profile.findOneAndUpdate(
 				{ _id: req.profile.id },
 				{ avatar: avatarPic[choosenAvatar] },
@@ -388,6 +388,23 @@ class ProfileController {
 					avatar: avatarPic[choosenAvatar],
 				});
 			}
+		} catch (err) {
+			console.log(err);
+			if (!err.statusCode) {
+				err.statusCode = 500;
+			}
+			next(err);
+		}
+	}
+
+	getAvatarList(req, res) {
+		try {
+			let { avatarPic } = require("../training/dataList");
+			res.status(200).json({
+				success: true,
+				message: "Avatar List",
+				data : avatarPic,
+			});
 		} catch (err) {
 			console.log(err);
 			if (!err.statusCode) {

@@ -6,7 +6,7 @@ const { tokenDecoder } = require("../../utils/chatUtils");
 
 async function startSocketChat(req, res) {
 	try {
-		req.profile = await tokenDecoder(req);
+		req.profile = (await tokenDecoder(req)).profile;
 		let from = mongoose.Types.ObjectId(req.profile.id);
 
 		req.socket.join(req.socket.handshake.query.roomID);

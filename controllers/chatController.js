@@ -30,16 +30,6 @@ class ChatController {
 			} else {
 				res.status(200).json({ success: true, message: "success", data: [] });
 			}
-			if (req.socket.handshake) {
-				console.log("handshake done");
-				next();
-			} else {
-				console.log("handshake need timeout");
-				setTimeout(() => {
-					console.log(req.socket.handshake, "handshake after time out")
-					next();
-				}, 2000);
-			}
 		} catch (err) {
 			console.log(err);
 			if (!err.statusCode) {
@@ -59,7 +49,7 @@ class ChatController {
 				.findOne({
 					member: { $all: [from, to] },
 				})
-				.populate("member", "_id name avatar");
+				.populate("member", "_id name avatar onlineStatus");
 
 			//================ create a room if user has not been registered in private room
 			if (chatRoom == null) {

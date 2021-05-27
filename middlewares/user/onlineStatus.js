@@ -1,5 +1,5 @@
-const profile = require("../models/profile");
-const user = require("../models/users");
+const profile = require("../../models/profile");
+const user = require("../../models/users");
 
 module.exports.setOnlineStatus = async (req, res, next) => {
 	if (req.profile.id !== null) {

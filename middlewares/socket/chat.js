@@ -2,11 +2,11 @@ const mongoose = require("mongoose");
 const { chat, notification } = require("../../models");
 const crypto = require("crypto");
 const { S3Client, PutObjectCommand } = require("@aws-sdk/client-s3");
+const { tokenDecoder } = require("../../utils/chatUtils");
 
 async function startSocketChat(req, res) {
 	try {
-		console.log("connect controller");
-
+		req.profile = await tokenDecoder(req);
 		let from = mongoose.Types.ObjectId(req.profile.id);
 
 		req.socket.join(req.socket.handshake.query.roomID);
@@ -39,6 +39,7 @@ async function startSocketChat(req, res) {
 				req.utils = {
 					handshake: req.socket.handshake.query.roomID,
 					message: message,
+					from : from,
 				};
 				socketImageUpload(req, res);
 			} else {
@@ -153,7 +154,7 @@ async function socketImageUpload(req, res) {
 			.create({
 				chatRoom: req.utils.message.chatRoom,
 				message: process.env.S3_URL + imageUrl,
-				from: from,
+				from: req.utils.from,
 				to: req.utils.message.to,
 				message_type: "image",
 			})

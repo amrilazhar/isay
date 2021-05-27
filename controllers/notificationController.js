@@ -11,7 +11,7 @@ class NotificationController {
 			};
 			//get data from database
 			let dataNotif = await notification.paginate(
-				{ owner: req.profile.id },
+				{ to : req.profile.id, type :  {$ne: 'chat'} },
 				options
 			);
 

@@ -127,6 +127,9 @@ app.use("/profile", profileRoutes);
 const statusRoutes = require("./routes/statusRoute.js");
 app.use("/status", statusRoutes);
 
+const notifRoutes = require("./routes/notifRoute.js");
+app.use("/notif", notifRoutes);
+
 // ============== END ROUTES DECLARATION & IMPORT ====================== //
 
 //========================= Error Handler ==========================

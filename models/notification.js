@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const mongoose_delete = require("mongoose-delete");
+const mongoosePaginate = require("mongoose-paginate-v2");
 
 const NotificationSchema = new mongoose.Schema(
 	{
@@ -48,6 +49,7 @@ const NotificationSchema = new mongoose.Schema(
 	}
 );
 
+NotificationSchema.plugin(mongoosePaginate);
 NotificationSchema.plugin(mongoose_delete, { overrideMethods: "all" });
 
 module.exports = mongoose.model(

@@ -370,18 +370,20 @@ class ProfileController {
 					? Math.floor(Math.random() * 11)
 					: req.params.avatar
 				: Math.floor(Math.random() * 11);
-
-			let setProfilePic = profile.findOneAndUpdate(
-				{ _id: req.profile.id },
+			console.log(req.profile.id, "==profile id");
+			
+			let setProfilePic = await profile.findOneAndUpdate(
+				{ _id: mongoose.Types.ObjectId(req.profile.id) },
 				{ avatar: avatarPic[choosenAvatar] },
 				{ new: true }
 			);
-
+			
 			if (setProfilePic) {
 				res.status(200).json({
 					success: true,
 					message: "Profile Avatar Changed",
 					avatar: avatarPic[choosenAvatar],
+					data : setProfilePic,
 				});
 			}
 		} catch (err) {

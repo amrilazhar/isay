@@ -59,7 +59,16 @@ router.put(
 );
 
 //DELETE IMAGE
-router.delete("/delim/:id", tokenParser, isAuth, setProfileId, dir, commentValidator.ImageDelValidate, commentController.imageDelete, imageDeletes);
+router.delete(
+  "/delim/:id",
+  tokenParser,
+  isAuth,
+  setProfileId,
+  dir,
+  commentValidator.ImageDelValidate,
+  commentController.imageDelete,
+  imageDeletes
+);
 
 router.delete(
   "/:id",

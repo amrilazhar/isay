@@ -1,4 +1,4 @@
-const { profile, comment, post, status, activities } = require("../models");
+const { profile, comment, post, status, activities, notification } = require("../models");
 
 class CommentController {
   //===============================|| get all comment ||=========================//
@@ -7,7 +7,7 @@ class CommentController {
     try {
       let dataComment = await comment
         .find({ status_id: req.query.status_id })
-        .sort({ _id: 1 })
+        .sort({ _id: 1 }).populate('owner')
         .lean()
         .exec(); //id status
 
@@ -112,8 +112,9 @@ class CommentController {
 
       let createComment = await comment.create(data);
       //push comment to status array
-      await status.comment.push(createComment._id);
-      await status.save();
+	  let updateStatus = await status.findOne({_id : req.body.status_id});
+      updateStatus.comment.push(createComment._id);
+      await updateStatus.save();
 
       let notif = await notification.create({
         type: "post_comment",
@@ -253,11 +254,6 @@ class CommentController {
   async deleteComment(req, res) {
     try {
       let deleteCom = await comment.deleteOne({ _id: req.params.id }); //id comment that want to delete
-      // remove comment in status
-      let indexOfComment = await status.comment.indexOf({ _id: req.params.id });
-      status.comment.splice(indexOfComment, 1);
-      await status.save();
-
       if (!deleteCom) {
         const error = new Error("Delete comment failed");
         error.statusCode = 400;

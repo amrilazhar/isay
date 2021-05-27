@@ -6,38 +6,13 @@ const { user, comment, profile } = require("../models"); // import transaksi mod
 
 let authenticationToken = "0";
 let tempID = "";
-let tempProfile = "608ac628c8d0a1bfded19469";
+let tempProfile = "608ac649c8d0a1bfded1946b";
 let tempProfileTwo = "60935f673fba7223585128d1";
-let tempUserTwo = "60af9109e8f9c90029a29f08"
+let tempUserTwo = "60a8ca95014fc025303025d1";
+let tempStatus = "6093967f3fba722358512955";
+let tempAct = "609f765707b67c021317d7d8";
 
-
-describe("Utils TEST", () => {
-  describe("/Get All Location ", () => {
-    test("It should return success", async () => {
-      const res = await request(app).get("/utils/location");
-      // .set({
-      //   Authorization: `Bearer ${authenticationToken}`,
-      // })
-
-      expect(res.statusCode).toEqual(200);
-      expect(res.body).toBeInstanceOf(Object);
-      expect(res.body.message).toEqual("success");
-    });
-  });
-
-  describe("/GET  Interest by Category", () => {
-    test("It should return success", async () => {
-      const res = await request(app).get(`/utils/interest/topic`);
-      // .set({
-      //   Authorization: `Bearer ${authenticationToken}`,
-      // });
-
-      expect(res.statusCode).toEqual(200);
-      expect(res.body).toBeInstanceOf(Object);
-      expect(res.body.message).toEqual("success");
-    });
-  });
-
+//==================|| Post comment and make user ||==================
   describe("/POST Comment ", () => {
     test("It should return success", async () => {
       let status_id = "6093967f3fba722358512955";
@@ -111,43 +86,9 @@ describe("Utils TEST", () => {
       tempCommentID = res.body.data._id;
     });
   });
-});
 
-//Test get profile
-describe("/GET Profile", () => {
-  test("It should return success", async () => {
-    const res = await request(app)
-      .post("/comment/getProfile/608ac628c8d0a1bfded19469")
-      .set({
-        Authorization: `Bearer ${authenticationToken}`,
-      });
 
-    expect(res.statusCode).toEqual(200);
-    expect(res.body).toBeInstanceOf(Object);
-    expect(res.body.success).toEqual(true);
-  });
-});
-
-// make a status
-describe("/POST dummy status", () => {
-  test("It should return success", async () => {
-    const res = await request(app)
-      .post("/status")
-      .set({
-        Authorization: `Bearer ${authenticationToken}`,
-      })
-      .send({
-        content: "Anne with an E",
-        interest: "6092b557e957671c70e24279",
-        // media:,
-      });
-
-    expect(res.statusCode).toEqual(201);
-    expect(res.body).toBeInstanceOf(Object);
-    expect(res.body.success).toEqual(true);
-  });
-});
-//Tes get profile post
+//==================|| view my profile's status ||==================
 describe("/GET Profile's post", () => {
   test("It should return success", async () => {
     const res = await request(app)
@@ -162,7 +103,7 @@ describe("/GET Profile's post", () => {
   });
 });
 
-//Tes get profile activities
+//==================|| view my profile's activities ||==================
 describe("/GET Profile's activities", () => {
   test("It should return success", async () => {
     const res = await request(app)
@@ -177,54 +118,62 @@ describe("/GET Profile's activities", () => {
   });
 });
 
-
-
-
-//view another profile
+//==================|| view another profile's activities ||==================
 describe("/GET another Profile's activities", () => {
-	test("It should return success", async () => {
+  test("It should return success", async () => {
+    //create data profile
+    const dataProfileTwo = {
+      bio: "new bio",
+      name: "Anonymous",
+      location: "608f5baf87fc4f408c131780",
+      interest: [
+        "6092b557e957671c70e24276",
+        "6092b557e957671c70e24277",
+        "6092b557e957671c70e24278",
+        "6092b557e957671c70e24279",
+      ],
+      avatar: "http://dummyimage.com/167x100.png/ff4444/ffffff",
+    };
 
-	        //create data profile
-			const dataProfileTwo = {
-				bio: "new bio",
-				location: "608f5baf87fc4f408c131780",
-				interest: [
-				  "6092b557e957671c70e24276",
-				  "6092b557e957671c70e24277",
-				  "6092b557e957671c70e24278",
-				  "6092b557e957671c70e24279",
-				],
-				avatar: "http://dummyimage.com/167x100.png/ff4444/ffffff",
-			  };
-		
-			  let userProfileTwo = await profile.create(dataProfileTwo);
-			  userProfileTwo._id = tempProfileTwo;
-		
-			  //create data user
-			  const dataUserTwo = {
-				email: "isayjhorgi@test.com",
-				password: "Aneh1234!!",
-				admin: false,
-				emailVerified: true,
-				profile: userProfile._id,
-			  };
-		
-			  let userLoginNew = await user.create(dataUserTwo);
-			  userLoginNew._id = tempUserTwo;
+    let userProfileTwo = await profile.create(dataProfileTwo);
+    userProfileTwo._id = tempProfileTwo;
 
-			  const statusDummy = {
-				content: "yahooo !!"
-				owner: ""
-			  }
-			  const res = await request(app)
-			  .get("/an/Activities")
-			  .set({
-				Authorization: `Bearer ${authenticationToken}`,
-			  });
-		
-			expect(res.statusCode).toEqual(200);
-			expect(res.body).toBeInstanceOf(Object);
-			expect(res.body.success).toEqual(true);
-		  });
-		});
-		
+    //create data user
+    const dataUserTwo = {
+      email: "isayjhorgi@test.com",
+      password: "Aneh1234!!",
+      admin: false,
+      emailVerified: true,
+      profile: userProfile._id,
+    };
+
+    let userCreateNew = await user.create(dataUserTwo);
+    userCreateNew._id = tempUserTwo;
+
+    const dataStatus = {
+      content: "yahooo !!",
+      owner: tempProfileTwo,
+    };
+    let statusDummy = await status.create(dataStatus);
+    statusDummy._id = tempStatus;
+
+    const dataActivities = {
+      type: `${dataProfileTwo.name} make a status`,
+      status_id: tempStatus,
+	  owner: tempProfileTwo,
+    };
+    let activitiesDummy = await activites.create(dataActivities);
+    activitiesDummy._id = tempAct;
+
+    const res = await request(app)
+      .get(`/an/Activities/${tempProfileTwo}`)
+      .set({
+        Authorization: `Bearer ${authenticationToken}`,
+      });
+
+    expect(res.statusCode).toEqual(200);
+    expect(res.body).toBeInstanceOf(Object);
+    expect(res.body.success).toEqual(true);
+  });
+});
+

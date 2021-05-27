@@ -357,7 +357,38 @@ class ProfileController {
 					message: "Get User Interest Success",
 					data: findUser.interest,
 				});
-		} catch (e) {
+		} catch (err) {
+			console.log(err);
+			if (!err.statusCode) {
+				err.statusCode = 500;
+			}
+			next(err);
+		}
+	}
+
+	async changeAvatar(req, res) {
+		try {
+			let { avatarPic } = require("../training/dataList");
+			let choosenAvatar = req.params.avatar
+				? req.params.avatar > 11
+					? Math.floor(Math.random() * 11)
+					: req.params.avatar
+				: Math.floor(Math.random() * 11);
+				
+			let setProfilePic = profile.findOneAndUpdate(
+				{ _id: req.profile.id },
+				{ avatar: avatarPic[choosenAvatar] },
+				{ new: true }
+			);
+
+			if (setProfilePic) {
+				res.status(200).json({
+					success: true,
+					message: "Profile Avatar Changed",
+					avatar: avatarPic[choosenAvatar],
+				});
+			}
+		} catch (err) {
 			console.log(err);
 			if (!err.statusCode) {
 				err.statusCode = 500;

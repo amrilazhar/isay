@@ -31,5 +31,6 @@ router.put("/:id", tokenParser, isAuth, setProfileId, profileValidator.profileVa
 router.put("/Interest/:id", tokenParser, isAuth, setProfileId, profileController.addInterest);
 router.put("/DeleteInt/:id", tokenParser, isAuth, setProfileId, profileController.deleteInterest);
 router.get("/userInterest",tokenParser, isAuth, setProfileId, profileController.getListUserInterest);
+router.put("/changeAvatar/:avatar",tokenParser, isAuth, setProfileId, profileController.changeAvatar);
 
 module.exports = router;

@@ -236,10 +236,6 @@ class ProfileController {
 		try {
 			let profileData = {
 				bio: req.body.bio,
-				name: req.body.name,
-				avatar: req.body.avatar ? req.body.avatar : "defaultAvatar.jpg",
-				user: req.body.user,
-				activities: req.body.activities,
 				location: req.body.location,
 			};
 
@@ -254,7 +250,7 @@ class ProfileController {
 				error.statusCode = 400;
 				throw error;
 			}
-			req.io.emit("my profile update:" + dataProfile, dataProfile);
+			
 			res.status(200).json({
 				success: true,
 				message: "Update Profile Success",

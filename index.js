@@ -35,16 +35,20 @@ app.use(cors());
 const admin = require("./utils/firebase");
 // const mongooseConnect = require("./utils/database");
 
+const { startSocketChat } = require("./middlewares/socket/chat");
 // Assign socket object to every request
 app.use((req, res, next) => {
 	req.io = io;
 
 	//remove all listener before start connection, it's useful when user refresh page multiple times,
-    //becaus if it's not removed then the other listener will emit the same thing to the user that can cause multiple message send
+	//becaus if it's not removed then the other listener will emit the same thing to the user that can cause multiple message send
 	req.io.removeAllListeners("connection");
-	req.io.on('connection', (socket)=>{
+	req.io.on("connection", (socket) => {
 		req.socket = socket;
-	})
+		if (socket.handshake.query.roomID) {
+			startSocketChat(req, res);
+		}
+	});
 	next();
 });
 

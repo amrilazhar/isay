@@ -480,7 +480,7 @@ exports.createFirstProfile = async (req, res, next) => {
       err.statusCode = 400;
       throw err;
     }
-    createProfile.populate('interest').execPopulate();
+    createProfile.populate("interest").execPopulate();
     // update profile id on user table
     let updatedProfile = await User.findOneAndUpdate(
       { _id: req.user._id },
@@ -507,7 +507,8 @@ exports.createFirstProfile = async (req, res, next) => {
         id: updatedProfile._id,
         name: createProfile.name,
         avatar: createProfile.avatar,
-        interest : createProfile.interest,
+        interest: createProfile.interest,
+        funfact: req.body.funfact,
       },
     });
   } catch (err) {

@@ -1,63 +1,157 @@
-const { users, profile, movie, review } = require("../models");
-const User = require("../models/users");
 const request = require("supertest");
 const app = require("../index");
 const jwt = require("jsonwebtoken");
-const dotenv = require("dotenv");
 
-dotenv.config();
+const { user, comment, profile } = require("../models"); // import transaksi models
 
-let authenticationToken = "";
-let tempID ;
-let emailVerified = true
-let invalidToken =
-	"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoiNjA3OGZjNGZjMWJjMjA3Nzc3ZTc4Nzk4IiwiZW1haWwiOiJ1c2VyMUBnbGludHNtYWlsLmNvbSJ9LCJpYXQiOjE2MTkyNTI5NDcsImV4cCI6MTYxOTg1Nzc0N30.c3KzbMZIPJXUGhHrQ_xeVSxT4AlSN3JVMOio0Pbz4K8";
+let authenticationToken = "0";
+let tempID = "";
+let tempProfile = "608ac628c8d0a1bfded19469";
 
-// ======================|| Create User and get profile||======================= */
+describe("Utils TEST", () => {
+  describe("/Get All Location ", () => {
+    test("It should return success", async () => {
+      const res = await request(app).get("/utils/location");
+      // .set({
+      //   Authorization: `Bearer ${authenticationToken}`,
+      // })
 
-describe("|| GET Profile Success ||", () => {
-	it("it should GET profile of user ", async () => {
-		await users.collection.dropIndexes();
-		await users.deleteMany();
-		await users.collection.createIndex();
+      expect(res.statusCode).toEqual(200);
+      expect(res.body).toBeInstanceOf(Object);
+      expect(res.body.message).toEqual("success");
+    });
+  });
 
-		const user = new User({
-			email: "jhorgijelek@sad.com",
-			password: "NowOrNever123!!",
-			firstName: "Mighty",
-			lastName: "Osiris",
-			// photoUrl: imageUrl,
-			emailToken: generateToken(),
-			emailExpiration: Date.now() + 3600000,
-		});
+  describe("/GET  Interest by Category", () => {
+    test("It should return success", async () => {
+      const res = await request(app).get(`/utils/interest/topic`);
+      // .set({
+      //   Authorization: `Bearer ${authenticationToken}`,
+      // });
 
-		await user.save();
+      expect(res.statusCode).toEqual(200);
+      expect(res.body).toBeInstanceOf(Object);
+      expect(res.body.message).toEqual("success");
+    });
+  });
 
-		// TODO SEND E-MAIL
-    	tempID = user.id;
-    
-		console.log(users.emailToken);
-		//create token for auth as user
-		const token = jwt.sign(
-			{
-				id: user._id.toString(),
-				admin: user.admin,
-			},
-			process.env.JWT_SECRET,
-			{ expiresIn: "30d" }
-		);
+  describe("/POST Comment ", () => {
+    test("It should return success", async () => {
+      let status_id = "6093967f3fba722358512955";
 
-		// save token for later use
-		authenticationToken = token;
+      //drop and create table users
+      await user.collection.dropIndexes();
+      await user.deleteMany();
+      await user.collection.createIndex({ email: 1 }, { unique: true });
 
-		const res = await request(app)
-			.get(`/profile/getProfile/${tempID}`)
-			.set({
-				Authorization: `Bearer ${authenticationToken}`,
-			});
+      //delete comment
+      //delete profile
+      await comment.deleteMany();
+      await profile.deleteMany();
 
-		expect(res.statusCode).toEqual(200);
-		expect(res.body.message).toEqual("Success");
-		expect(res.body.data).toBeInstanceOf(Object);
-	});
+      //create data profile
+      const dataProfile = {
+        bio: "new bio",
+        location: "608f5baf87fc4f408c131780",
+        interest: [
+          "6092b557e957671c70e24276",
+          "6092b557e957671c70e24277",
+          "6092b557e957671c70e24278",
+          "6092b557e957671c70e24279",
+        ],
+        avatar: "http://dummyimage.com/167x100.png/ff4444/ffffff",
+      };
+
+      let userProfile = await profile.create(dataProfile);
+      userProfile._id = tempProfile;
+
+      //create data user
+      const dataUser = {
+        email: "isayjhorgi@test.com",
+        password: "Aneh1234!!",
+        admin: false,
+        emailVerified: true,
+        profile: userProfile._id,
+      };
+
+      let userLogin = await user.create(dataUser);
+
+      //generate token
+      const token = jwt.sign(
+        {
+          id: userLogin._id,
+          admin: userLogin.admin,
+          profile: userProfile._id,
+        },
+        process.env.JWT_SECRET,
+        { expiresIn: "30d" }
+      );
+
+      //save token variable for later use
+      authenticationToken = token;
+
+      const res = await request(app)
+        .post("/comment")
+        .set({
+          Authorization: `Bearer ${authenticationToken}`,
+        })
+        .send({
+          content: "Anne with an E",
+          status_id: status_id,
+          depth: 1,
+        });
+
+      expect(res.statusCode).toEqual(200);
+      expect(res.body).toBeInstanceOf(Object);
+      expect(res.body.success).toEqual(true);
+    });
+  });
 });
+
+//Test get profile
+describe("/GET Profile", () => {
+  test("It should return success", async () => {
+    const res = await request(app)
+      .post("/comment/getProfile/608ac628c8d0a1bfded19469")
+      .set({
+        Authorization: `Bearer ${authenticationToken}`,
+      });
+
+    expect(res.statusCode).toEqual(200);
+    expect(res.body).toBeInstanceOf(Object);
+    expect(res.body.success).toEqual(true);
+  });
+});
+
+//Tes get profile post
+describe("/GET Profile's post", () => {
+  test("It should return success", async () => {
+    const res = await request(app)
+      .get("/Post")
+      .set({
+        Authorization: `Bearer ${authenticationToken}`,
+      });
+
+    expect(res.statusCode).toEqual(200);
+    expect(res.body).toBeInstanceOf(Object);
+    expect(res.body.success).toEqual(true);
+  });
+});
+
+//Tes get profile activities
+describe("/GET Profile's activities", () => {
+	test("It should return success", async () => {
+	  const res = await request(app)
+		.get("/Activities")
+		.set({
+		  Authorization: `Bearer ${authenticationToken}`,
+		});
+  
+	  expect(res.statusCode).toEqual(200);
+	  expect(res.body).toBeInstanceOf(Object);
+	  expect(res.body.success).toEqual(true);
+	});
+  });
+
+  //view another profile
+  

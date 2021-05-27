@@ -53,3 +53,13 @@ exports.single = [
 ];
 
 exports.delete = [param("id").trim().custom(isValidObjectId)];
+
+exports.remove = [
+	param("id")
+		.trim()
+		.custom(isValidObjectId)
+		.bail()
+		.customSanitizer(objectId), 
+	query("media")
+		.trim()
+];

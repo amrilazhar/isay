@@ -106,11 +106,13 @@ router.put(
 );
 //TODO : DELETE IMAGE
 router.delete(
-	"/delim/", 
+	"/delim/:id", 
 	tokenParser, 
 	isAuth, 
 	setProfileId, 
 	dir, 
+	statusValidator.remove,
+	statusController.imageDelete,
 	imageDeletes
 );
 router.delete(

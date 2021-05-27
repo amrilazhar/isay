@@ -115,17 +115,15 @@ class ChatController {
 			let idLastChat = lastChat.map((item) => {
 				if (item.length > 0) {
 					//insert item to object container
-					console.log(item[0], "============item");
 					objCont[item[0]._id] = item[0];
 					return item[0]._id;
 				} else return null;
 			});
 
-			console.log(idLastChat, "=== last chat");
 			idLastChat.sort();
 			idLastChat.reverse();
 			idLastChat.forEach((item) => {
-				if (item) roomList.push(objCont[item]);
+				if (item) roomList.push({...objCont[item]._doc, chatOwner : req.profile.id});
 			});
 
 			return res

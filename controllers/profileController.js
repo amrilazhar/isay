@@ -366,18 +366,17 @@ class ProfileController {
 		try {
 			let { avatarPic } = require("../training/dataList");
 			let choosenAvatar = req.params.avatar
-				? req.params.avatar > 11
-					? Math.floor(Math.random() * 11)
+				? req.params.avatar > avatarPic.length || req.params.avatar < 0 
+					? Math.floor(Math.random() * (avatarPic.length-1) )
 					: req.params.avatar
-				: Math.floor(Math.random() * 11);
-			console.log(req.profile.id, "==profile id");
+				: Math.floor(Math.random() * (avatarPic.length-1) );
 			
 			let setProfilePic = await profile.findOneAndUpdate(
 				{ _id: mongoose.Types.ObjectId(req.profile.id) },
 				{ avatar: avatarPic[choosenAvatar] },
 				{ new: true }
 			);
-			
+
 			if (setProfilePic) {
 				res.status(200).json({
 					success: true,

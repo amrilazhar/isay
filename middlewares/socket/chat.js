@@ -65,7 +65,7 @@ async function startSocketChat(req, res) {
 
 						//emit notification to user
 						let notificationData = {
-							notification_type: "chat",
+							type: "chat",
 							status_id: null,
 							chatMsg_id: query._id,
 							comment_id: null,
@@ -167,7 +167,7 @@ async function socketImageUpload(req, res) {
 
 				//emit notification to user
 				let notificationData = {
-					notification_type: "chat",
+					type: "chat",
 					status_id: null,
 					chatMsg_id: query._id,
 					comment_id: null,

@@ -7,11 +7,17 @@ class NotificationController {
 				sort: { created_at: -1 },
 				page: req.query.page ? (req.query.page < 20 ? req.query.page : 20) : 1,
 				limit: req.query.limit ? req.query.limit : 20,
-				populate: "status_id chatMsg_id comment_id from to",
+				populate: [
+					{ path: "status_id", populate: "owner" },
+					{ path: "chatMsg_id" },
+					{ path: "comment_id" },
+					{ path: "from" },
+					{ path: "to" },
+				],
 			};
 			//get data from database
 			let dataNotif = await notification.paginate(
-				{ to : req.profile.id, type :  {$ne: 'chat'} },
+				{ to: req.profile.id, type: { $ne: "chat" } },
 				options
 			);
 

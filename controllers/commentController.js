@@ -7,7 +7,7 @@ class CommentController {
 		try {
 			let dataComment = await comment
 				.find({ status_id: req.query.status_id })
-				.sort({ _id: 1 })
+				.sort({ _id: 1 }).populate("owner")
 				.lean()
 				.exec(); //id status
 

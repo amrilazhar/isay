@@ -3,7 +3,7 @@ const router = express.Router();
 const notifController = require("../controllers/notificationController");
 const tokenParser = require("../middlewares/authentication/tokenParser");
 const isAuth = require("../middlewares/authentication/isAuth");
-const setProfileId = require("../utils/setProfileId");
+const setProfileId = require("../middlewares/user/setProfileId");
 
 // SET ROUTER HERE
 router.get(

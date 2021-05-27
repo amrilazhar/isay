@@ -35,6 +35,7 @@ app.use(cors());
 const admin = require("./utils/firebase");
 // const mongooseConnect = require("./utils/database");
 
+const { startSocketChat } = require("./middlewares/socket/chat");
 // Assign socket object to every request
 app.use((req, res, next) => {
 	req.io = io;
@@ -44,6 +45,10 @@ app.use((req, res, next) => {
 	req.io.removeAllListeners("connection");
 	req.io.on("connection", (socket) => {
 		req.socket = socket;
+		if (socket.handshake.query.roomID) {
+			socket.offAny();
+			startSocketChat(req, res);
+		}
 	});
 	next();
 });

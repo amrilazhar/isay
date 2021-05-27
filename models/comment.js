@@ -41,8 +41,14 @@ const CommentSchema = new mongoose.Schema(
 			createdAt: "created_at",
 			updatedAt: "updated_at",
 		},
+		toJSON: { getters: true },
 	}
-);
+  );
+  
+  function getMedia(image) {
+	return process.env.S3_URL + image;
+  }
+  
 
 CommentSchema.plugin(mongoose_delete, { overrideMethods: "all" });
 

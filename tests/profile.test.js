@@ -7,6 +7,9 @@ const { user, comment, profile } = require("../models"); // import transaksi mod
 let authenticationToken = "0";
 let tempID = "";
 let tempProfile = "608ac628c8d0a1bfded19469";
+let tempProfileTwo = "60935f673fba7223585128d1";
+let tempUserTwo = "60af9109e8f9c90029a29f08"
+
 
 describe("Utils TEST", () => {
   describe("/Get All Location ", () => {
@@ -104,6 +107,8 @@ describe("Utils TEST", () => {
       expect(res.statusCode).toEqual(200);
       expect(res.body).toBeInstanceOf(Object);
       expect(res.body.success).toEqual(true);
+      //save id movie
+      tempCommentID = res.body.data._id;
     });
   });
 });
@@ -123,6 +128,25 @@ describe("/GET Profile", () => {
   });
 });
 
+// make a status
+describe("/POST dummy status", () => {
+  test("It should return success", async () => {
+    const res = await request(app)
+      .post("/status")
+      .set({
+        Authorization: `Bearer ${authenticationToken}`,
+      })
+      .send({
+        content: "Anne with an E",
+        interest: "6092b557e957671c70e24279",
+        // media:,
+      });
+
+    expect(res.statusCode).toEqual(201);
+    expect(res.body).toBeInstanceOf(Object);
+    expect(res.body.success).toEqual(true);
+  });
+});
 //Tes get profile post
 describe("/GET Profile's post", () => {
   test("It should return success", async () => {
@@ -140,18 +164,67 @@ describe("/GET Profile's post", () => {
 
 //Tes get profile activities
 describe("/GET Profile's activities", () => {
-	test("It should return success", async () => {
-	  const res = await request(app)
-		.get("/Activities")
-		.set({
-		  Authorization: `Bearer ${authenticationToken}`,
-		});
-  
-	  expect(res.statusCode).toEqual(200);
-	  expect(res.body).toBeInstanceOf(Object);
-	  expect(res.body.success).toEqual(true);
-	});
-  });
+  test("It should return success", async () => {
+    const res = await request(app)
+      .get("/Activities")
+      .set({
+        Authorization: `Bearer ${authenticationToken}`,
+      });
 
-  //view another profile
-  
+    expect(res.statusCode).toEqual(200);
+    expect(res.body).toBeInstanceOf(Object);
+    expect(res.body.success).toEqual(true);
+  });
+});
+
+
+
+
+//view another profile
+describe("/GET another Profile's activities", () => {
+	test("It should return success", async () => {
+
+	        //create data profile
+			const dataProfileTwo = {
+				bio: "new bio",
+				location: "608f5baf87fc4f408c131780",
+				interest: [
+				  "6092b557e957671c70e24276",
+				  "6092b557e957671c70e24277",
+				  "6092b557e957671c70e24278",
+				  "6092b557e957671c70e24279",
+				],
+				avatar: "http://dummyimage.com/167x100.png/ff4444/ffffff",
+			  };
+		
+			  let userProfileTwo = await profile.create(dataProfileTwo);
+			  userProfileTwo._id = tempProfileTwo;
+		
+			  //create data user
+			  const dataUserTwo = {
+				email: "isayjhorgi@test.com",
+				password: "Aneh1234!!",
+				admin: false,
+				emailVerified: true,
+				profile: userProfile._id,
+			  };
+		
+			  let userLoginNew = await user.create(dataUserTwo);
+			  userLoginNew._id = tempUserTwo;
+
+			  const statusDummy = {
+				content: "yahooo !!"
+				owner: ""
+			  }
+			  const res = await request(app)
+			  .get("/an/Activities")
+			  .set({
+				Authorization: `Bearer ${authenticationToken}`,
+			  });
+		
+			expect(res.statusCode).toEqual(200);
+			expect(res.body).toBeInstanceOf(Object);
+			expect(res.body.success).toEqual(true);
+		  });
+		});
+		

@@ -1,6 +1,6 @@
 const { S3Client, DeleteObjectCommand } = require("@aws-sdk/client-s3");
 
-async function amazonDelete(req, res, next) {
+async function amazonDelete(req) {
 	try {
 		const REGION = "ap-southeast-1";
 
@@ -22,22 +22,15 @@ async function amazonDelete(req, res, next) {
 			error.statusCode = 400;
 			throw error;
 		}
-		// console.log(s3, "---------------------- ini s3");
 
 		let removeImages = await s3.send(new DeleteObjectCommand(deleteParams));
 
 		if (removeImages) {
-			res.status(200).json({
-				success: true,
-				message: "Delete images Success",
-			});
+			console.log("Delete images Success");
 		}
+
 	} catch (err) {
 		console.log(err);
-		if (!err.statusCode) {
-			err.statusCode = 500;
-		}
-		next(err);
 	}
 }
 module.exports = amazonDelete;

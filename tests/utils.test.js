@@ -2,7 +2,7 @@ const request = require("supertest");
 const app = require("../index");
 const jwt = require("jsonwebtoken");
 
-const { user, comment, profile } = require("../models"); // import transaksi models
+const { user, comment, profile, status } = require("../models"); // import transaksi models
 
 let authenticationToken = "0";
 let tempID = "";
@@ -21,7 +21,7 @@ describe("Utils TEST", () => {
 		});
 	});
 
-	describe("/GET  Interest by Category", () => {
+	describe("/GET Interest by Category", () => {
 		test("It should return success", async () => {
 			const res = await request(app).get(`/utils/interest/topic`);
 			// .set({

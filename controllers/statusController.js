@@ -65,7 +65,11 @@ class StatusController {
 			//pagination
 			const options = {
 				sort: { created_at: -1 },
-				page: req.query.page ? (req.query.page < 20 ? req.query.page : 20) : 1,
+				page: req.query.page
+					? req.query.page < 20
+						? req.query.page
+						: 20
+					: 1,
 				limit: req.query.limit ? req.query.limit : 8,
 				populate: [
 					{
@@ -121,7 +125,11 @@ class StatusController {
 			//pagination
 			const options = {
 				sort: { created_at: -1 },
-				page: req.query.page ? (req.query.page < 20 ? req.query.page : 20) : 1,
+				page: req.query.page
+					? req.query.page < 20
+						? req.query.page
+						: 20
+					: 1,
 				limit: req.query.limit ? req.query.limit : 8,
 				populate: [
 					{
@@ -166,7 +174,11 @@ class StatusController {
 			//pagination
 			const options = {
 				sort: { created_at: -1 },
-				page: req.query.page ? (req.query.page < 20 ? req.query.page : 20) : 1,
+				page: req.query.page
+					? req.query.page < 20
+						? req.query.page
+						: 20
+					: 1,
 				limit: req.query.limit ? req.query.limit : 8,
 				populate: [
 					{
@@ -387,6 +399,35 @@ class StatusController {
 		}
 	}
 
+	//TODO-DELETE : Delete Image
+	async imageDelete(req, res, next) {
+		try {
+			let findStatus = await status.findOne({ _id: req.params.id });
+			let indexOfImages = findStatus.media.indexOf(req.query.media);
+			findStatus.media.splice(indexOfImages, 1);
+
+			let deleteImage = await status.findOneAndUpdate(
+				{ _id: findStatus._id },
+				findStatus,
+				{ new: true }
+			);
+			
+			res.status(200).json({
+				success: true,
+				message: "Success",
+				data: deleteImage,
+			});
+
+			next();
+		} catch (err) {
+			console.log(err);
+			if (!err.statusCode) {
+				err.statusCode = 500;
+			}
+			next(err);
+		}
+	}
+
 	//TODO-GET : Loadmore Get Status/Post By User
 	async loadMoreStatusByUser(req, res, next) {
 		try {
@@ -542,15 +583,17 @@ class StatusController {
 		try {
 			validationErrorHandler(req, res, next);
 
-			let statusData = await status.findOne({ _id: req.params.id }).populate([
-				{
-					path: "owner",
-					select: "id name avatar",
-					populate: "location",
-				},
-				{ path: "interest", select: "interest category icon" },
-				// { path: "likeBy" , select : "name avatar"}
-			]);
+			let statusData = await status
+				.findOne({ _id: req.params.id })
+				.populate([
+					{
+						path: "owner",
+						select: "id name avatar",
+						populate: "location",
+					},
+					{ path: "interest", select: "interest category icon" },
+					// { path: "likeBy" , select : "name avatar"}
+				]);
 
 			if (!statusData) {
 				const error = new Error("Status Data can't be appeared");

@@ -1,6 +1,5 @@
 const { interest, location, funfact } = require("../models");
 const file = require("fs");
-const brain = require("brain.js");
 
 class UtilsController {
 	async getAllLocation(req, res) {

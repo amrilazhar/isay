@@ -122,7 +122,7 @@ describe("Comment TEST", () => {
           status_id: `${tempStatus}`,
           owner: `${tempProfile}`,
           depth: 1,
-          likeBy: []
+          likeBy: [],
         });
 
       expect(res.statusCode).toEqual(200);
@@ -177,7 +177,7 @@ describe("Comment TEST", () => {
 
         expect(res.statusCode).toEqual(400);
         expect(res.body).toBeInstanceOf(Object);
-        expect(res.body.message).toEqual("Comment not found");
+        expect(res.body.message).toEqual("Comment is not found");
       });
     });
   });
@@ -203,19 +203,53 @@ describe("Comment TEST", () => {
     });
   });
 
-  //===============================|| add like (error 1) ||=========================//
-  describe("/PUT Add Like", () => {
+  //===============================|| delete image on put method (error 1) ||=========================//
+  describe("/DELETE image on AWS and local", () => {
     describe("It should return failed", () => {
-      test("[Error] Comment is not found", async () => {
+      test("[Error] delete can't be processes", async () => {
         const res = await request(app)
-          .put(`/comment/addLike/6092b557e957671c70e2427`)
+          .delete(`/comment/delim/${tempComment}?media=uidfha8df8afyd8`)
           .set({
             Authorization: `Bearer ${authenticationTokenTwo}`,
           });
 
         expect(res.statusCode).toEqual(400);
         expect(res.body).toBeInstanceOf(Object);
-        expect(res.body.message).toEqual("Profile id is not found");
+        expect(res.body.message).toEqual("delete can't be processes");
+      });
+    });
+  });
+
+  //===============================|| delete image on put method ||=========================//
+  describe("/DELETE image on AWS and local", () => {
+    test("It should return success", async () => {
+      const res = await request(app)
+        .delete(
+          `/comment/delim/${tempComment}?media=http://dummyimage.com/167x100.png/ff4444/ffffff.${tempProfile}`
+        )
+        .set({
+          Authorization: `Bearer ${authenticationTokenTwo}`,
+        });
+
+      expect(res.statusCode).toEqual(200);
+      expect(res.body).toBeInstanceOf(Object);
+      expect(res.body.message).toEqual("Success");
+    });
+  });
+
+  //===============================|| add like (error 1) ||=========================//
+  describe("/PUT Add Like", () => {
+    describe("It should return failed", () => {
+      test("[Error] Comment is not found", async () => {
+        const res = await request(app)
+          .put(`/comment/addLike/6092b557e957671c70e242`)
+          .set({
+            Authorization: `Bearer ${authenticationTokenTwo}`,
+          });
+
+        expect(res.statusCode).toEqual(400);
+        expect(res.body).toBeInstanceOf(Object);
+        expect(res.body.message).toEqual("Comment is not found");
       });
     });
   });
@@ -224,25 +258,26 @@ describe("Comment TEST", () => {
 
   describe("/PUT Add Like", () => {
     test("It should return success", async () => {
-        const res = await request(app)
-          .put(`/comment/addLike/${tempProfile}`)
-          .set({
-            Authorization: `Bearer ${authenticationTokenTwo}`,
-          });
+      const res = await request(app)
+        .put(`/comment/addLike/${tempComment}?likeBy=${tempProfile}`)
+        .set({
+          Authorization: `Bearer ${authenticationTokenTwo}`,
+        });
 
-        expect(res.statusCode).toEqual(200);
-        expect(res.body).toBeInstanceOf(Object);
-        expect(res.body.message).toEqual("Success");
-      });
+      expect(res.statusCode).toEqual(200);
+      expect(res.body).toBeInstanceOf(Object);
+      expect(res.body.success).toEqual(true);
+      expect(res.body.message).toEqual("Success");
     });
+  });
 
   //===============================|| add like (error 1)||=========================//
 
   describe("/PUT Add Like", () => {
     describe("It should return failed", () => {
-        test("[Error] You can't like twice", async () => {
+      test("[Error] You can't like twice", async () => {
         const res = await request(app)
-          .put(`/comment/addLike/${tempProfile}`)
+          .put(`/comment/addLike/${tempComment}?likeBy=${tempProfile}`)
           .set({
             Authorization: `Bearer ${authenticationTokenTwo}`,
           });
@@ -252,22 +287,54 @@ describe("Comment TEST", () => {
         expect(res.body.message).toEqual("You can't like twice");
       });
     });
-  })
-    // //===============================|| remove like (error 1) ||=========================//
-    // describe("/PUT update comment", () => {
-    //     describe("It should return failed", () => {
-    //       test("[Error] Comment is not found", async () => {
-    //         const res = await request(app)
-    //           .put(`/comment/6092b557e957671c70e2427`)
-    //           .set({
-    //             Authorization: `Bearer ${authenticationTokenTwo}`,
-    //           });
-    
-    //         expect(res.statusCode).toEqual(400);
-    //         expect(res.body).toBeInstanceOf(Object);
-    //         expect(res.body.message).toEqual("Comment not found");
-    //       });
-    //     });
-    //   });
+  });
+
+  //===============================|| remove like (error 1) ||=========================//
+  describe("/PUT remove like", () => {
+    describe("It should return failed", () => {
+      test("[Error] Comment is not found", async () => {
+        const res = await request(app)
+          .put(`/comment/6092b557e957671c70e2427`)
+          .set({
+            Authorization: `Bearer ${authenticationTokenTwo}`,
+          });
+
+        expect(res.statusCode).toEqual(400);
+        expect(res.body).toBeInstanceOf(Object);
+        expect(res.body.message).toEqual("Comment is not found");
+      });
+    });
+  });
+  //===============================|| remove like ||=========================//
+  describe("/PUT remove like", () => {
+    test("It should return success", async () => {
+      const res = await request(app)
+        .put(`/comment/removeLike/${tempComment}?likeBy=${tempProfile}`)
+        .set({
+          Authorization: `Bearer ${authenticationTokenTwo}`,
+        });
+
+      expect(res.statusCode).toEqual(200);
+      expect(res.body).toBeInstanceOf(Object);
+      expect(res.body.success).toEqual(true);
+      expect(res.body.message).toEqual("Success");
+    });
+  });
+
+  //===============================|| delete comment ||=========================//
+  describe("/DELETE one comment", () => {
+    test("It should return success", async () => {
+      const res = await request(app)
+        .delete(`/comment/${tempComment}`)
+        .set({
+          Authorization: `Bearer ${authenticationTokenTwo}`,
+        });
+
+      expect(res.statusCode).toEqual(200);
+      expect(res.body).toBeInstanceOf(Object);
+      expect(res.body.success).toEqual(true);
+      expect(res.body.message).toEqual("Delete comment Success");
+    });
+  });
 
 });

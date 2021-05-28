@@ -37,7 +37,7 @@ class CommentValidator {
 
       if (act === "/:id") {
         if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
-          errors.push("Comment not found");
+          errors.push("Comment is not found");
         }
       }
 
@@ -63,7 +63,7 @@ class CommentValidator {
 
       if (act === "/addLike/:id" || act === "/removeLike/:id") {
         if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
-          errors.push("Profile id is not found");
+          errors.push("Comment is not found");
         }
       }
 
@@ -99,7 +99,7 @@ class CommentValidator {
 
       if (errors.length > 0) {
         return res.status(400).json({
-          message: errors,
+          message: errors.toString(),
         });
       }
       next();

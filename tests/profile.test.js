@@ -2,18 +2,46 @@ const request = require("supertest");
 const app = require("../index");
 const jwt = require("jsonwebtoken");
 
-const { user, comment, profile } = require("../models"); // import transaksi models
+const { user, comment, profile, status } = require("../models");
 
 let authenticationToken = "0";
 let tempID = "";
-let tempProfile = "608ac649c8d0a1bfded1946b";
+let tempProfile = "60b09064c6cd100e28513001";
+let tempLogin = "60b09064c6cd100e28513002"
 let tempProfileTwo = "60935f673fba7223585128d1";
 let tempUserTwo = "60a8ca95014fc025303025d1";
 let tempStatus = "6093967f3fba722358512955";
 let tempAct = "609f765707b67c021317d7d8";
 
+describe("Profile TEST", () => {
+	describe("/Get All Location ", () => {
+	  test("It should return success", async () => {
+		const res = await request(app).get("/utils/location");
+		// .set({
+		//   Authorization: `Bearer ${authenticationToken}`,
+		// })
+  
+		expect(res.statusCode).toEqual(200);
+		expect(res.body).toBeInstanceOf(Object);
+		expect(res.body.message).toEqual("success");
+	  });
+	});
+  
+	describe("/GET  Interest by Category", () => {
+	  test("It should return success", async () => {
+		const res = await request(app).get(`/utils/interest/topic`);
+		// .set({
+		//   Authorization: `Bearer ${authenticationToken}`,
+		// });
+  
+		expect(res.statusCode).toEqual(200);
+		expect(res.body).toBeInstanceOf(Object);
+		expect(res.body.message).toEqual("success");
+	  });
+	});
+  
 //==================|| Post comment and make user ||==================
-  describe("/POST Comment ", () => {
+  describe("/GET profile ", () => {
     test("It should return success", async () => {
       let status_id = "6093967f3fba722358512955";
 
@@ -24,7 +52,6 @@ let tempAct = "609f765707b67c021317d7d8";
 
       //delete comment
       //delete profile
-      await comment.deleteMany();
       await profile.deleteMany();
 
       //create data profile
@@ -41,25 +68,27 @@ let tempAct = "609f765707b67c021317d7d8";
       };
 
       let userProfile = await profile.create(dataProfile);
-      userProfile._id = tempProfile;
-
+	  tempProfile = userProfile._id ;
+	  console.log(tempProfile,"-------------------ini temp profile")
       //create data user
       const dataUser = {
         email: "isayjhorgi@test.com",
         password: "Aneh1234!!",
         admin: false,
         emailVerified: true,
-        profile: userProfile._id,
+        profile: tempProfile,
       };
 
       let userLogin = await user.create(dataUser);
+	  tempLogin = userLogin._id 
+	  console.log(tempLogin,"-------------------ini temp login")
 
       //generate token
       const token = jwt.sign(
         {
-          id: userLogin._id,
+          id: tempProfile,
           admin: userLogin.admin,
-          profile: userProfile._id,
+          profile: tempProfile,
         },
         process.env.JWT_SECRET,
         { expiresIn: "30d" }
@@ -67,9 +96,9 @@ let tempAct = "609f765707b67c021317d7d8";
 
       //save token variable for later use
       authenticationToken = token;
-
+	  console.log(res,"-------------------ini res")
       const res = await request(app)
-        .get(`/getProfile/${tempProfile}`)
+        .get(`/profile/getProfile/${tempProfile}`)
         .set({
           Authorization: `Bearer ${authenticationToken}`,
         })
@@ -81,7 +110,7 @@ let tempAct = "609f765707b67c021317d7d8";
     });
   });
 
-
+/*
 //==================|| view my profile's status ||==================
 describe("/GET Profile's post", () => {
   test("It should return success", async () => {
@@ -265,3 +294,5 @@ describe("/GET User Interest", () => {
   });
 });
 
+*/
+})

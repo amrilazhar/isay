@@ -5,9 +5,9 @@ const jwt = require("jsonwebtoken");
 const { user, comment, profile, status } = require("../models"); // import transaksi models
 
 let authenticationToken = "0";
-let temStatusID = "";
-let tempInterestID = "";
-let tempID = "";
+let tempStatusID = "60b1195e095c381242aab79c";
+let tempInterestID = "6092b557e957671c70e24276";
+let tempProfileID = "60b120ea28eecf18b9e9f31b";
 
 describe("Status TEST", () => {
 	//TODO-POST : create status/post
@@ -77,6 +77,7 @@ describe("Status TEST", () => {
 			expect(res.body.success).toEqual(true);
 		});
 	});
+
 	//TODO-GET : Get status/post by User
 	describe("/GET/ Status by User", () => {
 		it("it should return success", async () => {
@@ -87,10 +88,11 @@ describe("Status TEST", () => {
 				});
 			expect(res.statusCode).toEqual(200);
 			expect(res.body).toBeInstanceOf(Object);
-			expect(res.body).toHaveProperty("data");
-			expect(res.body.data).toBeInstanceOf(Object);
+			expect(res.body.success).toEqual(true);
+			expect(res.body.message).toEqual("Success");
 		});
 	});
+
 	//TODO-GET : Get status/post by interest (all)
 	describe("/GET/ Status by Interest all", () => {
 		it("it should return success", async () => {
@@ -101,26 +103,87 @@ describe("Status TEST", () => {
 				});
 			expect(res.statusCode).toEqual(200);
 			expect(res.body).toBeInstanceOf(Object);
-			expect(res.body).toHaveProperty("data");
-			expect(res.body.data).toBeInstanceOf(Object);
+			expect(res.body.success).toEqual(true);
+			expect(res.body.message).toEqual("Success");
 		});
 	});
 
 	//TODO-GET : Get status/post by interest (single)
+	describe("/GET/ Status by one Interest", () => {
+		it("it should return success", async () => {
+			const res = await request(app)
+				.get(`/status/interest/${tempInterestID}`)
+				.set({
+					Authorization: `Bearer ${authenticationToken}`,
+				});
+			expect(res.statusCode).toEqual(200);
+			expect(res.body).toBeInstanceOf(Object);
+			expect(res.body.success).toEqual(true);
+		});
+	});
 
-	//TODO-PUT : Update status/post
+	//TODO-PUT : Update status/post [Not Complete]
 
-	//TODO-PUT : Like Status/post : Record (Activities) : Record (Notification)
+	//TODO-PUT : Like Status/post [Not Complete]
 
-	//TODO-PUT : Unlike Status/post
+	//TODO-PUT : Unlike Status/post [Not Complete]
 
 	//TODO-GET : Loadmore Get Status/Post By User
+	describe("/GET/ Load More Status by User", () => {
+		it("it should return success", async () => {
+			const res = await request(app)
+				.get(`/status/users/loadmore`)
+				.set({
+					Authorization: `Bearer ${authenticationToken}`,
+				});
+			expect(res.statusCode).toEqual(200);
+			expect(res.body).toBeInstanceOf(Object);
+			expect(res.body.success).toEqual(true);
+		});
+	});
 
 	//TODO-GET : Loadmore Get Status/Post By Interest (all)
+	describe("/GET/ Load More Status by Interest all", () => {
+		it("it should return success", async () => {
+			const res = await request(app)
+				.get(`/status/interest/loadmore`)
+				.set({
+					Authorization: `Bearer ${authenticationToken}`,
+				});
+			expect(res.statusCode).toEqual(200);
+			expect(res.body).toBeInstanceOf(Object);
+			expect(res.body.success).toEqual(true);
+		});
+	});
 
 	//TODO-GET : Loadmore Get Status/Post By Interest (single)
+	describe("/GET/ Load More Status by one Interest", () => {
+		it("it should return success", async () => {
+			const res = await request(app)
+				.get(`/status/interest/${tempInterestID}/loadmore`)
+				.set({
+					Authorization: `Bearer ${authenticationToken}`,
+				});
+			expect(res.statusCode).toEqual(200);
+			expect(res.body).toBeInstanceOf(Object);
+			expect(res.body.success).toEqual(true);
+		});
+	});
 
-	//TODO-GET : Get status/post by ID : No Pagination
+	//TODO-GET : Get status/post by ID [Not Complete]
 
 	//TODO-DELETE : Delete status/post
+	describe("/DELETE/ status", () => {
+		test("It should return success", async () => {
+		  const res = await request(app)
+			.delete(`/status/${tempStatusID}`)
+			.set({
+			  Authorization: `Bearer ${authenticationToken}`,
+			});	
+		  expect(res.statusCode).toEqual(200);
+		  expect(res.body).toBeInstanceOf(Object);
+		  expect(res.body.success).toEqual(true);
+		  expect(res.body.message).toEqual("Success");
+		});
+	  });	
 });

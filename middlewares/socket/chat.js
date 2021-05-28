@@ -73,7 +73,7 @@ async function startSocketChat(req, res) {
 							from: from,
 						};
 						let sendNotif = await notification.create(notificationData);
-						sendNotif.populate("from chatMsg_id").execPopulate();
+						await sendNotif.populate("from chatMsg_id").execPopulate();
 						req.io.emit("chat:" + message.to, sendNotif);
 					})
 					.catch((e) => {
@@ -176,7 +176,7 @@ async function socketImageUpload(req, res) {
 					from: from,
 				};
 				let sendNotif = await notification.create(notificationData);
-				sendNotif.populate("from chatMsg_id").execPopulate();
+				await sendNotif.populate("from chatMsg_id").execPopulate();
 				req.io.emit("chat:" + req.utils.message.to, sendNotif);
 
 				//emit to specific room if message create message success

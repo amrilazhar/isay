@@ -288,7 +288,7 @@ class StatusController {
 				to: findStatusByUser.owner,
 			});
 
-			notif.populate("status_id from to").execPopulate();
+			await notif.populate("status_id from to").execPopulate();
 
 			req.io.emit("notif:" + findStatusByUser.owner, notif);
 

@@ -39,7 +39,7 @@ async function startSocketChat(req, res) {
 				req.utils = {
 					handshake: req.socket.handshake.query.roomID,
 					message: message,
-					from : from,
+					from: from,
 				};
 				socketImageUpload(req, res);
 			} else {
@@ -72,8 +72,9 @@ async function startSocketChat(req, res) {
 							to: message.to,
 							from: from,
 						};
-						await notification.create(notificationData);
-						req.io.emit("chat:" + message.to, notificationData);
+						let sendNotif = await notification.create(notificationData);
+						sendNotif.populate("from chatMsg_id").execPopulate();
+						req.io.emit("chat:" + message.to, sendNotif);
 					})
 					.catch((e) => {
 						//emit to specific room if message create message error
@@ -174,8 +175,9 @@ async function socketImageUpload(req, res) {
 					to: req.utils.message.to,
 					from: from,
 				};
-				await notification.create(notificationData);
-				req.io.emit("chat:" + req.utils.message.to, notificationData);
+				let sendNotif = await notification.create(notificationData);
+				sendNotif.populate("from chatMsg_id").execPopulate();
+				req.io.emit("chat:" + req.utils.message.to, sendNotif);
 
 				//emit to specific room if message create message success
 				req.io.to(req.utils.handshake).emit("messageFromServer", sendMess);

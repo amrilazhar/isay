@@ -253,7 +253,7 @@ class ProfileController {
 				const error = new Error("Data user can't be appeared");
 				error.statusCode = 400;
 				throw error;
-			}
+			};
 			req.io.emit("my profile update:" + dataProfile, dataProfile);
 			res.status(200).json({
 				success: true,
@@ -281,6 +281,7 @@ class ProfileController {
 				findUser,
 				{ new: true }
 			);
+
 			if (!insertUser) {
 				const error = new Error("Interest can't be added");
 				error.statusCode = 400;

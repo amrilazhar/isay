@@ -167,9 +167,10 @@ class CommentController {
         { new: true }
       );
 
+      if(req.images) {
       req.images.forEach((item) => dataComment.media.push(item));
       await dataComment.save();
-
+      }
       dataComment = await comment.findOne({ _id: req.params.id });
 
       if (!dataComment) {

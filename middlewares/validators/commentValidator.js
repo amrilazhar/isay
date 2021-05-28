@@ -4,8 +4,9 @@ const mongoose = require("mongoose");
 class CommentValidator {
   async commentValidate(req, res, next) {
     try {
-      let act = req.route.path;
       let errors = [];
+      let act = req.route.path;
+      
 
       if (act === "/") {
         if (!mongoose.Types.ObjectId.isValid(req.body.status_id)) {
@@ -13,16 +14,12 @@ class CommentValidator {
         }
       }
 
-      if (errors.length == 1) {
+      if (errors.length > 0 ) {
         return res.status(400).json({
-          message: errors,
+          message: errors.toString(),
         });
       }
-      if (errors.length > 1) {
-        return res.status(400).json({
-          message: errors.join(",and "),
-        });
-      }
+
       // Go to next
       next();
     } catch (err) {
@@ -46,7 +43,7 @@ class CommentValidator {
 
       if (errors.length > 0) {
         return res.status(400).json({
-          message: errors,
+          message: errors.toString(),
         });
       }
       // Go to next
@@ -66,13 +63,13 @@ class CommentValidator {
 
       if (act === "/addLike/:id" || act === "/removeLike/:id") {
         if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
-          errors.push("Comment is not found");
+          errors.push("Profile id is not found");
         }
       }
 
       if (errors.length > 0) {
         return res.status(400).json({
-          message: errors,
+          message: errors.toString(),
         });
       }
       // Go to next

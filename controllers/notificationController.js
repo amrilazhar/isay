@@ -8,7 +8,7 @@ class NotificationController {
 				page: req.query.page ? (req.query.page < 20 ? req.query.page : 20) : 1,
 				limit: req.query.limit ? req.query.limit : 20,
 				populate: [
-					{ path: "status_id" },
+					{ path: "status_id" , populate : "interest" },
 					{ path: "chatMsg_id" },
 					{ path: "comment_id" },
 					{ path: "from" },

@@ -127,6 +127,7 @@ class CommentController {
 			let notif = await notification.create({
 				type: "post_comment",
 				comment_id: createComment._id,
+				status_id: updateStatus._id,
 				from: req.profile.id,
 				to: updateStatus.owner,
 			});
@@ -175,8 +176,10 @@ class CommentController {
 				{ new: true }
 			);
 
-			req.images.forEach((item) => dataComment.media.push(item));
-			await dataComment.save();
+			if (req.images) {
+				req.images.forEach((item) => dataComment.media.push(item));
+				await dataComment.save();
+			}
 
 			dataComment = await comment.findOne({ _id: req.params.id });
 

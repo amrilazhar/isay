@@ -58,25 +58,24 @@ class UtilsController {
 
 	async generateBasicProfile(req, res, next) {
 		try {
+			let DecisionTree = require("decision-tree");
 			//create parameter for generate name
-			let genderParam = Math.floor(Math.random() * 2);
-			let randN = Math.floor(Math.random() * 2);
+			let gender = ["pria", "wanita"];
+			let dateCreatedStatus =
+				new Date().getDate() % 2 === 0 ? "genap" : "ganjil";
+			let genderParam = Math.floor(Math.random() * 2) % 2;
 			const {
-				greeting,
-				charName,
-				listInterest,
-				listProvince,
 				avatarPic,
 			} = require("../training/dataList.js");
-			let province = 0.07;
-			let interestOne = 0;
-			let interestTwo = 0;
-			let interestThree = 0;
+			let province = "Jawa Timur";
+			let interestOne = "";
+			let interestTwo = "";
+			let interestThree = "";
 
 			//convert location to number that can be use by model
 			if (!req.body.location) {
 				let locationParam = await location.findById(locationParam);
-				province = listProvince.indexOf(locationParam.province) / 100;
+				province = locationParam.province;
 			}
 
 			//convert interest to number that can be use by model
@@ -92,56 +91,48 @@ class UtilsController {
 					}
 				});
 
-				interestOne = interestCont[0]
-					? listInterest.indexOf(interestCont[0].interest) / 100
-					: 0;
-				interestTwo = interestCont[1]
-					? listInterest.indexOf(interestCont[1].interest) / 100
-					: 0;
+				interestOne = interestCont[0] ? interestCont[0].interest : "";
+				interestTwo = interestCont[1] ? interestCont[1].interest : "";
 
 				if (interestCont.length > 3) {
 					let randInterest = Math.floor(Math.random() * interestCont.length);
 					let idx = randInterest < 2 ? irandInterest + 2 : randInterest;
-					interestThree = interestCont[idx]
-						? listInterest.indexOf(interestCont[idx].interest) / 100
-						: 0;
-				} else
-					interestThree = interestCont[2]
-						? listInterest.indexOf(interestCont[2].interest) / 100
-						: 0;
+					interestThree = interestCont[idx] ? interestCont[idx].interest : "";
+				} else interestThree = interestCont[2] ? interestCont[2].interest : "";
 			}
 
-			//initialize brain
-			const sapaan = new brain.NeuralNetwork();
-			const nama = new brain.NeuralNetwork();
-
-			// get trained model from file
-			let jsonSapaan = file.readFileSync("./training/sapaan.json", "utf8");
-			let jsonNama = file.readFileSync("./training/username.json", "utf8");
+			// get preTrained model from file
+			let jsonSapaan = JSON.parse(
+				file.readFileSync("./training/sapaanDtree.json", "utf8")
+			);
+			let jsonName = JSON.parse(
+				file.readFileSync("./training/nameDtree.json", "utf8")
+			);
 
 			//load trained model to brain JS
-			sapaan.fromJSON(JSON.parse(jsonSapaan));
-			nama.fromJSON(JSON.parse(jsonNama));
+			let namaSapaanDTree = new DecisionTree(jsonSapaan);
+			let namaCharDTree = new DecisionTree(jsonName);
+
 			//generate random avatar
 			let randomNum = Math.floor(Math.random() * 12);
 
 			//generate Name
-			let tempN = nama.run({
-				g: genderParam,
-				n: randN,
-				i: interestOne,
-				ii: interestTwo,
-				iii: interestThree,
+			let namaChar = namaCharDTree.predict({
+				gender: gender[genderParam],
+				datecreated: dateCreatedStatus,
+				interest1: interestOne,
+				interest2: interestTwo,
+				interest3: interestThree,
 			});
-			let tempS = sapaan.run({ g: genderParam, p: province });
-			console.log(
-				Math.floor(tempS.sapa * 100),
-				" ",
-				Math.floor(tempN.name * 1000)
-			);
-			const generatedName = `${greeting[Math.floor(tempS.sapa * 100)]}.${
-				charName[Math.floor(tempN.name * 1000)]
-			}.#${Math.floor(Math.random() * 9999)}`;
+
+			let namaSapaan = namaSapaanDTree.predict({
+				provinsi: province,
+				gender: gender[genderParam],
+			});
+
+			const generatedName = `${namaSapaan}.${namaChar}.#${Math.floor(
+				Math.random() * 9999
+			)}`;
 
 			//set avatar
 			let avatar = avatarPic[randomNum];

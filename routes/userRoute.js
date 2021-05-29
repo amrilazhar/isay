@@ -43,8 +43,13 @@ router.post(
 );
 
 router.post(
-	"/google_sign_in",
-	userController.googleSignIn
+	"/signup-google",
+	userController.signupGoogle
+);
+
+router.post(
+	"/login-google",
+	userController.loginGoogle
 );
 
 /* GET verify actions. */

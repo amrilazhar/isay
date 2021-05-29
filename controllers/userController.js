@@ -17,6 +17,11 @@ const nodemailerMailgun = nodemailer.createTransport(mg(auth));
 
 const SENDER_ADDRESS = "noreply@isay.gabatch11.my.id";
 
+const accountType = {
+  LOCAL: "local",
+  GOOGLE: "google",
+};
+
 const User = require("../models/users");
 
 const Profile = require("../models/profile");
@@ -25,13 +30,7 @@ const validationErrorHandler = require("../utils/validationErrorHandler");
 
 const successMessage = "Fetched user successfully";
 
-const userFields = [
-  "newEmail",
-  "password",
-  "photoURL",
-  "firstName",
-  "lastName",
-];
+const userFields = ["newEmail", "password"];
 
 const generateToken = () => {
   const token = crypto.randomBytes(32).toString("hex");
@@ -42,21 +41,16 @@ exports.signup = async (req, res, next) => {
   try {
     validationErrorHandler(req, res, next);
 
-    // TODO GENERATE NAME
-
     const user = new User({
       email: req.body.email,
       password: req.body.password,
-      // firstName: ,
-      // lastName: ,
-      // photoUrl: imageUrl,
       emailToken: generateToken(),
       emailExpiration: Date.now() + 3600000,
+      accountType: accountType.LOCAL,
     });
 
     await user.save();
 
-    // TODO SEND E-MAIL
     console.log(user.emailToken);
 
     nodemailerMailgun.sendMail({
@@ -64,6 +58,68 @@ exports.signup = async (req, res, next) => {
       to: user.email,
       subject: "Welcome to i-Say!",
       html: `<a href="${process.env.SERVER_URI}/user/verify?action=verifyEmail&token=${user.emailToken}">Click here to verify your e-mail!</a>`,
+    });
+
+    const token = jwt.sign(
+      {
+        id: user._id.toString(),
+        admin: user.admin,
+      },
+      process.env.JWT_SECRET,
+      { expiresIn: "30d" }
+    );
+
+    res.status(201).json({
+      success: true,
+      message: "User created!",
+      data: { id: user._id, token: token },
+    });
+  } catch (err) {
+    if (!err.statusCode) {
+      err.statusCode = 500;
+    }
+    next(err);
+  }
+};
+
+exports.signupGoogle = async (req, res, next) => {
+  try {
+    validationErrorHandler(req, res, next);
+
+    const ticket = await client.verifyIdToken({
+      idToken: req.body.token,
+      audience: process.env.GOOGLE_CLIENT_ID,
+    });
+
+    const { email } = ticket.getPayload();
+
+    const emailExists = await Promise.all([
+      User.exists({ email: email }),
+      User.exists({
+        newEmail: email,
+        emailExpiration: { $gt: Date.now() },
+      }),
+    ]);
+  
+    if (emailExists[0] || emailExists[1]) {
+      const err = new Error("E-mail is already used");
+      err.statusCode = 422;
+      throw err;
+    }
+
+    const user = new User({
+      email: email,
+      emailVerified: true,
+      accountType: accountType.GOOGLE,
+    });
+
+    await user.save();
+
+    nodemailerMailgun.sendMail({
+      from: SENDER_ADDRESS,
+      to: user.email,
+      subject: "Welcome to i-Say!",
+      html: `Welcome to i-Say! You are finished registering with your Google account!`,
     });
 
     const token = jwt.sign(
@@ -99,6 +155,14 @@ exports.login = async (req, res, next) => {
     if (!user) {
       const error = new Error("A user with this e-mail could not be found");
       error.statusCode = 401;
+      throw error;
+    }
+
+    if (user.accountType !== accountType.LOCAL) {
+      const error = new Error(
+        "Invalid account type, try login using your Google account instead"
+      );
+      error.statusCode = 400;
       throw error;
     }
 
@@ -139,22 +203,50 @@ exports.login = async (req, res, next) => {
   }
 };
 
-exports.googleSignIn = async (req, res, next) => {
+exports.loginGoogle = async (req, res, next) => {
   try {
+    validationErrorHandler(req, res, next);
+
     const ticket = await client.verifyIdToken({
       idToken: req.body.token,
       audience: process.env.GOOGLE_CLIENT_ID,
     });
 
-    if (!ticket) {
-      // TODO
-    }
-
     const { email } = ticket.getPayload();
 
-    console.log(ticket.getPayload());
+    const user = await User.findOne({ email: email });
 
-    // TODO
+    if (!user) {
+      const error = new Error("A user with this e-mail could not be found");
+      error.statusCode = 401;
+      throw error;
+    }
+
+    console.log(user.accountType);
+
+    if (user.accountType !== accountType.GOOGLE) {
+      const error = new Error(
+        "Invalid account type, try login by using your email and password"
+      );
+      error.statusCode = 400;
+      throw error;
+    }
+
+    const token = jwt.sign(
+      {
+        id: user._id.toString(),
+        admin: user.admin,
+        profile: user.profile,
+      },
+      process.env.JWT_SECRET,
+      { expiresIn: "30d" }
+    );
+
+    res.status(200).json({
+      success: true,
+      message: "Login success",
+      data: { token: token, id: user._id.toString() },
+    });
   } catch (err) {
     if (!err.statusCode) {
       err.statusCode = 500;
@@ -175,9 +267,6 @@ exports.getSingleUser = async (req, res, next) => {
         $project: {
           _id: 0,
           id: "$_id",
-          // firstName: "$firstName",
-          // lastName: "$lastName",
-          // photoUrl: "$photoUrl",
         },
       },
     ];
@@ -190,9 +279,6 @@ exports.getSingleUser = async (req, res, next) => {
             _id: 0,
             id: "$_id",
             email: "$email",
-            // firstName: "$firstName",
-            // lastName: "$lastName",
-            // photoUrl: "$photoUrl",
           },
         },
       ];
@@ -222,6 +308,14 @@ exports.updateUser = async (req, res, next) => {
   try {
     validationErrorHandler(req, res, next);
 
+    if (req.user.accountType !== accountType.LOCAL) {
+      const error = new Error(
+        "Invalid account type, only account with local authentication type that can change their e-mail and/or password"
+      );
+      error.statusCode = 400;
+      throw error;
+    }
+
     let noFieldUpdated = true;
 
     userFields.forEach((field) => {
@@ -239,10 +333,25 @@ exports.updateUser = async (req, res, next) => {
     }
 
     if (req.body?.newEmail) {
+      const checkEmail = await Promise.all([
+        User.exists({ email: req.body.email }),
+        User.exists({
+          newEmail: req.body.email,
+          emailExpiration: { $gt: Date.now() },
+        }),
+      ]);
+
+      if (checkEmail[0] || checkEmail[1]) {
+        const err = new Error("E-mail is already used");
+        err.statusCode = 422;
+        throw err;
+      }
+    }
+
+    if (req.body?.newEmail) {
       req.user.emailToken = generateToken();
       req.user.emailExpiration = Date.now() + 3600000;
 
-      // TODO SEND E-MAIL
       console.log(req.user.emailToken);
 
       nodemailerMailgun.sendMail({
@@ -258,9 +367,6 @@ exports.updateUser = async (req, res, next) => {
     const user = {
       id: req.user._id,
       newEmail: req.user.newEmail,
-      // firstName: user.firstName,
-      // lastName: user.lastName,
-      // photoUrl: user.photoUrl
     };
 
     res.status(200).json({
@@ -288,7 +394,6 @@ exports.resetPassword = async (req, res, next) => {
 
     await user.save();
 
-    // TODO CUSTOM E-MAIL
     console.log(user.resetPasswordToken);
 
     nodemailerMailgun.sendMail({

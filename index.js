@@ -36,6 +36,7 @@ const admin = require("./utils/firebase");
 // const mongooseConnect = require("./utils/database");
 
 const { startSocketChat } = require("./middlewares/socket/chat");
+const { startSocketNotif } = require("./middlewares/socket/notif");
 // Assign socket object to every request
 app.use((req, res, next) => {
 	req.io = io;

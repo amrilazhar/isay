@@ -346,9 +346,7 @@ exports.updateUser = async (req, res, next) => {
         err.statusCode = 422;
         throw err;
       }
-    }
-
-    if (req.body?.newEmail) {
+   
       req.user.emailToken = generateToken();
       req.user.emailExpiration = Date.now() + 3600000;
 

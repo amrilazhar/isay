@@ -1,320 +1,305 @@
-const {
-	profile,
-	comment,
-	post,
-	status,
-	activities,
-	notification,
-} = require("../models");
+const { profile, comment, post, status, activities, notification } = require("../models");
 
 class CommentController {
-	//===============================|| get all comment ||=========================//
+  //===============================|| get all comment ||=========================//
 
-	async getAllComment(req, res, next) {
-		try {
-			let dataComment = await comment
-				.find({ status_id: req.query.status_id })
-				.sort({ _id: 1 })
-				.populate("owner")
-				.lean()
-				.exec(); //id status
+  async getAllComment(req, res, next) {
+    try {
+      let dataComment = await comment
+        .find({ status_id: req.query.status_id })
+        .sort({ _id: 1 }).populate('owner')
+        .lean()
+        .exec(); //id status
 
-			let rec = (comment, threads) => {
-				for (let thread in threads) {
-					let value = threads[thread];
+      let rec = (comment, threads) => {
+        for (let thread in threads) {
+          let value = threads[thread];
 
-					if (thread.toString() === comment.parent_id.toString()) {
-						value.children[comment._id] = comment;
-						return;
-					}
+          if (thread.toString() === comment.parent_id.toString()) {
+            value.children[comment._id] = comment;
+            return;
+          }
 
-					if (value.children) {
-						rec(comment, value.children);
-					}
-				}
-			};
+          if (value.children) {
+            rec(comment, value.children);
+          }
+        }
+      };
 
-			let threads = {},
-				komentar;
-			for (let i = 0; i < dataComment.length; i++) {
-				komentar = dataComment[i];
-				komentar["children"] = {};
-				let parent_id = komentar.parent_id;
-				if (!parent_id) {
-					threads[komentar._id] = komentar;
-					continue;
-				}
+      let threads = {},
+        komentar;
+      for (let i = 0; i < dataComment.length; i++) {
+        komentar = dataComment[i];
+        komentar["children"] = {};
+        let parent_id = komentar.parent_id;
+        if (!parent_id) {
+          threads[komentar._id] = komentar;
+          continue;
+        }
 
-				rec(komentar, threads);
-			}
+        rec(komentar, threads);
+      }
 
-			if (dataComment.length == 0) {
-				res.status(400).json({
-					success: true,
-					message: "Not found",
-					data: null,
-				});
-			} else
-				res.status(200).json({
-					success: true,
-					message: "Success",
-					data: { count: dataComment.length, comments: threads },
-				});
-		} catch (err) {
-			console.log(err);
-			if (!err.statusCode) {
-				err.statusCode = 500;
-			}
-			next(err);
-		}
-	}
+      if (dataComment.length == 0) {
+        res.status(400).json({
+          success: true,
+          message: "Not found",
+          data: null,
+        });
+      } else
+        res.status(200).json({
+          success: true,
+          message: "Success",
+          data: { count: dataComment.length, comments: threads },
+        });
+    } catch (err) {
+      console.log(err);
+      if (!err.statusCode) {
+        err.statusCode = 500;
+      }
+      next(err);
+    }
+  }
 
-	//===============================|| get one  comment ||=========================//
+  //===============================|| get one  comment ||=========================//
 
-	async getOneComment(req, res, next) {
-		try {
-			let dataComment = await comment
-				.findOne({ _id: req.params.id })
-				.populate({
-					path: "status_id",
-					select: "content owner media interest likeBy",
-				})
-				.exec();
-			req.io.emit("comment " + dataComment, dataComment);
+  async getOneComment(req, res, next) {
+    try {
+      let dataComment = await comment
+        .findOne({ _id: req.params.id })
+        .populate({
+          path: "status_id",
+          select: "content owner media interest likeBy",
+        })
+        .exec();
 
-			res.status(200).json({
-				success: true,
-				message: "Success",
-				data: dataComment,
-			});
-		} catch (err) {
-			console.log(err);
-			if (!err.statusCode) {
-				err.statusCode = 500;
-			}
-			next(err);
-		}
-	}
-	//===============================|| create  comment ||=========================//
-	async postComment(req, res, next) {
-		try {
-			// search status that I want to comment
+      res.status(200).json({
+        success: true,
+        message: "Success",
+        data: dataComment,
+      });
+    } catch (err) {
+      console.log(err);
+      if (!err.statusCode) {
+        err.statusCode = 500;
+      }
+      next(err);
+    }
+  }
+  //===============================|| create  comment ||=========================//
+  async postComment(req, res, next) {
+    try {
+      // search status that I want to comment
 
-			let data = {
-				status_id: req.body.status_id,
-				content: req.body.content,
-				owner: req.profile.id,
-				media: [],
-			};
+      let data = {
+        status_id: req.body.status_id,
+        content: req.body.content,
+        owner: req.profile.id,
+        media: [],
+      };
 
-			if ("images" in req) {
-				data.media = req.images;
-			}
+      if ("images" in req) {
+        data.media = req.images;
+      }
 
-			if ("parent_id" in req.body) {
-				data.parent_id = req.body.parent_id;
-			}
-			if ("depth" in req.body) {
-				data.depth = req.body.depth;
-			}
+      if ("parent_id" in req.body) {
+        data.parent_id = req.body.parent_id;
+      }
+      if ("depth" in req.body) {
+        data.depth = req.body.depth;
+      }
 
-			let createComment = await comment.create(data);
-			//push comment to status array
-			let updateStatus = await status.findOne({ _id: req.body.status_id });
-			updateStatus.comment.push(createComment._id);
-			await updateStatus.save();
+      let createComment = await comment.create(data);
+      //push comment to status array
+	  let updateStatus = await status.findOne({_id : req.body.status_id});
+      updateStatus.comment.push(createComment._id);
+      await updateStatus.save();
 
-			let notif = await notification.create({
-				type: "post_comment",
-				comment_id: createComment._id,
-				status_id: updateStatus._id,
-				from: req.profile.id,
-				to: updateStatus.owner,
-			});
+      let notif = await notification.create({
+        type: "post_comment",
+        comment_id: createComment._id,
+        from: req.profile.id,
+        to: updateStatus.owner,
+      });
 
-			await notif.populate("comment_id from to").execPopulate();
+      notif.populate("comment_id from to").execPopulate();
 
-			req.io.emit("notif:" + createComment.owner, notif);
+      req.io.emit("notif:" + updateStatus.owner, notif);
 
-			if (!createComment) {
-				const error = new Error("Post Comment failed");
-				error.statusCode = 400;
-				throw error;
-			} else
-				await activities.create({
-					type: "post_comment",
-					comment_id: createComment._id,
-					owner: req.profile.id,
-				});
+      if (!createComment) {
+        const error = new Error("Post Comment failed");
+        error.statusCode = 400;
+        throw error;
+      } else
+        await activities.create({
+          type: "post_comment",
+          comment_id: createComment._id,
+          owner: req.profile.id,
+        });
 
-			res.status(200).json({
-				success: true,
-				message: "Post comment success",
-				data: createComment,
-			});
-		} catch (err) {
-			console.log(err);
-			if (!err.statusCode) {
-				err.statusCode = 500;
-			}
-			next(err);
-		}
-	}
+      res.status(200).json({
+        success: true,
+        message: "Post comment success",
+        data: createComment,
+      });
+    } catch (err) {
+      console.log(err);
+      if (!err.statusCode) {
+        err.statusCode = 500;
+      }
+      next(err);
+    }
+  }
 
-	//===============================|| update comment ||=========================//
+  //===============================|| update comment ||=========================//
 
-	async updateComment(req, res, next) {
-		try {
-			let data = {
-				content: req.body.content,
-				owner: req.profile.id,
-			};
+  async updateComment(req, res, next) {
+    try {
+      let data = {
+        content: req.body.content,
+        owner: req.profile.id,
+      };
 
-			let dataComment = await comment.findOneAndUpdate(
-				{ _id: req.params.id }, // id comment that will be changed
-				data,
-				{ new: true }
-			);
+      let dataComment = await comment.findOneAndUpdate(
+        { _id: req.params.id }, // id comment that will be changed
+        data,
+        { new: true }
+      );
 
-			if (req.images) {
-				req.images.forEach((item) => dataComment.media.push(item));
-				await dataComment.save();
-			}
+      if(req.images) {
+      req.images.forEach((item) => dataComment.media.push(item));
+      await dataComment.save();
+      }
+      dataComment = await comment.findOne({ _id: req.params.id });
 
-			dataComment = await comment.findOne({ _id: req.params.id });
+      if (!dataComment) {
+        const error = new Error("Comment fail to be appeared");
+        error.statusCode = 400;
+        throw error;
+      }
 
-			if (!dataComment) {
-				const error = new Error("Comment fail to be appeared");
-				error.statusCode = 400;
-				throw error;
-			}
+      res.status(200).json({
+        success: true,
+        message: "Update comment Success",
+        data: dataComment,
+      });
+    } catch (err) {
+      console.log(err);
+      if (!err.statusCode) {
+        err.statusCode = 500;
+      }
+      next(err);
+    }
+  }
 
-			res.status(200).json({
-				success: true,
-				message: "Update comment Success",
-				data: dataComment,
-			});
-		} catch (err) {
-			console.log(err);
-			if (!err.statusCode) {
-				err.statusCode = 500;
-			}
-			next(err);
-		}
-	}
+  //===============================|| add like ||=========================//
 
-	//===============================|| add like ||=========================//
+  async addLike(req, res, next) {
+    try {
+      let findUser = await comment.findOne({ _id: req.params.id });
+      if (findUser.likeBy.includes(req.profile.id)) {
+        const error = new Error("You can't like twice");
+        error.statusCode = 400;
+        throw error;
+      } else findUser.likeBy.push(req.profile.id);
+      findUser.save();
+      res.status(200).json({
+        success: true,
+        message: "Success",
+        data: findUser,
+      });
+      await activities.create({
+        type: "like_comment",
+        comment_id: findUser._id,
+        owner: req.profile.id,
+      });
+    } catch (err) {
+      console.log(err);
+      if (!err.statusCode) {
+        err.statusCode = 500;
+      }
+      next(err);
+    }
+  }
 
-	async addLike(req, res, next) {
-		try {
-			let findUser = await comment.findOne({ _id: req.params.id });
-			if (findUser.likeBy.includes(req.profile.id)) {
-				const error = new Error("You can't like twice");
-				error.statusCode = 400;
-				throw error;
-			} else findUser.likeBy.push(req.profile.id);
-			findUser.save();
-			res.status(200).json({
-				success: true,
-				message: "Success",
-				data: findUser,
-			});
-			await activities.create({
-				type: "like_comment",
-				comment_id: findUser._id,
-				owner: req.profile.id,
-			});
-		} catch (err) {
-			console.log(err);
-			if (!err.statusCode) {
-				err.statusCode = 500;
-			}
-			next(err);
-		}
-	}
+  //===============================|| remove like ||=========================//
 
-	//===============================|| remove like ||=========================//
+  async removeLike(req, res, next) {
+    try {
+      let findUser = await comment.findOne({ _id: req.params.id });
+      let indexOfLike = findUser.likeBy.indexOf(req.profile.id);
+      findUser.likeBy.splice(indexOfLike, 1);
+      let deleteLike = await comment.findOneAndUpdate(
+        { _id: findUser._id },
+        findUser,
+        { new: true }
+      );
+      res.status(200).json({
+        success: true,
+        message: "Success",
+        data: deleteLike,
+      });
+      await activities.deleteOne({ _id: req.params.id });
+      next();
+    } catch (err) {
+      console.log(err);
+      if (!err.statusCode) {
+        err.statusCode = 500;
+      }
+      next(err);
+    }
+  }
+  //===============================|| delete comment ||=========================//
 
-	async removeLike(req, res, next) {
-		try {
-			let findUser = await comment.findOne({ _id: req.params.id });
-			let indexOfLike = findUser.likeBy.indexOf(req.profile.id);
-			findUser.likeBy.splice(indexOfLike, 1);
-			let deleteLike = await comment.findOneAndUpdate(
-				{ _id: findUser._id },
-				findUser,
-				{ new: true }
-			);
-			res.status(200).json({
-				success: true,
-				message: "Success",
-				data: deleteLike,
-			});
-			await activities.deleteOne({ _id: req.params.id });
-			next();
-		} catch (err) {
-			console.log(err);
-			if (!err.statusCode) {
-				err.statusCode = 500;
-			}
-			next(err);
-		}
-	}
-	//===============================|| delete comment ||=========================//
+  async deleteComment(req, res) {
+    try {
+      let deleteCom = await comment.deleteOne({ _id: req.params.id }); //id comment that want to delete
+      if (!deleteCom) {
+        const error = new Error("Delete comment failed");
+        error.statusCode = 400;
+        throw error;
+      } else await activities.deleteOne({ _id: req.params.id });
+      res.status(200).json({
+        success: true,
+        message: "Delete comment Success",
+        data: deleteCom.deletedCount,
+      });
+    } catch (err) {
+      console.log(err);
+      if (!err.statusCode) {
+        err.statusCode = 500;
+      }
+      next(err);
+    }
+  };
 
-	async deleteComment(req, res) {
-		try {
-			let deleteCom = await comment.deleteOne({ _id: req.params.id }); //id comment that want to delete
-			// remove comment in status
-			let indexOfComment = await status.comment.indexOf({ _id: req.params.id });
-			status.comment.splice(indexOfComment, 1);
-			await status.save();
+  //======================|| Delete Images on upload on AWS S3 ||=====================//
+  async imageDelete(req, res, next) {
+    try {
+      let findComment = await comment.findOne({ _id: req.params.id });
+      let indexOfImages = findComment.media.indexOf(req.query.media);
+      findComment.media.splice(indexOfImages, 1);
+      let deleteImage = await comment.findOneAndUpdate(
+        { _id: findComment._id },
+        findComment,
+        { new: true }
+      );
+      res.status(200).json({
+        success: true,
+        message: "Success",
+        data: deleteImage,
+      });
 
-			if (!deleteCom) {
-				const error = new Error("Delete comment failed");
-				error.statusCode = 400;
-				throw error;
-			} else await activities.deleteOne({ _id: req.params.id });
-			res.status(200).json({
-				success: true,
-				message: "Delete comment Success",
-				data: deleteCom.deletedCount,
-			});
-		} catch (err) {
-			console.log(err);
-			if (!err.statusCode) {
-				err.statusCode = 500;
-			}
-			next(err);
-		}
-	}
+      next();
+    } catch (err) {
+      console.log(err);
+      if (!err.statusCode) {
+        err.statusCode = 500;
+      }
+      next(err);
+    }
+  }
 
-	//======================|| Delete Images on upload on AWS S3 ||=====================//
-	async imageDelete(req, res, next) {
-		try {
-			let findComment = await comment.findOne({ _id: req.params.id });
-			let indexOfImages = findComment.media.indexOf(req.query.media);
-			findComment.media.splice(indexOfImages, 1);
-			let deleteImage = await comment.findOneAndUpdate(
-				{ _id: findComment._id },
-				findComment,
-				{ new: true }
-			);
-			res.status(200).json({
-				success: true,
-				message: "Success",
-				data: deleteImage,
-			});
-
-			next();
-		} catch (err) {
-			console.log(err);
-			if (!err.statusCode) {
-				err.statusCode = 500;
-			}
-			next(err);
-		}
-	}
 }
 
 module.exports = new CommentController();

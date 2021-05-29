@@ -113,9 +113,6 @@ if (process.env.NODE_ENV === "development") {
 const userRoutes = require("./routes/userRoute.js");
 app.use("/user", userRoutes);
 
-const activitiesRoutes = require("./routes/activitiesRoute.js");
-app.use("/activity", activitiesRoutes);
-
 const utilsRoutes = require("./routes/utilsRoute.js");
 app.use("/utils", utilsRoutes);
 

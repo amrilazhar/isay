@@ -10,12 +10,7 @@ const imageDeletes = require("../middlewares/delete/image");
 // IMPORT AUTH HERE
 const tokenParser = require("../middlewares/authentication/tokenParser");
 const isAuth = require("../middlewares/authentication/isAuth");
-
-// SET VARIABLE PROFILE ID
-let setProfileId = (req, res, next) => {
-	req.profile = { id: req.user.profile };
-	next();
-};
+const setProfileId = require("../middlewares/user/setProfileId");
 
 let dir = (req, res, next) => {
 	req.directory = "images/status/";

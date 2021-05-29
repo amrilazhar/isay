@@ -117,11 +117,12 @@ class StatusController {
 			validationErrorHandler(req, res, next);
 
 			let interestUser = await profile.findOne({ _id: req.profile.id });
-			let stringFind = { $or: [] };
+			let stringFind = interestUser ? { $or: [] } : {};
 
-			interestUser.interest.forEach((item) => {
+			interestUser?.interest?.forEach((item) => {
 				stringFind["$or"].push({ interest: item });
 			});
+
 			//pagination
 			const options = {
 				sort: { created_at: -1 },
@@ -485,9 +486,9 @@ class StatusController {
 			let limit = eval(req.query.limit) ? eval(req.query.limit) : 8;
 
 			let interestUser = await profile.findOne({ _id: req.profile.id });
-			let stringFind = { $or: [] };
+			let stringFind = interestUser ? { $or: [] } : {};
 
-			interestUser.interest.forEach((item) => {
+			interestUser?.interest?.forEach((item) => {
 				stringFind["$or"].push({ interest: item });
 			});
 

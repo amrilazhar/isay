@@ -10,12 +10,7 @@ const imageDeletes = require("../middlewares/delete/image");
 const commentValidator = require("../middlewares/validators/commentValidator");
 const tokenParser = require("../middlewares/authentication/tokenParser");
 const isAuth = require("../middlewares/authentication/isAuth");
-
-//set variabel profile.id
-let setProfileId = (req, res, next) => {
-  req.profile = { id: req.user.profile };
-  next();
-};
+const setProfileId = require("../middlewares/user/setProfileId");
 
 let dir = (req, res, next) => {
   req.directory = "images/comment/";
@@ -59,7 +54,16 @@ router.put(
 );
 
 //DELETE IMAGE
-router.delete("/delim/:id", tokenParser, isAuth, setProfileId, dir, commentValidator.ImageDelValidate, commentController.imageDelete, imageDeletes);
+router.delete(
+  "/delim/:id",
+  tokenParser,
+  isAuth,
+  setProfileId,
+  dir,
+  commentValidator.ImageDelValidate,
+  commentController.imageDelete,
+  imageDeletes
+);
 
 router.delete(
   "/:id",

@@ -7,7 +7,6 @@ const { user, comment, profile, status } = require("../models"); // import trans
 let authenticationToken = "0";
 let tempStatusID = "60b1195e095c381242aab79c";
 let tempInterestID = "6092b557e957671c70e24276";
-let tempProfileID = "60b120ea28eecf18b9e9f31b";
 
 describe("Status TEST", () => {
 	//TODO-POST : create status/post
@@ -75,6 +74,8 @@ describe("Status TEST", () => {
 			expect(res.statusCode).toEqual(201);
 			expect(res.body).toBeInstanceOf(Object);
 			expect(res.body.success).toEqual(true);
+
+			tempStatusID = res.body.data._id;
 		});
 	});
 
@@ -97,10 +98,11 @@ describe("Status TEST", () => {
 	describe("/GET/ Status by Interest all", () => {
 		it("it should return success", async () => {
 			const res = await request(app)
-				.get(`/status/interest/`)
+				.get(`/status/interest`)
 				.set({
 					Authorization: `Bearer ${authenticationToken}`,
 				});
+			console.log(res.body);
 			expect(res.statusCode).toEqual(200);
 			expect(res.body).toBeInstanceOf(Object);
 			expect(res.body.success).toEqual(true);
@@ -175,15 +177,15 @@ describe("Status TEST", () => {
 	//TODO-DELETE : Delete status/post
 	describe("/DELETE/ status", () => {
 		test("It should return success", async () => {
-		  const res = await request(app)
-			.delete(`/status/${tempStatusID}`)
-			.set({
-			  Authorization: `Bearer ${authenticationToken}`,
-			});	
-		  expect(res.statusCode).toEqual(200);
-		  expect(res.body).toBeInstanceOf(Object);
-		  expect(res.body.success).toEqual(true);
-		  expect(res.body.message).toEqual("Success");
+			const res = await request(app)
+				.delete(`/status/${tempStatusID}`)
+				.set({
+					Authorization: `Bearer ${authenticationToken}`,
+				});
+			expect(res.statusCode).toEqual(200);
+			expect(res.body).toBeInstanceOf(Object);
+			expect(res.body.success).toEqual(true);
+			expect(res.body.message).toEqual("Success");
 		});
-	  });	
+	});
 });

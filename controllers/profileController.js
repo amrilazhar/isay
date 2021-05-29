@@ -289,6 +289,7 @@ class ProfileController {
 				findUser,
 				{ new: true }
 			);
+
 			if (!insertUser) {
 				const error = new Error("Interest can't be added");
 				error.statusCode = 400;

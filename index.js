@@ -45,6 +45,7 @@ app.use((req, res, next) => {
 	req.io.removeAllListeners("connection");
 	req.io.on("connection", (socket) => {
 		req.socket = socket;
+		startSocketNotif(req,res);
 		if (socket.handshake.query.roomID) {
 			startSocketChat(req, res);
 		}

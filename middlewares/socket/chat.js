@@ -12,7 +12,7 @@ async function startSocketChat(req, res) {
 		req.socket.join(req.socket.handshake.query.roomID);
 
 		//set user status as Online
-		req.io.emit("online:" + req.user.profile, true);
+		req.io.emit("online:" + req.profile.id, true);
 
 		//start listening event set read status
 		req.socket.on("readMessage", async (data) => {

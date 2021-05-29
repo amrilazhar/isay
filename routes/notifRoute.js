@@ -14,4 +14,20 @@ router.get(
 	notifController.getNotifHistory
 );
 
+router.get(
+	"/unreadNotif",
+	tokenParser,
+	isAuth,
+	setProfileId,
+	notifController.getUnreadedNotifCount
+);
+
+router.put(
+	"/readNotif/:id",
+	tokenParser,
+	isAuth,
+	setProfileId,
+	notifController.setReadStatus
+);
+
 module.exports = router;

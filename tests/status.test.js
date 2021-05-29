@@ -102,7 +102,6 @@ describe("Status TEST", () => {
 				.set({
 					Authorization: `Bearer ${authenticationToken}`,
 				});
-			console.log(res.body);
 			expect(res.statusCode).toEqual(200);
 			expect(res.body).toBeInstanceOf(Object);
 			expect(res.body.success).toEqual(true);

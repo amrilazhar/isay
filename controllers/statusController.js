@@ -119,7 +119,7 @@ class StatusController {
 			let interestUser = await profile.findOne({ _id: req.profile.id });
 			let stringFind = interestUser ? { $or: [] } : {};
 
-			interestUser?.interest?.forEach((item) => {
+			interestUser.interest.forEach((item) => {
 				stringFind["$or"].push({ interest: item });
 			});
 
@@ -488,7 +488,7 @@ class StatusController {
 			let interestUser = await profile.findOne({ _id: req.profile.id });
 			let stringFind = interestUser ? { $or: [] } : {};
 
-			interestUser?.interest?.forEach((item) => {
+			interestUser.interest.forEach((item) => {
 				stringFind["$or"].push({ interest: item });
 			});
 

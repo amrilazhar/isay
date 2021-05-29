@@ -241,12 +241,14 @@ class StatusController {
 				}
 			);
 
-			req.images.forEach((item) => statusUpdate.media.push(item));
-			await statusUpdate.save();
+			if (req.images) {
+				req.images.forEach((item) => statusUpdate.media.push(item));
+				await statusUpdate.save();
+			}			
 
 			let returnData = await status.findOne({ _id: req.params.id });
 
-			if (!returnData) {
+			if (!statusUpdate) {
 				const error = new Error("Update status failed");
 				error.statusCode = 400;
 				throw error;

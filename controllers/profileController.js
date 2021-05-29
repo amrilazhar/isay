@@ -1,9 +1,9 @@
 const mongoose = require("mongoose");
-const { status, profile, interest, activities } = require("../models");
+const { status, profile, interest, activities, funfact } = require("../models");
 
 class ProfileController {
 	//=====================|| my profile ||=================//
-	async myProfile(req, res) {
+	async myProfile(req, res, next) {
 		try {
 			//find user id
 			let dataProfile = await profile
@@ -17,7 +17,13 @@ class ProfileController {
 					select: "province city_type city country",
 				})
 				.exec();
-			req.io.emit("my profile:" + dataProfile, dataProfile);
+
+			let funfacts = await funfact.find({}).populate("interest").exec();
+
+			if (funfacts) {
+				let randomNum = Math.floor(Math.random() * funfacts.length);
+				dataProfile._doc.funfacts = funfacts[randomNum];
+			} else dataProfile._doc.funfacts = "sorry we are currently searching for it";
 
 			res.status(200).json({
 				success: true,
@@ -34,7 +40,7 @@ class ProfileController {
 	}
 
 	//=====================|| my profile post ||=================//
-	async myProfilePost(req, res) {
+	async myProfilePost(req, res, next) {
 		try {
 			let paginateStatus = true;
 			if (req.query.pagination) {
@@ -55,7 +61,7 @@ class ProfileController {
 				{ owner: req.profile.id },
 				options
 			);
-			req.io.emit("my profile's post:" + dataProfile, dataProfile);
+
 			res.status(200).json({
 				success: true,
 				message: "Success",
@@ -71,7 +77,7 @@ class ProfileController {
 	}
 	//======================|| my profile activity ||====================//
 
-	async myProfileActivities(req, res) {
+	async myProfileActivities(req, res, next) {
 		try {
 			let paginateStatus = true;
 			if (req.query.pagination) {
@@ -130,8 +136,14 @@ class ProfileController {
 					select: "province city_type city country",
 				})
 				.exec();
-			req.io.emit("my friend profile:" + dataProfiles, dataProfiles);
 
+			let funfacts = await funfact.find({}).populate("interest").exec();
+
+			if (funfacts) {
+				let randomNum = Math.floor(Math.random() * funfacts.length);
+				dataProfiles._doc.funfacts = funfacts[randomNum];
+			} else dataProfiles._doc.funfacts = "sorry we are currently searching for it";
+			
 			res.status(200).json({
 				success: true,
 				message: "Success",
@@ -232,7 +244,7 @@ class ProfileController {
 		}
 	}
 	// =======================|| Update Profile ||================//
-	async profileUpdate(req, res) {
+	async profileUpdate(req, res, next) {
 		try {
 			let profileData = {
 				bio: req.body.bio,
@@ -250,7 +262,7 @@ class ProfileController {
 				error.statusCode = 400;
 				throw error;
 			}
-			
+
 			res.status(200).json({
 				success: true,
 				message: "Update Profile Success",
@@ -267,7 +279,7 @@ class ProfileController {
 
 	//===========================|| add Interest ||========================//
 
-	async addInterest(req, res) {
+	async addInterest(req, res, next) {
 		try {
 			let findUser = await profile.findOne({ _id: req.profile.id });
 			findUser.interest.push(req.query.id_interest);
@@ -297,7 +309,7 @@ class ProfileController {
 	}
 
 	//===========================|| delete Interest ||========================//
-	async deleteInterest(req, res) {
+	async deleteInterest(req, res, next) {
 		try {
 			let findUser = await profile.findOne({ _id: req.profile.id });
 			let indexOfInterest = findUser.interest.indexOf(req.query.id_interest);
@@ -337,7 +349,7 @@ class ProfileController {
 
 	//===========================|| List User Interest ||========================//
 
-	async getListUserInterest(req, res) {
+	async getListUserInterest(req, res, next) {
 		try {
 			let findUser = await profile
 				.findOne({ _id: req.profile.id })
@@ -362,15 +374,15 @@ class ProfileController {
 		}
 	}
 
-	async changeAvatar(req, res) {
+	async changeAvatar(req, res, next) {
 		try {
 			let { avatarPic } = require("../training/dataList");
 			let choosenAvatar = req.params.avatar
-				? req.params.avatar > avatarPic.length || req.params.avatar < 0 
-					? Math.floor(Math.random() * (avatarPic.length-1) )
+				? req.params.avatar > avatarPic.length || req.params.avatar < 0
+					? Math.floor(Math.random() * (avatarPic.length - 1))
 					: req.params.avatar
-				: Math.floor(Math.random() * (avatarPic.length-1) );
-			
+				: Math.floor(Math.random() * (avatarPic.length - 1));
+
 			let setProfilePic = await profile.findOneAndUpdate(
 				{ _id: mongoose.Types.ObjectId(req.profile.id) },
 				{ avatar: avatarPic[choosenAvatar] },
@@ -382,7 +394,7 @@ class ProfileController {
 					success: true,
 					message: "Profile Avatar Changed",
 					avatar: avatarPic[choosenAvatar],
-					data : setProfilePic,
+					data: setProfilePic,
 				});
 			}
 		} catch (err) {
@@ -394,13 +406,13 @@ class ProfileController {
 		}
 	}
 
-	getAvatarList(req, res) {
+	getAvatarList(req, res, next) {
 		try {
 			let { avatarPic } = require("../training/dataList");
 			res.status(200).json({
 				success: true,
 				message: "Avatar List",
-				data : avatarPic,
+				data: avatarPic,
 			});
 		} catch (err) {
 			console.log(err);

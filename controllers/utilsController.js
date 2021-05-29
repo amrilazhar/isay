@@ -71,13 +71,13 @@ class UtilsController {
 			let interestTwo = "";
 			let interestThree = "";
 
-			//convert location to number that can be use by model
+			//get province name from database based on location ID
 			if (!req.body.location) {
 				let locationParam = await location.findById(locationParam);
 				province = locationParam.province;
 			}
 
-			//convert interest to number that can be use by model
+			//get interest name from database based on location ID
 			if (!req.body.interest) {
 				let interestAll = await interest.find({}).exec();
 				let interestParam = JSON.parse(req.body.interest);
@@ -108,7 +108,7 @@ class UtilsController {
 				file.readFileSync("./training/nameDtree.json", "utf8")
 			);
 
-			//load trained model to brain JS
+			//load trained model to DecisionTree
 			let namaSapaanDTree = new DecisionTree(jsonSapaan);
 			let namaCharDTree = new DecisionTree(jsonName);
 

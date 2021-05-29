@@ -17,7 +17,7 @@ let setProfileId = (req, res, next) => {
 // SET ROUTER PROFILE HERE
 
 //view our profile
-router.get("/getProfile/:id", tokenParser, isAuth, setProfileId, profileController.myProfile);
+router.get("/getProfile", tokenParser, isAuth, setProfileId, profileController.myProfile);
 router.get("/Post", tokenParser, isAuth, setProfileId, profileController.myProfilePost);
 router.get("/Activities", tokenParser, isAuth, setProfileId, profileController.myProfileActivities);
 

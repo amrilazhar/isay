@@ -1,5 +1,4 @@
-const { notification } = require("../models");
-
+const { chat, notification } = require("../models");
 class NotificationController {
 	async getNotifHistory(req, res, next) {
 		try {
@@ -50,18 +49,16 @@ class NotificationController {
 					readed: false,
 				})
 				.exec();
-
-			if (unreadedNotifCount) {
-				unreadedNotifCount.forEach((item) => item.type === "chat" ? chatCont.push(item) : '');
-				unreadedNotifCount.forEach((item) => item.type !== "chat" ? notifCont.push(item) : '');
-			}
+			let unreadedChatCount = await chat.message
+				.find({ to: req.profile.id, readed: false })
+				.exec();
 
 			//send data
 			return res.status(200).json({
 				success: true,
 				message: "success",
-				chatCount: chatCont.length,
-				notifCount: notifCont.length,
+				chatCount: unreadedChatCount.length,
+				notifCount: unreadedNotifCount.length,
 			});
 		} catch (error) {
 			if (!error.statusCode) {
@@ -71,7 +68,7 @@ class NotificationController {
 		}
 	}
 
-	async setReadStatus(req, res, next) {
+	async setReadNotif(req, res, next) {
 		try {
 			//get data from database
 			let setRead = await notification.findOneAndUpdate(
@@ -79,6 +76,10 @@ class NotificationController {
 				{ readed: true },
 				{ new: true }
 			);
+
+			if (setRead) {
+				req.io.emit("readedNotif:" + req.profile.id, "readed");
+			}
 
 			if (setRead) {
 				return res.status(200).json({ success: true, message: "readed" });

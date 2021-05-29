@@ -27,7 +27,7 @@ router.put(
 	tokenParser,
 	isAuth,
 	setProfileId,
-	notifController.setReadStatus
+	notifController.setReadNotif
 );
 
 module.exports = router;

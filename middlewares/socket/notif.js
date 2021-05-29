@@ -10,7 +10,7 @@ async function startSocketNotif(req, res) {
 		//start listening event read notif
 		req.socket.on("readNotif", async (data) => {
 			await notification.findByIdAndUpdate(data.notif_id, { readed: true });
-			req.io.emit("updatedReadNotif", data.notif_id);
+			req.io.emit("readedNotif:" + req.profile.id, data.notif_id);
 		});
 
 		//disconnect the connection
@@ -23,7 +23,6 @@ async function startSocketNotif(req, res) {
 
 			req.socket.disconnect();
 		});
-
 	} catch (error) {
 		console.log(error);
 	}

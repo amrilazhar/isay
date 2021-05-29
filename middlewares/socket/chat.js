@@ -64,7 +64,7 @@ async function startSocketChat(req, res) {
 							.to(req.socket.handshake.query.roomID)
 							.emit("messageFromServer", sendMess);
 
-						req.io.emit("chat:" + message.to, "notif");
+						req.io.emit("chat:" + message.to, sendMess);
 					})
 					.catch((e) => {
 						//emit to specific room if message create message error
@@ -156,7 +156,7 @@ async function socketImageUpload(req, res) {
 					.populate("to", "name avatar")
 					.execPopulate();
 
-				req.io.emit("chat:" + req.utils.message.to, "notif");
+				req.io.emit("chat:" + req.utils.message.to, sendMess);
 
 				//emit to specific room if message create message success
 				req.io.to(req.utils.handshake).emit("messageFromServer", sendMess);

@@ -6,6 +6,7 @@ const { user, comment, profile, status } = require("../models"); // import trans
 
 let authenticationToken = "0";
 let tempStatusID;
+let tempStatusExample = "6093967f3fba722358512945";
 let tempInterestID = "6092b557e957671c70e24277";
 let tempProfileID;
 
@@ -161,6 +162,30 @@ describe("Status TEST", () => {
 			expect(res.body.success).toEqual(true);
 			expect(res.body.message).toEqual("Success");
 		});
+		//todo : if failed
+		test("It should return failed: cannot like twice", async () => {
+			const res = await request(app)
+				.put(`/status/like/${tempStatusID}?likeBy=${tempProfileID}`)
+				.set({
+					Authorization: `Bearer ${authenticationToken}`,
+				});
+			expect(res.statusCode).toEqual(400);
+			expect(res.body).toBeInstanceOf(Object);
+			expect(res.body.message).toEqual("You can't like status twice");
+		});
+		//todo : if failed
+		test("It should return failed: status not found", async () => {
+			const res = await request(app)
+				.put(
+					`/status/like/6092b557e957671c70e24276?likeBy=${tempProfileID}`
+				)
+				.set({
+					Authorization: `Bearer ${authenticationToken}`,
+				});
+			expect(res.statusCode).toEqual(400);
+			expect(res.body).toBeInstanceOf(Object);
+			expect(res.body.message).toEqual("Status not found");
+		});
 	});
 
 	//TODO-PUT : Unlike Status/pos
@@ -176,6 +201,31 @@ describe("Status TEST", () => {
 			expect(res.body).toBeInstanceOf(Object);
 			expect(res.body.success).toEqual(true);
 			expect(res.body.message).toEqual("Success");
+		});
+		//todo : if failed
+		test("It should return failed: Status not liked yet", async () => {
+			const res = await request(app)
+				.put(
+					`/status/unlike/${tempStatusExample}?likeBy=${tempProfileID}`
+				)
+				.set({
+					Authorization: `Bearer ${authenticationToken}`,
+				});
+			expect(res.statusCode).toEqual(400);
+			expect(res.body).toBeInstanceOf(Object);
+		});
+		//todo : if failed
+		test("It should return failed: status not found", async () => {
+			const res = await request(app)
+				.put(
+					`/status/unlike/6092b557e957671c70e24276?likeBy=${tempProfileID}`
+				)
+				.set({
+					Authorization: `Bearer ${authenticationToken}`,
+				});
+			expect(res.statusCode).toEqual(400);
+			expect(res.body).toBeInstanceOf(Object);
+			expect(res.body.message).toEqual("Status Not Found");
 		});
 	});
 

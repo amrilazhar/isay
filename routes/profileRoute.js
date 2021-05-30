@@ -8,16 +8,11 @@ const profileController = require("../controllers/profileController");
 const profileValidator = require("../middlewares/validators/profileValidator");
 const tokenParser = require("../middlewares/authentication/tokenParser");
 const isAuth = require("../middlewares/authentication/isAuth");
-
-//set variabel profile.id
-let setProfileId = (req, res, next) => {
-	req.profile = { id: req.user.profile };  
-	next();
-  };
+const setProfileId = require("../middlewares/user/setProfileId");
 // SET ROUTER PROFILE HERE
 
 //view our profile
-router.get("/getProfile/:id", tokenParser, isAuth, setProfileId, profileController.myProfile);
+router.get("/getProfile", tokenParser, isAuth, setProfileId, profileController.myProfile);
 router.get("/Post", tokenParser, isAuth, setProfileId, profileController.myProfilePost);
 router.get("/Activities", tokenParser, isAuth, setProfileId, profileController.myProfileActivities);
 

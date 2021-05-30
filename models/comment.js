@@ -20,11 +20,11 @@ const CommentSchema = new mongoose.Schema(
 			type: String,
 			required: false,
 		},
-		media: [{
-			type: String,
-			required: false,
-			get : getMedia
-		}],
+		media: {
+			type: Array,
+			get : getMediaArr,
+			required : false,
+		},
 		owner: {
 			type: mongoose.Schema.Types.ObjectId,
 			required: true,
@@ -43,13 +43,16 @@ const CommentSchema = new mongoose.Schema(
 			updatedAt: "updated_at",
 		},
 		toJSON: { getters: true },
+		toObject: { getters: false },
 	}
-  );
-  
-  function getMedia(image) {
-	return process.env.S3_URL + image;
-  }
-  
+);
+
+function getMediaArr(arr) {
+	return arr.map(image=>{
+		return process.env.S3_URL + image;
+	})
+	
+}
 
 CommentSchema.plugin(mongoose_delete, { overrideMethods: "all" });
 

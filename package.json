@@ -12,7 +12,7 @@
     ]
   },
   "scripts": {
-    "test": "cross-env NODE_ENV=test jest --silent=false --testTimeout=1000000 --coverage --forceExit",
+    "test": "cross-env NODE_ENV=test jest --testTimeout=1000000 --coverage --forceExit --runInBand",
     "dev": "NODE_ENV=development nodemon index.js",
     "deva": "NODE_ENV=development node index.js",
     "stop": "NODE_ENV=production forever stop index.js || true",

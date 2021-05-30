@@ -71,23 +71,24 @@ class UtilsController {
 			let interestTwo = "";
 			let interestThree = "";
 
-			//convert location to number that can be use by model
+			//get province name from database based on location ID
 			if (!req.body.location) {
 				let locationParam = await location.findById(locationParam);
 				province = locationParam.province;
 			}
 
-			//convert interest to number that can be use by model
-			if (!req.body.interest) {
+			//get interest name from database based on location ID
+			if (req.body.interest) {
 				let interestAll = await interest.find({}).exec();
 				let interestParam = JSON.parse(req.body.interest);
 				let interestCont = [];
-
+				
 				interestParam.forEach((element) => {
-					let idx = interesAll.indexOf(element);
-					if (idx > -1) {
-						interestCont.push(interestAll[idx]);
-					}
+					interestAll.forEach(item=>{
+						if (item._id == element) {
+							interestCont.push(item)
+						}						
+					})
 				});
 
 				interestOne = interestCont[0] ? interestCont[0].interest : "";
@@ -95,7 +96,7 @@ class UtilsController {
 
 				if (interestCont.length > 3) {
 					let randInterest = Math.floor(Math.random() * interestCont.length);
-					let idx = randInterest < 2 ? irandInterest + 2 : randInterest;
+					let idx = randInterest < 2 ? randInterest + 2 : randInterest;
 					interestThree = interestCont[idx] ? interestCont[idx].interest : "";
 				} else interestThree = interestCont[2] ? interestCont[2].interest : "";
 			}
@@ -108,7 +109,7 @@ class UtilsController {
 				file.readFileSync("./training/nameDtree.json", "utf8")
 			);
 
-			//load trained model to brain JS
+			//load trained model to DecisionTree
 			let namaSapaanDTree = new DecisionTree(jsonSapaan);
 			let namaCharDTree = new DecisionTree(jsonName);
 
@@ -124,6 +125,10 @@ class UtilsController {
 				interest3: interestThree,
 			});
 
+			console.log(interestOne, "===interest One");
+			console.log(interestTwo, "===interest Two");
+			console.log(interestThree, "===interest Three");
+
 			let namaSapaan = namaSapaanDTree.predict({
 				provinsi: province,
 				gender: gender[genderParam],
@@ -137,9 +142,12 @@ class UtilsController {
 			let avatar = avatarPic[randomNum];
 
 			//selecting fun fact
-			req.body.funfact = (await funfact.find({}).populate("interest").exec())[
-				randomNum
-			];
+			let funfacts = await funfact.find({}).populate("interest").exec();
+
+			if (funfacts) {
+				let randomNum = Math.floor(Math.random() * funfacts.length);
+				req.body.funfact = funfacts[randomNum];
+			} else req.body.funfact = "sorry we are currently searching for it";
 
 			req.body.name = generatedName;
 			req.body.avatar = avatar;

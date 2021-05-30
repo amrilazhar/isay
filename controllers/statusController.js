@@ -117,11 +117,12 @@ class StatusController {
 			validationErrorHandler(req, res, next);
 
 			let interestUser = await profile.findOne({ _id: req.profile.id });
-			let stringFind = { $or: [] };
+			let stringFind = interestUser ? { $or: [] } : {};
 
 			interestUser.interest.forEach((item) => {
 				stringFind["$or"].push({ interest: item });
 			});
+
 			//pagination
 			const options = {
 				sort: { created_at: -1 },
@@ -242,13 +243,12 @@ class StatusController {
 			);
 
 			if (req.images) {
-				req.images.forEach((item) => statusUpdate.media.push(item));
+				let oldImageContainer = statusUpdate.media.map(item=>item.replace(process.env.S3_URL,''))
+				statusUpdate.media = [...oldImageContainer, ...req.images];
 				await statusUpdate.save();
-			}
+			}			
 
-			let returnData = await status.findOne({ _id: req.params.id });
-
-			if (!returnData) {
+			if (!statusUpdate) {
 				const error = new Error("Update status failed");
 				error.statusCode = 400;
 				throw error;
@@ -256,7 +256,7 @@ class StatusController {
 				res.status(200).json({
 					success: true,
 					message: "Success",
-					data: returnData,
+					data: statusUpdate,
 				});
 			}
 		} catch (err) {
@@ -485,7 +485,7 @@ class StatusController {
 			let limit = eval(req.query.limit) ? eval(req.query.limit) : 8;
 
 			let interestUser = await profile.findOne({ _id: req.profile.id });
-			let stringFind = { $or: [] };
+			let stringFind = interestUser ? { $or: [] } : {};
 
 			interestUser.interest.forEach((item) => {
 				stringFind["$or"].push({ interest: item });

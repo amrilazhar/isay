@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-const { chat, notification } = require("../../models");
+const { chat, profile } = require("../../models");
 const crypto = require("crypto");
 const { S3Client, PutObjectCommand } = require("@aws-sdk/client-s3");
 const { tokenDecoder } = require("../../utils/chatUtils");
@@ -12,7 +12,7 @@ async function startSocketChat(req, res) {
 		req.socket.join(req.socket.handshake.query.roomID);
 
 		//set user status as Online
-		req.io.emit("online:" + req.user.profile, true);
+		req.io.emit("online:" + req.profile.id, true);
 
 		//start listening event set read status
 		req.socket.on("readMessage", async (data) => {
@@ -20,13 +20,14 @@ async function startSocketChat(req, res) {
 			req.io
 				.to(req.socket.handshake.query.roomID)
 				.emit("updatedReadMessage", data.message_id);
+
+			req.io.emit("readedChat:" + req.profile.id, data.message_id);
 		});
 
 		//disconnect the connection
-		req.socket.on("disconnect", () => {
+		req.socket.on("disconnect", async () => {
 			console.log("user disconnect");
 			req.socket.leave(req.socket.handshake.query.roomID);
-
 			//set user status as Offline when disconnect
 			req.io.emit("online:" + req.profile.id, false);
 
@@ -63,18 +64,8 @@ async function startSocketChat(req, res) {
 							.to(req.socket.handshake.query.roomID)
 							.emit("messageFromServer", sendMess);
 
-						//emit notification to user
-						let notificationData = {
-							type: "chat",
-							status_id: null,
-							chatMsg_id: query._id,
-							comment_id: null,
-							to: message.to,
-							from: from,
-						};
-						let sendNotif = await notification.create(notificationData);
-						await sendNotif.populate("from chatMsg_id").execPopulate();
-						req.io.emit("chat:" + message.to, sendNotif);
+						req.io.emit("chat:" + message.to, sendMess);
+						req.io.emit("chat:" + from, sendMess);
 					})
 					.catch((e) => {
 						//emit to specific room if message create message error
@@ -164,23 +155,12 @@ async function socketImageUpload(req, res) {
 				let sendMess = await query
 					.populate("from", "name avatar")
 					.populate("to", "name avatar")
-					.execPopulate();
-
-				//emit notification to user
-				let notificationData = {
-					type: "chat",
-					status_id: null,
-					chatMsg_id: query._id,
-					comment_id: null,
-					to: req.utils.message.to,
-					from: from,
-				};
-				let sendNotif = await notification.create(notificationData);
-				await sendNotif.populate("from chatMsg_id").execPopulate();
-				req.io.emit("chat:" + req.utils.message.to, sendNotif);
+					.execPopulate();				
 
 				//emit to specific room if message create message success
 				req.io.to(req.utils.handshake).emit("messageFromServer", sendMess);
+				req.io.emit("chat:" + req.utils.message.to, sendMess);
+				req.io.emit("chat:" + req.utils.from, sendMess);
 			})
 			.catch((e) => {
 				//emit to specific room if message create message error

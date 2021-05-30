@@ -36,6 +36,7 @@ const admin = require("./utils/firebase");
 // const mongooseConnect = require("./utils/database");
 
 const { startSocketChat } = require("./middlewares/socket/chat");
+const { startSocketNotif } = require("./middlewares/socket/notif");
 // Assign socket object to every request
 app.use((req, res, next) => {
 	req.io = io;
@@ -45,6 +46,7 @@ app.use((req, res, next) => {
 	req.io.removeAllListeners("connection");
 	req.io.on("connection", (socket) => {
 		req.socket = socket;
+		startSocketNotif(req,res);
 		if (socket.handshake.query.roomID) {
 			startSocketChat(req, res);
 		}
@@ -76,7 +78,7 @@ app.use(xss());
 // Rate limiting
 const limiter = rateLimit({
 	windowMs: 1 * 60 * 1000, // 10 mins
-	max: 100,
+	max: 200,
 });
 
 app.use(limiter);
@@ -112,9 +114,6 @@ if (process.env.NODE_ENV === "development") {
 
 const userRoutes = require("./routes/userRoute.js");
 app.use("/user", userRoutes);
-
-const activitiesRoutes = require("./routes/activitiesRoute.js");
-app.use("/activity", activitiesRoutes);
 
 const utilsRoutes = require("./routes/utilsRoute.js");
 app.use("/utils", utilsRoutes);

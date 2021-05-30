@@ -14,7 +14,7 @@ class CommentController {
 		try {
 			let dataComment = await comment
 				.find({ status_id: req.query.status_id })
-				.sort({ _id: 1 })
+				.sort({ _id: -1 })
 				.populate("owner")
 				.lean()
 				.exec(); //id status
@@ -80,7 +80,6 @@ class CommentController {
 					select: "content owner media interest likeBy",
 				})
 				.exec();
-			req.io.emit("comment " + dataComment, dataComment);
 
 			res.status(200).json({
 				success: true,
@@ -127,14 +126,14 @@ class CommentController {
 			let notif = await notification.create({
 				type: "post_comment",
 				comment_id: createComment._id,
-				status_id: updateStatus._id,
+        status_id : req.body.status_id,
 				from: req.profile.id,
 				to: updateStatus.owner,
 			});
 
-			await notif.populate("comment_id from to").execPopulate();
+			notif.populate("comment_id from to").execPopulate();
 
-			req.io.emit("notif:" + createComment.owner, notif);
+			req.io.emit("notif:" + updateStatus.owner, notif);
 
 			if (!createComment) {
 				const error = new Error("Post Comment failed");
@@ -144,6 +143,7 @@ class CommentController {
 				await activities.create({
 					type: "post_comment",
 					comment_id: createComment._id,
+          status_id : req.body.status_id,
 					owner: req.profile.id,
 				});
 
@@ -177,11 +177,10 @@ class CommentController {
 			);
 
 			if (req.images) {
-				req.images.forEach((item) => dataComment.media.push(item));
+				let oldImageContainer = dataComment.media.map(item=>item.replace(process.env.S3_URL,''))
+				dataComment.media = [...oldImageContainer, ...req.images];
 				await dataComment.save();
 			}
-
-			dataComment = await comment.findOne({ _id: req.params.id });
 
 			if (!dataComment) {
 				const error = new Error("Comment fail to be appeared");
@@ -265,11 +264,6 @@ class CommentController {
 	async deleteComment(req, res) {
 		try {
 			let deleteCom = await comment.deleteOne({ _id: req.params.id }); //id comment that want to delete
-			// remove comment in status
-			let indexOfComment = await status.comment.indexOf({ _id: req.params.id });
-			status.comment.splice(indexOfComment, 1);
-			await status.save();
-
 			if (!deleteCom) {
 				const error = new Error("Delete comment failed");
 				error.statusCode = 400;

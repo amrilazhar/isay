@@ -30,7 +30,6 @@ module.exports = async (req, res, next) => {
 		try {
 			const decodedToken = jwt.verify(token[1], process.env.JWT_SECRET);
 			user = await User.findOne({_id: decodedToken.id});
-			console.log(user);
 		} catch (err) {
 			err.statusCode = 500;
 			throw err;

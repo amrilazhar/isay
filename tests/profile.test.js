@@ -2,229 +2,273 @@ const request = require("supertest");
 const app = require("../index");
 const jwt = require("jsonwebtoken");
 
-const { user, comment, profile } = require("../models"); // import transaksi models
+const { user, profile } = require("../models");
 
 let authenticationToken = "0";
-let tempID = "";
-let tempProfile = "608ac628c8d0a1bfded19469";
+let tempProfile = "60b0af790d1bf101446e25eb";
+let tempLogin = "60b09064c6cd100e28513002";
 let tempProfileTwo = "60935f673fba7223585128d1";
-let tempUserTwo = "60af9109e8f9c90029a29f08"
 
+describe("Profile TEST", () => {
+	describe("/Get All Location ", () => {
+		test("It should return success", async () => {
+			const res = await request(app).get("/utils/location");
+			// .set({
+			//   Authorization: `Bearer ${authenticationToken}`,
+			// })
 
-describe("Utils TEST", () => {
-  describe("/Get All Location ", () => {
-    test("It should return success", async () => {
-      const res = await request(app).get("/utils/location");
-      // .set({
-      //   Authorization: `Bearer ${authenticationToken}`,
-      // })
+			expect(res.statusCode).toEqual(200);
+			expect(res.body).toBeInstanceOf(Object);
+			expect(res.body.message).toEqual("success");
+		});
+	});
 
-      expect(res.statusCode).toEqual(200);
-      expect(res.body).toBeInstanceOf(Object);
-      expect(res.body.message).toEqual("success");
-    });
-  });
+	describe("/GET  Interest by Category", () => {
+		test("It should return success", async () => {
+			const res = await request(app).get(`/utils/interest/topic`);
+			// .set({
+			//   Authorization: `Bearer ${authenticationToken}`,
+			// });
 
-  describe("/GET  Interest by Category", () => {
-    test("It should return success", async () => {
-      const res = await request(app).get(`/utils/interest/topic`);
-      // .set({
-      //   Authorization: `Bearer ${authenticationToken}`,
-      // });
+			expect(res.statusCode).toEqual(200);
+			expect(res.body).toBeInstanceOf(Object);
+			expect(res.body.message).toEqual("success");
+		});
+	});
 
-      expect(res.statusCode).toEqual(200);
-      expect(res.body).toBeInstanceOf(Object);
-      expect(res.body.message).toEqual("success");
-    });
-  });
+	//==================|| Post comment and make user ||==================
+	describe("/GET profile ", () => {
+		test("It should return success", async () => {
+			//drop and create table users
+			await user.collection.dropIndexes();
+			await user.deleteMany();
+			await user.collection.createIndex({ email: 5 }, { unique: true });
 
-  // describe("/POST Comment ", () => {
-  //   test("It should return success", async () => {
-  //     let status_id = "6093967f3fba722358512955";
+			//delete comment
+			//delete profile
+			await profile.deleteMany();
 
-  //     //drop and create table users
-  //     await user.collection.dropIndexes();
-  //     await user.deleteMany();
-  //     await user.collection.createIndex({ email: 1 }, { unique: true });
+			//create data profile
+			const dataProfile = {
+				bio: "new bio",
+				location: "608f5baf87fc4f408c131780",
+				interest: [
+					"6092b557e957671c70e24276",
+					"6092b557e957671c70e24277",
+					"6092b557e957671c70e24278",
+					"6092b557e957671c70e24279",
+				],
+				avatar: "http://dummyimage.com/167x100.png/ff4444/ffffff",
+			};
 
-  //     //delete comment
-  //     //delete profile
-  //     await comment.deleteMany();
-  //     await profile.deleteMany();
+			let userProfile = await profile.create(dataProfile);
+			tempProfile = userProfile._id;
+			//create data user
+			const dataUser = {
+				email: "isayjhorgi@test.com",
+				password: "Aneh1234!!",
+				admin: false,
+				emailVerified: true,
+				profile: tempProfile,
+			};
 
-  //     //create data profile
-  //     const dataProfile = {
-  //       bio: "new bio",
-  //       location: "608f5baf87fc4f408c131780",
-  //       interest: [
-  //         "6092b557e957671c70e24276",
-  //         "6092b557e957671c70e24277",
-  //         "6092b557e957671c70e24278",
-  //         "6092b557e957671c70e24279",
-  //       ],
-  //       avatar: "http://dummyimage.com/167x100.png/ff4444/ffffff",
-  //     };
+			let userLogin = await user.create(dataUser);
+			tempLogin = userLogin._id;
 
-  //     let userProfile = await profile.create(dataProfile);
-  //     userProfile._id = tempProfile;
+			//generate token
+			const token = jwt.sign(
+				{
+					id: tempLogin,
+					admin: userLogin.admin,
+					profile: tempProfile,
+				},
+				process.env.JWT_SECRET,
+				{ expiresIn: "30d" }
+			);
 
-  //     //create data user
-  //     const dataUser = {
-  //       email: "isayjhorgi@test.com",
-  //       password: "Aneh1234!!",
-  //       admin: false,
-  //       emailVerified: true,
-  //       profile: userProfile._id,
-  //     };
+			//save token variable for later use
+			authenticationToken = token;
 
-  //     let userLogin = await user.create(dataUser);
+			const res = await request(app)
+				.get(`/profile/getProfile`)
+				.set({
+					Authorization: `Bearer ${authenticationToken}`,
+				});
 
-  //     //generate token
-  //     const token = jwt.sign(
-  //       {
-  //         id: userLogin._id,
-  //         admin: userLogin.admin,
-  //         profile: userProfile._id,
-  //       },
-  //       process.env.JWT_SECRET,
-  //       { expiresIn: "30d" }
-  //     );
+			expect(res.statusCode).toEqual(200);
+			expect(res.body).toBeInstanceOf(Object);
+			expect(res.body.success).toEqual(true);
+			expect(res.body.message).toEqual("Success");
+		});
+	});
 
-  //     //save token variable for later use
-  //     authenticationToken = token;
+	//==================|| view my profile's status ||==================
+	describe("/GET Profile's post", () => {
+		test("It should return success", async () => {
+			const res = await request(app)
+				.get("/profile/Post")
+				.set({
+					Authorization: `Bearer ${authenticationToken}`,
+				});
 
-  //     const res = await request(app)
-  //       .post("/comment")
-  //       .set({
-  //         Authorization: `Bearer ${authenticationToken}`,
-  //       })
-  //       .send({
-  //         content: "Anne with an E",
-  //         status_id: status_id,
-  //         depth: 1,
-  //       });
+			expect(res.statusCode).toEqual(200);
+			expect(res.body).toBeInstanceOf(Object);
+			expect(res.body.success).toEqual(true);
+		});
+	});
 
-  //     expect(res.statusCode).toEqual(200);
-  //     expect(res.body).toBeInstanceOf(Object);
-  //     expect(res.body.success).toEqual(true);
-  //     //save id movie
-  //     tempCommentID = res.body.data._id;
-  //   });
-  // });
+	//==================|| view my profile's activities ||==================
+	describe("/GET Profile's activities", () => {
+		test("It should return success", async () => {
+			const res = await request(app)
+				.get("/profile/Activities")
+				.set({
+					Authorization: `Bearer ${authenticationToken}`,
+				});
+
+			expect(res.statusCode).toEqual(200);
+			expect(res.body).toBeInstanceOf(Object);
+			expect(res.body.success).toEqual(true);
+		});
+	});
+
+	//==================|| view another profile's activities ||==================
+	describe("/GET make dummy user and view its profile", () => {
+		test("It should return success", async () => {
+			//create data profile
+			const dataProfileTwo = {
+				bio: "new bio",
+				name: "Anonymous",
+				location: "608f5baf87fc4f408c131780",
+				interest: ["6092b557e957671c70e24276", "6092b557e957671c70e24277"],
+				avatar: "http://dummyimage.com/167x100.png/ff4444/ffffff",
+			};
+
+			let userProfileTwo = await profile.create(dataProfileTwo);
+			tempProfileTwo = userProfileTwo._id;
+
+			//create data user
+			const dataUserTwo = {
+				email: "isayluffy@test.com",
+				password: "Aneh1234!!",
+				admin: false,
+				emailVerified: true,
+				profile: tempProfileTwo,
+			};
+
+			let userCreateNew = await user.create(dataUserTwo);
+			tempUserTwo = userCreateNew._id;
+
+			const res = await request(app)
+				.get(`/profile/an/${tempProfileTwo}`)
+				.set({
+					Authorization: `Bearer ${authenticationToken}`,
+				});
+
+			expect(res.statusCode).toEqual(200);
+			expect(res.body).toBeInstanceOf(Object);
+			expect(res.body.success).toEqual(true);
+		});
+	});
+
+	//==================|| view another profile's post ||==================
+	describe("/GET another member profile's post", () => {
+		test("It should return success", async () => {
+			const res = await request(app)
+				.get(`/profile/an/Post/${tempProfileTwo}`)
+				.set({
+					Authorization: `Bearer ${authenticationToken}`,
+				});
+
+			expect(res.statusCode).toEqual(200);
+			expect(res.body).toBeInstanceOf(Object);
+			expect(res.body.success).toEqual(true);
+		});
+	});
+
+	//==================|| view another profile's activities ||==================
+	describe("/GET another member profile's activities", () => {
+		test("It should return success", async () => {
+			const res = await request(app)
+				.get(`/profile/an/Activities/${tempProfileTwo}`)
+				.set({
+					Authorization: `Bearer ${authenticationToken}`,
+				});
+
+			expect(res.statusCode).toEqual(200);
+			expect(res.body).toBeInstanceOf(Object);
+			expect(res.body.success).toEqual(true);
+		});
+	});
+
+	//=============|| edit our profile ||=========================
+	describe("/PUT edit my profile", () => {
+		test("It should return success", async () => {
+			const res = await request(app)
+				.put(`/profile`)
+				.set({
+					Authorization: `Bearer ${authenticationToken}`,
+				})
+				.send({
+					bio: "this is my bio",
+					name: "Jhorgi",
+					interest: ["6092b557e957671c70e24278", "6092b557e957671c70e24279"],
+					location: "608f5baf87fc4f408c131780",
+				});
+
+			expect(res.statusCode).toEqual(200);
+			expect(res.body).toBeInstanceOf(Object);
+			expect(res.body.success).toEqual(true);
+		});
+	});
+
+	//===============|| edit our interest (+add) ||===============
+	describe("/PUT Edit Interest (add)", () => {
+		test("It should return success", async () => {
+			const res = await request(app)
+				.put(
+					`/profile/Interest/${tempProfile}?id_interest=6092b557e957671c70e24286`
+				)
+				.set({
+					Authorization: `Bearer ${authenticationToken}`,
+				});
+
+			expect(res.statusCode).toEqual(200);
+			expect(res.body).toBeInstanceOf(Object);
+			expect(res.body.success).toEqual(true);
+			expect(res.body.message).toEqual("Add Interest Success");
+		});
+	});
+
+	//===============|| edit our interest (-delete) ||===============
+	describe("/PUT Edit Interest (delete)", () => {
+		test("It should return success", async () => {
+			const res = await request(app)
+				.put(
+					`/profile/DeleteInt/${tempProfile}?id_interest=6092b557e957671c70e24286`
+				)
+				.set({
+					Authorization: `Bearer ${authenticationToken}`,
+				});
+
+			expect(res.statusCode).toEqual(200);
+			expect(res.body).toBeInstanceOf(Object);
+			expect(res.body.success).toEqual(true);
+		});
+	});
+
+	//================||get user Interest ||====================
+	describe("/GET User Interest", () => {
+		test("It should return success", async () => {
+			const res = await request(app)
+				.get(`/profile/userInterest`)
+				.set({
+					Authorization: `Bearer ${authenticationToken}`,
+				});
+
+			expect(res.statusCode).toEqual(200);
+			expect(res.body).toBeInstanceOf(Object);
+			expect(res.body.success).toEqual(true);
+		});
+	});
 });
-
-// //Test get profile
-// describe("/GET Profile", () => {
-//   test("It should return success", async () => {
-//     const res = await request(app)
-//       .post("/comment/getProfile/608ac628c8d0a1bfded19469")
-//       .set({
-//         Authorization: `Bearer ${authenticationToken}`,
-//       });
-
-//     expect(res.statusCode).toEqual(200);
-//     expect(res.body).toBeInstanceOf(Object);
-//     expect(res.body.success).toEqual(true);
-//   });
-// });
-
-// // make a status
-// describe("/POST dummy status", () => {
-//   test("It should return success", async () => {
-//     const res = await request(app)
-//       .post("/status")
-//       .set({
-//         Authorization: `Bearer ${authenticationToken}`,
-//       })
-//       .send({
-//         content: "Anne with an E",
-//         interest: "6092b557e957671c70e24279",
-//         // media:,
-//       });
-
-//     expect(res.statusCode).toEqual(201);
-//     expect(res.body).toBeInstanceOf(Object);
-//     expect(res.body.success).toEqual(true);
-//   });
-// });
-// //Tes get profile post
-// describe("/GET Profile's post", () => {
-//   test("It should return success", async () => {
-//     const res = await request(app)
-//       .get("/Post")
-//       .set({
-//         Authorization: `Bearer ${authenticationToken}`,
-//       });
-
-//     expect(res.statusCode).toEqual(200);
-//     expect(res.body).toBeInstanceOf(Object);
-//     expect(res.body.success).toEqual(true);
-//   });
-// });
-
-// //Tes get profile activities
-// describe("/GET Profile's activities", () => {
-//   test("It should return success", async () => {
-//     const res = await request(app)
-//       .get("/Activities")
-//       .set({
-//         Authorization: `Bearer ${authenticationToken}`,
-//       });
-
-//     expect(res.statusCode).toEqual(200);
-//     expect(res.body).toBeInstanceOf(Object);
-//     expect(res.body.success).toEqual(true);
-//   });
-// });
-
-
-
-
-//view another profile
-// describe("/GET another Profile's activities", () => {
-// 	test("It should return success", async () => {
-
-// 	        //create data profile
-// 			const dataProfileTwo = {
-// 				bio: "new bio",
-// 				location: "608f5baf87fc4f408c131780",
-// 				interest: [
-// 				  "6092b557e957671c70e24276",
-// 				  "6092b557e957671c70e24277",
-// 				  "6092b557e957671c70e24278",
-// 				  "6092b557e957671c70e24279",
-// 				],
-// 				avatar: "http://dummyimage.com/167x100.png/ff4444/ffffff",
-// 			  };
-		
-// 			  let userProfileTwo = await profile.create(dataProfileTwo);
-// 			  userProfileTwo._id = tempProfileTwo;
-		
-// 			  //create data user
-// 			  const dataUserTwo = {
-// 				email: "isayjhorgi@test.com",
-// 				password: "Aneh1234!!",
-// 				admin: false,
-// 				emailVerified: true,
-// 				profile: userProfile._id,
-// 			  };
-		
-// 			  let userLoginNew = await user.create(dataUserTwo);
-// 			  userLoginNew._id = tempUserTwo;
-
-// 			  const statusDummy = {
-// 				content: "yahooo !!"
-// 				owner: ""
-// 			  }
-// 			  const res = await request(app)
-// 			  .get("/an/Activities")
-// 			  .set({
-// 				Authorization: `Bearer ${authenticationToken}`,
-// 			  });
-		
-// 			expect(res.statusCode).toEqual(200);
-// 			expect(res.body).toBeInstanceOf(Object);
-// 			expect(res.body.success).toEqual(true);
-// 		  });
-// 		});
-		

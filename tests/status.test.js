@@ -99,7 +99,7 @@ describe("Status TEST", () => {
 		//todo : if success
 		test("it should return success", async () => {
 			const res = await request(app)
-				.get(`/status/interest/`)
+				.get(`/status/interest`)
 				.set({
 					Authorization: `Bearer ${authenticationToken}`,
 				});

@@ -54,6 +54,9 @@ class ChatController {
 			//================ create a room if user has not been registered in private room
 			if (chatRoom == null) {
 				chatRoom = await chat.room.create({ member: [from, to] });
+
+				await chatRoom.populate("member", "_id name avatar onlineStatus").execPopulate();
+
 				//print error if failed to create
 				if (!chatRoom) {
 					return res

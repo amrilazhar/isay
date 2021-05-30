@@ -164,7 +164,7 @@ describe("Status TEST", () => {
 	});
 
 	//TODO-PUT : Unlike Status/pos
-	describe("/PUT remove like", () => {
+	describe("/PUT/ remove like", () => {
 		//todo : if success
 		test("It should return success", async () => {
 			const res = await request(app)
@@ -241,10 +241,21 @@ describe("Status TEST", () => {
 			expect(res.body.success).toEqual(true);
 			expect(res.body.message).toEqual("Success");
 		});
+		//todo : if failed
+		test("it should return failed", async () => {
+			const res = await request(app)
+				.get(`/status/6092b557e957671c70e24277`)
+				.set({
+					Authorization: `Bearer ${authenticationToken}`,
+				});
+			expect(res.statusCode).toEqual(400);
+			expect(res.body).toBeInstanceOf(Object);
+			expect(res.body.message).toEqual("Status Data can't be appeared");
+		});
 	});
 
 	//TODO-DELETE : Delete image
-	// describe("/DELETE image on AWS and local", () => {
+	// describe("/DELETE/ image on AWS and local", () => {
 	// 	test("It should return success", async () => {
 	// 		const res = await request(app)
 	// 			.delete(

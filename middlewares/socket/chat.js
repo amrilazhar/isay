@@ -25,7 +25,7 @@ async function startSocketChat(req, res) {
 		});
 
 		//disconnect the connection
-		req.socket.on("disconnect", () => {
+		req.socket.on("disconnect", async () => {
 			console.log("user disconnect");
 			req.socket.leave(req.socket.handshake.query.roomID);
 			//set user status as Offline when disconnect

@@ -14,7 +14,7 @@ async function startSocketNotif(req, res) {
 		});
 
 		//disconnect the connection
-		req.socket.on("disconnect", () => {
+		req.socket.on("disconnect", async () => {
 			console.log("user disconnect");
 			req.socket.leave(req.socket.handshake.query.roomID);
 			

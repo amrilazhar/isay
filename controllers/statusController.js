@@ -241,8 +241,10 @@ class StatusController {
 				}
 			);
 
-			req.images.forEach((item) => statusUpdate.media.push(item));
-			await statusUpdate.save();
+			if (req.images) {
+				req.images.forEach((item) => statusUpdate.media.push(item));
+				await statusUpdate.save();
+			}
 
 			let returnData = await status.findOne({ _id: req.params.id });
 
@@ -411,7 +413,7 @@ class StatusController {
 				findStatus,
 				{ new: true }
 			);
-			
+
 			res.status(200).json({
 				success: true,
 				message: "Success",

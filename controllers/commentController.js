@@ -177,10 +177,10 @@ class CommentController {
 			);
 
 			if (req.images) {
-				req.images.forEach((item) => dataComment.media.push(item));
+				let oldImageContainer = dataComment.media.map(item=>item.replace(process.env.S3_URL,''))
+				dataComment.media = [...oldImageContainer, ...req.images];
 				await dataComment.save();
 			}
-			dataComment = await comment.findOne({ _id: req.params.id });
 
 			if (!dataComment) {
 				const error = new Error("Comment fail to be appeared");

@@ -87,7 +87,7 @@ class ProfileController {
 			}
 
 			const options = {
-				select: "activities_type status_id comment_id owner",
+				select: "type status_id comment_id owner",
 				sort: { updated_at: -1 },
 				populate: {
 					path: "status_id",
@@ -207,7 +207,7 @@ class ProfileController {
 			}
 
 			const options = {
-				select: "activities_type status_id comment_id owner",
+				select: "type status_id comment_id owner",
 				sort: { updated_at: -1 },
 				populate: {
 					path: "status_id",

@@ -20,6 +20,7 @@ async function startSocketChat(req, res) {
 			req.io
 				.to(req.socket.handshake.query.roomID)
 				.emit("updatedReadMessage", data.message_id);
+				
 			req.io.emit("readedChat:" + req.profile.id, data.message_id);
 		});
 

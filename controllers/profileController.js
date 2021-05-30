@@ -89,14 +89,13 @@ class ProfileController {
 			const options = {
 				select: "type status_id comment_id owner",
 				sort: { updated_at: -1 },
-				populate: {
+				populate: [{
 					path: "status_id",
-					select: "content owner media comment interest likeBy timestamps",
-				},
-				populate: {
+					select: "content owner media comment interest likeBy timestamps created_at",
+				}, {
 					path: "comment_id",
-					select: "content owner media comment likeBy timestamps",
-				},
+					select: "content owner media comment likeBy timestamps created_at",
+				}],
 				page: req.query.page ? (req.query.page < 20 ? req.query.page : 20) : 1,
 				limit: req.query.limit ? req.query.limit : 8,
 				pagination: paginateStatus,
@@ -209,14 +208,13 @@ class ProfileController {
 			const options = {
 				select: "type status_id comment_id owner",
 				sort: { updated_at: -1 },
-				populate: {
+				populate: [{
 					path: "status_id",
-					select: "content owner media comment interest likeBy timestamps",
-				},
-				populate: {
+					select: "content owner media comment interest likeBy timestamps created_at",
+				}, {
 					path: "comment_id",
-					select: "content owner media comment likeBy timestamps",
-				},
+					select: "content owner media comment likeBy timestamps created_at",
+				}],
 				page: req.query.page ? (req.query.page < 20 ? req.query.page : 20) : 1,
 				limit: req.query.limit ? req.query.limit : 8,
 				pagination: paginateStatus,

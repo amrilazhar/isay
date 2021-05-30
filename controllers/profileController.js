@@ -23,7 +23,8 @@ class ProfileController {
 			if (funfacts) {
 				let randomNum = Math.floor(Math.random() * funfacts.length);
 				dataProfile._doc.funfacts = funfacts[randomNum];
-			} else dataProfile._doc.funfacts = "sorry we are currently searching for it";
+			} else
+				dataProfile._doc.funfacts = "sorry we are currently searching for it";
 
 			res.status(200).json({
 				success: true,
@@ -87,15 +88,22 @@ class ProfileController {
 			}
 
 			const options = {
-				select: "type status_id comment_id owner",
+				select: "type status_id comment_id owner created_at",
 				sort: { updated_at: -1 },
-				populate: [{
-					path: "status_id",
-					select: "content owner media comment interest likeBy timestamps created_at",
-				}, {
-					path: "comment_id",
-					select: "content owner media comment likeBy timestamps created_at",
-				}],
+				populate: [
+					{
+						path: "status_id",
+						select: "content media comment likeBy created_at",
+						populate: [
+							{ path: "owner", select: "name avatar", populate: "location" },
+							{ path: "interest" },
+						],
+					},
+					{
+						path: "comment_id",
+						select: "content owner media comment likeBy created_at",
+					},
+				],
 				page: req.query.page ? (req.query.page < 20 ? req.query.page : 20) : 1,
 				limit: req.query.limit ? req.query.limit : 8,
 				pagination: paginateStatus,
@@ -141,8 +149,9 @@ class ProfileController {
 			if (funfacts) {
 				let randomNum = Math.floor(Math.random() * funfacts.length);
 				dataProfiles._doc.funfacts = funfacts[randomNum];
-			} else dataProfiles._doc.funfacts = "sorry we are currently searching for it";
-			
+			} else
+				dataProfiles._doc.funfacts = "sorry we are currently searching for it";
+
 			res.status(200).json({
 				success: true,
 				message: "Success",
@@ -206,15 +215,22 @@ class ProfileController {
 			}
 
 			const options = {
-				select: "type status_id comment_id owner",
+				select: "type status_id comment_id owner created_at",
 				sort: { updated_at: -1 },
-				populate: [{
-					path: "status_id",
-					select: "content owner media comment interest likeBy timestamps created_at",
-				}, {
-					path: "comment_id",
-					select: "content owner media comment likeBy timestamps created_at",
-				}],
+				populate: [
+					{
+						path: "status_id",
+						select: "content media comment likeBy created_at",
+						populate: [
+							{ path: "owner", select: "name avatar", populate: "location" },
+							{ path: "interest" },
+						],
+					},
+					{
+						path: "comment_id",
+						select: "content owner media comment likeBy created_at",
+					},
+				],
 				page: req.query.page ? (req.query.page < 20 ? req.query.page : 20) : 1,
 				limit: req.query.limit ? req.query.limit : 8,
 				pagination: paginateStatus,

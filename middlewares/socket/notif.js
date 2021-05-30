@@ -17,6 +17,8 @@ async function startSocketNotif(req, res) {
 		req.socket.on("disconnect", () => {
 			console.log("user disconnect");
 			req.socket.leave(req.socket.handshake.query.roomID);
+			
+			await profile.findByIdAndUpdate(req.profile.id, { onlineStatus: false });
 
 			//set user status as Offline when disconnect
 			req.io.emit("online:" + req.profile.id, false);

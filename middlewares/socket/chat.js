@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-const { chat, notification } = require("../../models");
+const { chat, profile } = require("../../models");
 const crypto = require("crypto");
 const { S3Client, PutObjectCommand } = require("@aws-sdk/client-s3");
 const { tokenDecoder } = require("../../utils/chatUtils");
@@ -20,7 +20,7 @@ async function startSocketChat(req, res) {
 			req.io
 				.to(req.socket.handshake.query.roomID)
 				.emit("updatedReadMessage", data.message_id);
-				
+
 			req.io.emit("readedChat:" + req.profile.id, data.message_id);
 		});
 
@@ -28,7 +28,6 @@ async function startSocketChat(req, res) {
 		req.socket.on("disconnect", () => {
 			console.log("user disconnect");
 			req.socket.leave(req.socket.handshake.query.roomID);
-
 			//set user status as Offline when disconnect
 			req.io.emit("online:" + req.profile.id, false);
 

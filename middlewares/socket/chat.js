@@ -65,6 +65,7 @@ async function startSocketChat(req, res) {
 							.emit("messageFromServer", sendMess);
 
 						req.io.emit("chat:" + message.to, sendMess);
+						req.io.emit("chat:" + message.from, sendMess);
 					})
 					.catch((e) => {
 						//emit to specific room if message create message error
@@ -154,12 +155,12 @@ async function socketImageUpload(req, res) {
 				let sendMess = await query
 					.populate("from", "name avatar")
 					.populate("to", "name avatar")
-					.execPopulate();
-
-				req.io.emit("chat:" + req.utils.message.to, sendMess);
+					.execPopulate();				
 
 				//emit to specific room if message create message success
 				req.io.to(req.utils.handshake).emit("messageFromServer", sendMess);
+				req.io.emit("chat:" + req.utils.message.to, sendMess);
+				req.io.emit("chat:" + req.utils.from, sendMess);
 			})
 			.catch((e) => {
 				//emit to specific room if message create message error

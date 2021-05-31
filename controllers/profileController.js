@@ -51,7 +51,6 @@ class ProfileController {
 			}
 
 			const options = {
-				select: "content media comment likeBy",
 				sort: { updated_at: -1 },
 				page: 1,
 				limit: 10,

@@ -1,4 +1,4 @@
-const { notification } = require("../../models");
+const { notification, profile } = require("../../models");
 const { tokenDecoder } = require("../../utils/chatUtils");
 
 async function startSocketNotif(req, res) {
@@ -16,7 +16,6 @@ async function startSocketNotif(req, res) {
 		//disconnect the connection
 		req.socket.on("disconnect", async () => {
 			console.log("user disconnect");
-			req.socket.leave(req.socket.handshake.query.roomID);
 			
 			await profile.findByIdAndUpdate(req.profile.id, { onlineStatus: false });
 

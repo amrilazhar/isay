@@ -22,6 +22,7 @@ const UserSchema = new mongoose.Schema(
       type: String,
       enum: [accountType.LOCAL, accountType.GOOGLE],
       required: true,
+      default : accountType.LOCAL,
     },
     admin: {
       type: Boolean,

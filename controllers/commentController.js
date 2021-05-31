@@ -135,11 +135,6 @@ class CommentController {
 
 			req.io.emit("notif:" + updateStatus.owner, notif);
 
-			if (!createComment) {
-				const error = new Error("Post Comment failed");
-				error.statusCode = 400;
-				throw error;
-			} else
 				await activities.create({
 					type: "post_comment",
 					comment_id: createComment._id,
@@ -182,11 +177,6 @@ class CommentController {
 				await dataComment.save();
 			}
 
-			if (!dataComment) {
-				const error = new Error("Comment fail to be appeared");
-				error.statusCode = 400;
-				throw error;
-			}
 
 			res.status(200).json({
 				success: true,
@@ -264,11 +254,8 @@ class CommentController {
 	async deleteComment(req, res) {
 		try {
 			let deleteCom = await comment.deleteOne({ _id: req.params.id }); //id comment that want to delete
-			if (!deleteCom) {
-				const error = new Error("Delete comment failed");
-				error.statusCode = 400;
-				throw error;
-			} else await activities.deleteOne({ _id: req.params.id });
+			
+			await activities.deleteOne({ _id: req.params.id });
 			res.status(200).json({
 				success: true,
 				message: "Delete comment Success",

@@ -304,11 +304,6 @@ class ProfileController {
 				{ new: true }
 			);
 
-			if (!insertUser) {
-				const error = new Error("Interest can't be added");
-				error.statusCode = 400;
-				throw error;
-			} else
 				res.status(200).json({
 					success: true,
 					message: "Add Interest Success",
@@ -370,11 +365,6 @@ class ProfileController {
 				.findOne({ _id: req.profile.id })
 				.populate("interest");
 
-			if (!findUser) {
-				const error = new Error("Interest can't be added");
-				error.statusCode = 400;
-				throw error;
-			} else
 				res.status(200).json({
 					success: true,
 					message: "Get User Interest Success",

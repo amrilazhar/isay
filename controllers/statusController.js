@@ -411,7 +411,7 @@ class StatusController {
 				findStatus,
 				{ new: true }
 			);
-			
+
 			res.status(200).json({
 				success: true,
 				message: "Success",

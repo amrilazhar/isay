@@ -140,11 +140,29 @@ describe("Status TEST", () => {
 					content: "ku update komentar terbaru",
 					owner: `${tempProfileID}`,
 					interest: `${tempInterestID}`,
+					media: "http://dummyimage.com/167x100.png/ff4444/ffffff",
 				});
 			expect(res.statusCode).toEqual(200);
 			expect(res.body).toBeInstanceOf(Object);
 			expect(res.body.success).toEqual(true);
 			expect(res.body.message).toEqual("Success");
+		});
+		//todo : if failed
+		test("it should return failed: Update status failed", async () => {
+			const res = await request(app)
+				.put(`/status/6092b557e957671c70e24276`)
+				.set({
+					Authorization: `Bearer ${authenticationToken}`,
+				})
+				.send({
+					content: "ku update komentar terbaru",
+					owner: `${tempProfileID}`,
+					interest: `${tempInterestID}`,
+					media: "http://dummyimage.com/167x100.png/ff4444/ffffff",
+				});
+			expect(res.statusCode).toEqual(400);
+			expect(res.body).toBeInstanceOf(Object);
+			expect(res.body.message).toEqual("Update status failed");
 		});
 	});
 
@@ -305,20 +323,21 @@ describe("Status TEST", () => {
 	});
 
 	//TODO-DELETE : Delete image
-	// describe("/DELETE/ image on AWS and local", () => {
-	// 	test("It should return success", async () => {
-	// 		const res = await request(app)
-	// 			.delete(
-	// 				`/status/delim/${tempStatusID}?media=http://dummyimage.com/167x100.png/ff4444/ffffff.${tempProfileID}`
-	// 			)
-	// 			.set({
-	// 				Authorization: `Bearer ${authenticationToken}`,
-	// 			});
-	// 		expect(res.statusCode).toEqual(200);
-	// 		expect(res.body).toBeInstanceOf(Object);
-	// 		expect(res.body.message).toEqual("Success");
-	// 	});
-	// });
+	describe("/DELETE/ image on AWS and local", () => {
+		//todo : if success
+		test("It should return success", async () => {
+			const res = await request(app)
+				.delete(
+					`/status/delim/${tempStatusID}?media=http://dummyimage.com/167x100.png/ff4444/ffffff.${tempProfileID}`
+				)
+				.set({
+					Authorization: `Bearer ${authenticationToken}`,
+				});
+			expect(res.statusCode).toEqual(200);
+			expect(res.body).toBeInstanceOf(Object);
+			expect(res.body.message).toEqual("Success");
+		});
+	});
 
 	//TODO-DELETE : Delete status/post
 	describe("/DELETE/ status", () => {

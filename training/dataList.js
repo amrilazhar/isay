@@ -12,3 +12,5 @@ module.exports.avatarPic = [
 	"https://ik.imagekit.io/alfianpur/Final_Project/User_Image/Tipe_02/g1538_MalmlOqEmCL.png",
 	"https://ik.imagekit.io/alfianpur/Final_Project/User_Image/Tipe_02/g1505_RXR_Y6kL_.png",
 ];
+
+module.exports.nameType = ["Makanan", "Funny", "Species", "Movie", "Anime"];

@@ -57,7 +57,9 @@ class UtilsController {
 
 	async generateBasicProfile(req, res, next) {
 		try {
+			//import decision Tree 
 			let DecisionTree = require("decision-tree");
+
 			//create parameter for generate name
 			let gender = ["pria", "wanita"];
 			let dateCreatedStatus =
@@ -65,6 +67,7 @@ class UtilsController {
 			let genderParam = Math.floor(Math.random() * 2) % 2;
 			const {
 				avatarPic,
+				nameType
 			} = require("../training/dataList.js");
 			let province = "Jawa Timur";
 			let interestOne = "";
@@ -116,18 +119,18 @@ class UtilsController {
 			//generate random avatar
 			let randomNum = Math.floor(Math.random() * 12);
 
+
 			//generate Name
-			let namaChar = namaCharDTree.predict({
+			let objName = {
+				name_type : nameType[Math.floor(Math.random()*nameType.length)],
 				gender: gender[genderParam],
 				datecreated: dateCreatedStatus,
 				interest1: interestOne,
 				interest2: interestTwo,
 				interest3: interestThree,
-			});
-
-			console.log(interestOne, "===interest One");
-			console.log(interestTwo, "===interest Two");
-			console.log(interestThree, "===interest Three");
+			}
+			console.log(objName);
+			let namaChar = namaCharDTree.predict(objName);
 
 			let namaSapaan = namaSapaanDTree.predict({
 				provinsi: province,

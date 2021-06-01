@@ -51,8 +51,6 @@ exports.signup = async (req, res, next) => {
 
     await user.save();
 
-    console.log(user.emailToken);
-
     nodemailerMailgun.sendMail({
       from: SENDER_ADDRESS,
       to: user.email,
@@ -222,8 +220,6 @@ exports.loginGoogle = async (req, res, next) => {
       throw error;
     }
 
-    console.log(user.accountType);
-
     if (user.accountType !== accountType.GOOGLE) {
       const error = new Error(
         "Invalid account type, try login by using your email and password"
@@ -320,7 +316,6 @@ exports.updateUser = async (req, res, next) => {
 
     userFields.forEach((field) => {
       if (req.body[field]) {
-        console.log(req.body[field]);
         noFieldUpdated = false;
         req.user[field] = req.body[field];
       }
@@ -350,8 +345,6 @@ exports.updateUser = async (req, res, next) => {
       req.user.emailToken = generateToken();
       req.user.emailExpiration = Date.now() + 3600000;
 
-      console.log(req.user.emailToken);
-
       nodemailerMailgun.sendMail({
         from: SENDER_ADDRESS,
         to: req.user.newEmail,
@@ -373,7 +366,7 @@ exports.updateUser = async (req, res, next) => {
       data: user,
     });
   } catch (err) {
-    console.log(err);
+    
     if (!err.statusCode) {
       err.statusCode = 500;
     }
@@ -391,8 +384,6 @@ exports.resetPassword = async (req, res, next) => {
     user.resetPasswordExpiration = Date.now() + 3600000;
 
     await user.save();
-
-    console.log(user.resetPasswordToken);
 
     nodemailerMailgun.sendMail({
       from: SENDER_ADDRESS,
@@ -458,8 +449,6 @@ exports.verify = async (req, res, next) => {
         }
 
         await user.save();
-
-        console.log(user);
 
         return res.status(200).json({
           success: true,

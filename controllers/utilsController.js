@@ -129,7 +129,6 @@ class UtilsController {
 				interest2: interestTwo,
 				interest3: interestThree,
 			}
-			console.log(objName);
 			let namaChar = namaCharDTree.predict(objName);
 
 			let namaSapaan = namaSapaanDTree.predict({
@@ -156,7 +155,6 @@ class UtilsController {
 			req.body.avatar = avatar;
 			next();
 		} catch (error) {
-			console.log(error);
 			if (!error.statusCode) {
 				error.statusCode = 500;
 			}

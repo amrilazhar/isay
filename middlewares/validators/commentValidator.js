@@ -23,7 +23,7 @@ class CommentValidator {
       // Go to next
       next();
     } catch (err) {
-      console.log(err);
+      
       if (!err.statusCode) {
         err.statusCode = 500;
       }
@@ -49,7 +49,7 @@ class CommentValidator {
       // Go to next
       next();
     } catch (err) {
-      console.log(err);
+      
       if (!err.statusCode) {
         err.statusCode = 500;
       }
@@ -75,7 +75,7 @@ class CommentValidator {
       // Go to next
       next();
     } catch (err) {
-      console.log(err);
+      
       if (!err.statusCode) {
         err.statusCode = 500;
       }
@@ -104,7 +104,7 @@ class CommentValidator {
       }
       next();
     } catch (err) {
-      console.log(err);
+      
       if (!err.statusCode) {
         err.statusCode = 500;
       }

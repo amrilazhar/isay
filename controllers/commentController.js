@@ -61,7 +61,7 @@ class CommentController {
 					data: { count: dataComment.length, comments: threads },
 				});
 		} catch (err) {
-			console.log(err);
+			
 			if (!err.statusCode) {
 				err.statusCode = 500;
 			}
@@ -87,7 +87,7 @@ class CommentController {
 				data: dataComment,
 			});
 		} catch (err) {
-			console.log(err);
+			
 			if (!err.statusCode) {
 				err.statusCode = 500;
 			}
@@ -148,7 +148,7 @@ class CommentController {
 				data: createComment,
 			});
 		} catch (err) {
-			console.log(err);
+			
 			if (!err.statusCode) {
 				err.statusCode = 500;
 			}
@@ -184,7 +184,7 @@ class CommentController {
 				data: dataComment,
 			});
 		} catch (err) {
-			console.log(err);
+			
 			if (!err.statusCode) {
 				err.statusCode = 500;
 			}
@@ -214,7 +214,7 @@ class CommentController {
 				owner: req.profile.id,
 			});
 		} catch (err) {
-			console.log(err);
+			
 			if (!err.statusCode) {
 				err.statusCode = 500;
 			}
@@ -242,7 +242,7 @@ class CommentController {
 			await activities.deleteOne({ _id: req.params.id });
 			next();
 		} catch (err) {
-			console.log(err);
+			
 			if (!err.statusCode) {
 				err.statusCode = 500;
 			}
@@ -262,7 +262,7 @@ class CommentController {
 				data: deleteCom.deletedCount,
 			});
 		} catch (err) {
-			console.log(err);
+			
 			if (!err.statusCode) {
 				err.statusCode = 500;
 			}
@@ -289,7 +289,7 @@ class CommentController {
 
 			next();
 		} catch (err) {
-			console.log(err);
+			
 			if (!err.statusCode) {
 				err.statusCode = 500;
 			}

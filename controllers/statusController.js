@@ -50,7 +50,7 @@ class StatusController {
 				});
 			}
 		} catch (err) {
-			console.log(err);
+			
 			if (!err.statusCode) {
 				err.statusCode = 500;
 			}
@@ -103,7 +103,7 @@ class StatusController {
 				});
 			}
 		} catch (err) {
-			console.log(err);
+			
 			if (!err.statusCode) {
 				err.statusCode = 500;
 			}
@@ -160,7 +160,7 @@ class StatusController {
 				});
 			}
 		} catch (err) {
-			console.log(err);
+			
 			if (!err.statusCode) {
 				err.statusCode = 500;
 			}
@@ -214,7 +214,7 @@ class StatusController {
 				});
 			}
 		} catch (err) {
-			console.log(err);
+			
 			if (!err.statusCode) {
 				err.statusCode = 500;
 			}
@@ -260,7 +260,7 @@ class StatusController {
 				});
 			}
 		} catch (err) {
-			console.log(err);
+			
 			if (!err.statusCode) {
 				err.statusCode = 500;
 			}
@@ -312,7 +312,7 @@ class StatusController {
 				data: findStatusByUser,
 			});
 		} catch (err) {
-			console.log(err);
+			
 			if (!err.statusCode) {
 				err.statusCode = 500;
 			}
@@ -331,11 +331,9 @@ class StatusController {
 				throw error;
 			}
 
-			let indexOfLike = findStatusByUser.likeBy.indexOf(req.profile.id);
-			console.log(indexOfLike);
+			let indexOfLike = findStatusByUser.likeBy.indexOf(req.profile.id);			
 
-			if (indexOfLike == -1) {
-				console.log(indexOfLike);
+			if (indexOfLike == -1) {				
 				const error = new Error("Status not liked yet");
 				error.statusCode = 400;
 				throw error;
@@ -362,7 +360,7 @@ class StatusController {
 
 			next();
 		} catch (err) {
-			console.log(err);
+			
 			if (!err.statusCode) {
 				err.statusCode = 500;
 			}
@@ -393,7 +391,7 @@ class StatusController {
 				});
 			}
 		} catch (err) {
-			console.log(err);
+			
 			if (!err.statusCode) {
 				err.statusCode = 500;
 			}
@@ -422,7 +420,7 @@ class StatusController {
 
 			next();
 		} catch (err) {
-			console.log(err);
+			
 			if (!err.statusCode) {
 				err.statusCode = 500;
 			}
@@ -469,7 +467,7 @@ class StatusController {
 				});
 			}
 		} catch (err) {
-			console.log(err);
+			
 			if (!err.statusCode) {
 				err.statusCode = 500;
 			}
@@ -524,7 +522,7 @@ class StatusController {
 				});
 			}
 		} catch (err) {
-			console.log(err);
+			
 			if (!err.statusCode) {
 				err.statusCode = 500;
 			}
@@ -572,7 +570,7 @@ class StatusController {
 				});
 			}
 		} catch (err) {
-			console.log(err);
+			
 			if (!err.statusCode) {
 				err.statusCode = 500;
 			}
@@ -609,7 +607,7 @@ class StatusController {
 				});
 			}
 		} catch (err) {
-			console.log(err);
+			
 			if (!err.statusCode) {
 				err.statusCode = 500;
 			}

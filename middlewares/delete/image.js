@@ -25,10 +25,6 @@ async function amazonDelete(req) {
 
 		let removeImages = await s3.send(new DeleteObjectCommand(deleteParams));
 
-		if (removeImages) {
-			console.log("Delete images Success");
-		}
-
 	} catch (err) {
 		console.log(err);
 	}

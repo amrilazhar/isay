@@ -11,9 +11,6 @@ async function startSocketChat(req, res) {
 
 		req.socket.join(req.socket.handshake.query.roomID);
 
-		//set user status as Online
-		req.io.emit("online:" + req.profile.id, true);
-
 		//start listening event set read status
 		req.socket.on("readMessage", async (data) => {
 			await chat.message.findByIdAndUpdate(data.message_id, { readed: true });
@@ -26,11 +23,7 @@ async function startSocketChat(req, res) {
 
 		//disconnect the connection
 		req.socket.on("disconnect", async () => {
-			console.log("user disconnect");
 			req.socket.leave(req.socket.handshake.query.roomID);
-			//set user status as Offline when disconnect
-			req.io.emit("online:" + req.profile.id, false);
-
 			req.socket.disconnect();
 		});
 
@@ -69,7 +62,6 @@ async function startSocketChat(req, res) {
 					})
 					.catch((e) => {
 						//emit to specific room if message create message error
-						console.log(e);
 						req.io
 							.to(req.socket.handshake.query.roomID)
 							.emit("messageErrorFromServer", "something wrong");
@@ -164,7 +156,6 @@ async function socketImageUpload(req, res) {
 			})
 			.catch((e) => {
 				//emit to specific room if message create message error
-				console.log(e);
 				req.io
 					.to(req.utils.handshake)
 					.emit("messageFromServer", "something wrong in image upload");

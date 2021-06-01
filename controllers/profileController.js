@@ -32,7 +32,7 @@ class ProfileController {
 				data: dataProfile,
 			});
 		} catch (err) {
-			console.log(err);
+			
 			if (!err.statusCode) {
 				err.statusCode = 500;
 			}
@@ -68,7 +68,7 @@ class ProfileController {
 				data: dataProfile,
 			});
 		} catch (err) {
-			console.log(err);
+			
 			if (!err.statusCode) {
 				err.statusCode = 500;
 			}
@@ -120,7 +120,7 @@ class ProfileController {
 				data: dataProfile,
 			});
 		} catch (err) {
-			console.log(err);
+			
 			if (!err.statusCode) {
 				err.statusCode = 500;
 			}
@@ -158,7 +158,7 @@ class ProfileController {
 				data: dataProfiles,
 			});
 		} catch (err) {
-			console.log(err);
+			
 			if (!err.statusCode) {
 				err.statusCode = 500;
 			}
@@ -196,7 +196,7 @@ class ProfileController {
 				...returnData,
 			});
 		} catch (err) {
-			console.log(err);
+			
 			if (!err.statusCode) {
 				err.statusCode = 500;
 			}
@@ -250,7 +250,7 @@ class ProfileController {
 				...returnData,
 			});
 		} catch (err) {
-			console.log(err);
+			
 			if (!err.statusCode) {
 				err.statusCode = 500;
 			}
@@ -283,7 +283,7 @@ class ProfileController {
 				data: dataProfile,
 			});
 		} catch (err) {
-			console.log(err);
+			
 			if (!err.statusCode) {
 				err.statusCode = 500;
 			}
@@ -310,7 +310,7 @@ class ProfileController {
 					data: findUser,
 				});
 		} catch (e) {
-			console.log(err);
+			
 			if (!err.statusCode) {
 				err.statusCode = 500;
 			}
@@ -349,7 +349,7 @@ class ProfileController {
 				data: findUser,
 			});
 		} catch (e) {
-			console.log(err);
+			
 			if (!err.statusCode) {
 				err.statusCode = 500;
 			}
@@ -371,7 +371,7 @@ class ProfileController {
 					data: findUser.interest,
 				});
 		} catch (err) {
-			console.log(err);
+			
 			if (!err.statusCode) {
 				err.statusCode = 500;
 			}
@@ -403,7 +403,7 @@ class ProfileController {
 				});
 			}
 		} catch (err) {
-			console.log(err);
+			
 			if (!err.statusCode) {
 				err.statusCode = 500;
 			}
@@ -420,7 +420,7 @@ class ProfileController {
 				data: avatarPic,
 			});
 		} catch (err) {
-			console.log(err);
+			
 			if (!err.statusCode) {
 				err.statusCode = 500;
 			}

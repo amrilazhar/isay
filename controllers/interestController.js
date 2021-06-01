@@ -12,7 +12,7 @@ class interestController {
         } else
           return res.status(200).json({ message: "Success", data: dataInterest });
       } catch (e) {
-        console.log(e);
+        
         return res.status(500).json({ message: "Internal server error" ,error: e });
       }
     }
@@ -33,7 +33,7 @@ class interestController {
           } else
             return res.status(200).json({ message: "Success", data: createInterest });
         } catch (e) {
-          console.log(e);
+          
           return res.status(500).json({ message: "Internal server error" , error: e});
         }
       }
@@ -60,7 +60,7 @@ async updateInterest(req, res) {
     } else
       return res.status(200).json({ message: "Success", data: updateInt });
   } catch (e) {
-    console.log(e);
+    
     return res.status(500).json({ message: "Internal server error", error : e});
   }
 }
@@ -80,7 +80,7 @@ async deleteInterest(req, res) {
         .status(200)
         .json({ message: "Success", deletedCount: deleteInt.deletedCount });
   } catch (e) {
-    console.log(e);
+    
     return res.status(500).json({ message: "Internal server error" , error : e});
   }
 }

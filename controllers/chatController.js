@@ -31,7 +31,7 @@ class ChatController {
 				res.status(200).json({ success: true, message: "success", data: [] });
 			}
 		} catch (err) {
-			console.log(err);
+			
 			if (!err.statusCode) {
 				err.statusCode = 500;
 			}
@@ -84,7 +84,7 @@ class ChatController {
 					receiverOnline: req.userOnline,
 				});			
 		} catch (err) {
-			console.log(err);
+			
 			if (!err.statusCode) {
 				err.statusCode = 500;
 			}
@@ -133,7 +133,7 @@ class ChatController {
 				.status(200)
 				.json({ success: true, message: "success", data: roomList });
 		} catch (err) {
-			console.log(err);
+			
 			if (!err.statusCode) {
 				err.statusCode = 500;
 			}
@@ -176,7 +176,7 @@ class ChatController {
 				});
 			}
 		} catch (err) {
-			console.log(err);
+			
 			if (!err.statusCode) {
 				err.statusCode = 500;
 			}

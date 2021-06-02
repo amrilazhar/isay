@@ -58,7 +58,6 @@ async function startSocketChat(req, res) {
 							.emit("messageFromServer", sendMess);
 
 						req.io.emit("chat:" + message.to, sendMess);
-						req.io.emit("chat:" + from, sendMess);
 					})
 					.catch((e) => {
 						//emit to specific room if message create message error

@@ -51,10 +51,14 @@ class ProfileController {
 			}
 
 			const options = {
-				sort: { updated_at: -1 },
-				page: 1,
-				limit: 10,
-				pagination: paginateStatus,
+				sort: { created_at: -1 },
+				page: req.query.page ? (req.query.page < 20 ? req.query.page : 20) : 1,
+				limit: req.query.limit ? req.query.limit : 8,
+				populate: [
+					{ path: "owner", populate: "location" },
+					{ path: "interest", select: "interest category" },
+				],
+				pagination : paginateStatus,
 			};
 
 			let dataProfile = await status.paginate(
@@ -186,9 +190,9 @@ class ProfileController {
 				options
 			);
 
-			//restruktur data mongoose paginate
-			let returnData = { ...statusUsers, data: statusUsers.docs };
-			delete returnData.docs;
+				//restruktur data mongoose paginate
+				let returnData = { ...statusUsers, data: statusUsers.docs };
+				delete returnData.docs;
 
 			res.status(200).json({
 				success: true,

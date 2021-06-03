@@ -120,7 +120,7 @@ module.exports.bodyEmail = (token) => {
                 <td bgcolor="#8A62FB" align="center" style="padding: 0px 10px 0px 10px;">
                     <table border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 600px;">
                         <tr>
-                            <td bgcolor="#E5E5E5" align="center" valign="top" style="padding: 40px 20px 20px 20px; border-radius: 4px 4px 0px 0px; color: #111111; font-family: 'Lato', Helvetica, Arial, sans-serif; font-size: 48px; font-weight: 400; letter-spacing: 4px; line-height: 48px;">
+                            <td bgcolor="#FFFFFF" align="center" valign="top" style="padding: 40px 20px 20px 20px; border-radius: 4px 4px 0px 0px; color: #111111; font-family: 'Lato', Helvetica, Arial, sans-serif; font-size: 48px; font-weight: 400; letter-spacing: 4px; line-height: 48px;">
                                 <h1 style="font-size: 48px; font-weight: 400; margin: 2;">Welcome!</h1> <img src=" https://i.ibb.co/XbcLxHP/Logo-Black.png" width="125" height="120" style="display: block; border: 0px;" />
                             </td>
                         </tr>
@@ -131,15 +131,15 @@ module.exports.bodyEmail = (token) => {
                 <td bgcolor="#61DB99" align="center" style="padding: 0px 10px 0px 10px;">
                     <table border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 600px;">
                         <tr>
-                            <td bgcolor="#E5E5E5" align="left" style="padding: 20px 30px 40px 30px; color: #000000; font-family: 'Lato', Helvetica, Arial, sans-serif; font-size: 18px; font-weight: 400; line-height: 25px;">
+                            <td bgcolor="#FFFFFF" align="left" style="padding: 20px 30px 40px 30px; color: #000000; font-family: 'Lato', Helvetica, Arial, sans-serif; font-size: 18px; font-weight: 400; line-height: 25px;">
                                 <p style="margin: 0;">Thank you for joining our Family, we're excited to have you get started. First, you need to confirm your account. Just press the button below.</p>
                             </td>
                         </tr>
                         <tr>
-                            <td bgcolor="#E5E5E5" align="left">
+                            <td bgcolor="#FFFFFF" align="left">
                                 <table width="100%" border="0" cellspacing="0" cellpadding="0">
                                     <tr>
-                                        <td bgcolor="#E5E5E5" align="center" style="padding: 20px 30px 60px 30px;">
+                                        <td bgcolor="#FFFFFF" align="center" style="padding: 20px 30px 60px 30px;">
                                             <table border="0" cellspacing="0" cellpadding="0">
                                                 <tr>
                                                     <td align="center" style="border-radius: 3px;" bgcolor="#8A62FB"><a href="${process.env.SERVER_URI}/user/verify?action=verifyEmail&token=${token}" target="_blank" style="font-size: 20px; font-family: Helvetica, Arial, sans-serif; color: #ffffff; text-decoration: none; color: #ffffff; text-decoration: none; padding: 15px 25px; border-radius: 2px; border: 1px solid #8A62FB; display: inline-block;">Confirm Account</a></td>
@@ -151,22 +151,22 @@ module.exports.bodyEmail = (token) => {
                             </td>
                         </tr> <!-- COPY -->
                         <tr>
-                            <td bgcolor="#E5E5E5" align="left" style="padding: 0px 30px 0px 30px; color: #000000; font-family: 'Lato', Helvetica, Arial, sans-serif; font-size: 18px; font-weight: 400; line-height: 25px;">
+                            <td bgcolor="#FFFFFF" align="left" style="padding: 0px 30px 0px 30px; color: #000000; font-family: 'Lato', Helvetica, Arial, sans-serif; font-size: 18px; font-weight: 400; line-height: 25px;">
                                 <p style="margin: 0;">If that doesn't work, copy and paste the following link in your browser:</p>
                             </td>
                         </tr> <!-- COPY -->
                         <tr>
-                            <td bgcolor="#E5E5E5" align="left" style="padding: 20px 30px 20px 30px; color: #000000; font-family: 'Lato', Helvetica, Arial, sans-serif; font-size: 18px; font-weight: 400; line-height: 25px;">
+                            <td bgcolor="#FFFFFF" align="left" style="padding: 20px 30px 20px 30px; color: #000000; font-family: 'Lato', Helvetica, Arial, sans-serif; font-size: 18px; font-weight: 400; line-height: 25px;">
                                 <p style="margin: 0;"><a href="#" target="_blank" style="color: #8A62FB;">${process.env.SERVER_URI}/user/verify?action=verifyEmail&token=${token}</a></p>
                             </td>
                         </tr>
                         <tr>
-                            <td bgcolor="#E5E5E5" align="left" style="padding: 0px 30px 20px 30px; color: #000000; font-family: 'Lato', Helvetica, Arial, sans-serif; font-size: 18px; font-weight: 400; line-height: 25px;">
+                            <td bgcolor="#FFFFFF" align="left" style="padding: 0px 30px 20px 30px; color: #000000; font-family: 'Lato', Helvetica, Arial, sans-serif; font-size: 18px; font-weight: 400; line-height: 25px;">
                                 <p style="margin: 0;">We hope you can enjoy using Our App. </p>
                             </td>
                         </tr>
                         <tr>
-                            <td bgcolor="#E5E5E5" align="left" style="padding: 0px 30px 40px 30px; border-radius: 0px 0px 4px 4px; color: #000000; font-family: 'Lato', Helvetica, Arial, sans-serif; font-size: 18px; font-weight: 400; line-height: 25px;">
+                            <td bgcolor="#FFFFFF" align="left" style="padding: 0px 30px 40px 30px; border-radius: 0px 0px 4px 4px; color: #000000; font-family: 'Lato', Helvetica, Arial, sans-serif; font-size: 18px; font-weight: 400; line-height: 25px;">
                                 <p style="margin: 0;">Best Regards,<br>Isay TEAM</p>
                             </td>
                         </tr>

@@ -276,9 +276,9 @@ class ProfileController {
 			let profileData = {
 				bio: req.body.bio,
 			};
-			
+
 			if (req.body.location) {
-				profileData.location = req.body.location,
+				profileData.location = req.body.location;
 			}
 
 			if(req.images && req.images.length > 0) {

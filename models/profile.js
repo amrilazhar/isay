@@ -50,6 +50,12 @@ const ProfileSchema = new mongoose.Schema(
 			required: false,
 			default: false,
 		},
+		backgroundImage: {
+			type: String,
+			required: false,
+			default: `images/background_profile_isay.jpeg`,
+			get : getMedia,
+		},
 	},
 	{
 		timestamps: {
@@ -59,6 +65,10 @@ const ProfileSchema = new mongoose.Schema(
 		toJSON: { getters: true },
 	}
 );
+
+function getMedia(image) {
+	return process.env.S3_URL + image;
+}
 
 ProfileSchema.plugin(mongoosePaginate);
 ProfileSchema.plugin(mongoose_delete, { overrideMethods: "all" });

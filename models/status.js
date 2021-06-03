@@ -52,7 +52,6 @@ function getMediaArr(arr) {
 	return arr.map(image=>{
 		return process.env.S3_URL + image;
 	})
-	
 }
 
 StatusSchema.plugin(mongoosePaginate);

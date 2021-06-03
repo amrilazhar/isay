@@ -28,10 +28,16 @@ class ChatController {
 					last: lastLoad,
 				});
 			} else {
-				res.status(200).json({ success: true, message: "success", data: [] });
+				res
+					.status(200)
+					.json({
+						success: true,
+						message: "success",
+						data: [],
+						last: lastLoad,
+					});
 			}
 		} catch (err) {
-			
 			if (!err.statusCode) {
 				err.statusCode = 500;
 			}
@@ -55,7 +61,9 @@ class ChatController {
 			if (chatRoom == null) {
 				chatRoom = await chat.room.create({ member: [from, to] });
 
-				await chatRoom.populate("member", "_id name avatar onlineStatus").execPopulate();
+				await chatRoom
+					.populate("member", "_id name avatar onlineStatus")
+					.execPopulate();
 
 				//print error if failed to create
 				if (!chatRoom) {
@@ -63,28 +71,23 @@ class ChatController {
 						.status(400)
 						.json({ success: false, message: "error create room" });
 				} else {
-					res
-						.status(200)
-						.json({
-							success: true,
-							message: "room created",
-							data: chatRoom,
-							receiverOnline: req.userOnline,
-						});
+					res.status(200).json({
+						success: true,
+						message: "room created",
+						data: chatRoom,
+						receiverOnline: req.userOnline,
+					});
 					next();
 				}
 			}
 			//=============END  create a room if user has not been registered in private room
-			res
-				.status(200)
-				.json({
-					success: true,
-					message: "room created",
-					data: chatRoom,
-					receiverOnline: req.userOnline,
-				});			
+			res.status(200).json({
+				success: true,
+				message: "room created",
+				data: chatRoom,
+				receiverOnline: req.userOnline,
+			});
 		} catch (err) {
-			
 			if (!err.statusCode) {
 				err.statusCode = 500;
 			}
@@ -126,14 +129,14 @@ class ChatController {
 			idLastChat.sort();
 			idLastChat.reverse();
 			idLastChat.forEach((item) => {
-				if (item) roomList.push({...objCont[item]._doc, chatOwner : req.profile.id});
+				if (item)
+					roomList.push({ ...objCont[item]._doc, chatOwner: req.profile.id });
 			});
 
 			return res
 				.status(200)
 				.json({ success: true, message: "success", data: roomList });
 		} catch (err) {
-			
 			if (!err.statusCode) {
 				err.statusCode = 500;
 			}
@@ -176,7 +179,6 @@ class ChatController {
 				});
 			}
 		} catch (err) {
-			
 			if (!err.statusCode) {
 				err.statusCode = 500;
 			}

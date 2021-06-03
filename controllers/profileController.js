@@ -23,8 +23,13 @@ class ProfileController {
 			if (funfacts) {
 				let randomNum = Math.floor(Math.random() * funfacts.length);
 				dataProfile._doc.funfacts = funfacts[randomNum];
-			} else
+			} else {
 				dataProfile._doc.funfacts = "sorry we are currently searching for it";
+			}
+
+			if (!dataProfile._doc.backgroundImage) {
+				dataProfile._doc.backgroundImage = `${process.env.S3_URL}images/background_profile_isay.jpeg`;
+			}				
 
 			res.status(200).json({
 				success: true,
@@ -153,9 +158,13 @@ class ProfileController {
 			if (funfacts) {
 				let randomNum = Math.floor(Math.random() * funfacts.length);
 				dataProfiles._doc.funfacts = funfacts[randomNum];
-			} else
+			} else {
 				dataProfiles._doc.funfacts = "sorry we are currently searching for it";
+			}
 
+			if (!dataProfiles._doc.backgroundImage) {
+				dataProfiles._doc.backgroundImage = `${process.env.S3_URL}images/background_profile_isay.jpeg`;
+			}
 			res.status(200).json({
 				success: true,
 				message: "Success",
@@ -268,6 +277,10 @@ class ProfileController {
 				bio: req.body.bio,
 				location: req.body.location,
 			};
+
+			if(req.images && req.images.length > 0) {
+				profileData.backgroundImage = req.images[0];
+			}
 
 			let dataProfile = await profile.findOneAndUpdate(
 				{ _id: req.profile.id },

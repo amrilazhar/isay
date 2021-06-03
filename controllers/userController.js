@@ -50,12 +50,13 @@ exports.signup = async (req, res, next) => {
     });
 
     await user.save();
-
+    const emailTemplate = require('../utils/emailConfirmation');
     nodemailerMailgun.sendMail({
       from: SENDER_ADDRESS,
       to: user.email,
       subject: "Welcome to i-Say!",
-      html: `<a href="${process.env.SERVER_URI}/user/verify?action=verifyEmail&token=${user.emailToken}">Click here to verify your e-mail!</a>`,
+      html : emailTemplate.bodyEmail(user.emailToken),
+      // html: `<a href="${process.env.SERVER_URI}/user/verify?action=verifyEmail&token=${user.emailToken}">Click here to verify your e-mail!</a>`,
     });
 
     const token = jwt.sign(
@@ -449,14 +450,14 @@ exports.verify = async (req, res, next) => {
         }
 
         await user.save();
-
-        return res.status(200).json({
-          success: true,
-          message: "E-mail has been verified",
-          data: {
-            email: user.email,
-          },
-        });
+        res.redirect('https://isaybatch11.herokuapp.com/');
+        // return res.status(200).json({
+        //   success: true,
+        //   message: "E-mail has been verified",
+        //   data: {
+        //     email: user.email,
+        //   },
+        // });
       default:
         const err = new Error("Invalid action");
         err.statusCode = 400;

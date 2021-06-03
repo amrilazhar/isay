@@ -275,8 +275,11 @@ class ProfileController {
 		try {
 			let profileData = {
 				bio: req.body.bio,
-				location: req.body.location,
 			};
+			
+			if (req.body.location) {
+				profileData.location = req.body.location,
+			}
 
 			if(req.images && req.images.length > 0) {
 				profileData.backgroundImage = req.images[0];

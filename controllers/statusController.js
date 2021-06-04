@@ -10,6 +10,21 @@ const {
 	location,
 } = require("../models");
 
+const matchWords = (words) => {
+	for (let i = 0; i < words.length; i++) {
+		words[i] = `(?=.*${words[i]}\\b)`;
+	}
+
+	const regex = new RegExp(words.join(""));
+
+	return regex;
+};
+
+const matchWordsForHtml = (words) => {
+	const regex = new RegExp("(" + words.join("|") + ")", "gi");
+	return regex;
+};
+
 class StatusController {
 	//TODO-POST : create status/post : Record (Activities)
 	async createStatus(req, res, next) {
@@ -50,7 +65,6 @@ class StatusController {
 				});
 			}
 		} catch (err) {
-			
 			if (!err.statusCode) {
 				err.statusCode = 500;
 			}
@@ -65,11 +79,7 @@ class StatusController {
 			//pagination
 			const options = {
 				sort: { created_at: -1 },
-				page: req.query.page
-					? req.query.page < 20
-						? req.query.page
-						: 20
-					: 1,
+				page: req.query.page ? (req.query.page < 20 ? req.query.page : 20) : 1,
 				limit: req.query.limit ? req.query.limit : 8,
 				populate: [
 					{
@@ -103,7 +113,6 @@ class StatusController {
 				});
 			}
 		} catch (err) {
-			
 			if (!err.statusCode) {
 				err.statusCode = 500;
 			}
@@ -126,11 +135,7 @@ class StatusController {
 			//pagination
 			const options = {
 				sort: { created_at: -1 },
-				page: req.query.page
-					? req.query.page < 20
-						? req.query.page
-						: 20
-					: 1,
+				page: req.query.page ? (req.query.page < 20 ? req.query.page : 20) : 1,
 				limit: req.query.limit ? req.query.limit : 8,
 				populate: [
 					{
@@ -160,7 +165,6 @@ class StatusController {
 				});
 			}
 		} catch (err) {
-			
 			if (!err.statusCode) {
 				err.statusCode = 500;
 			}
@@ -175,11 +179,7 @@ class StatusController {
 			//pagination
 			const options = {
 				sort: { created_at: -1 },
-				page: req.query.page
-					? req.query.page < 20
-						? req.query.page
-						: 20
-					: 1,
+				page: req.query.page ? (req.query.page < 20 ? req.query.page : 20) : 1,
 				limit: req.query.limit ? req.query.limit : 8,
 				populate: [
 					{
@@ -214,7 +214,6 @@ class StatusController {
 				});
 			}
 		} catch (err) {
-			
 			if (!err.statusCode) {
 				err.statusCode = 500;
 			}
@@ -243,10 +242,12 @@ class StatusController {
 			);
 
 			if (req.images) {
-				let oldImageContainer = statusUpdate.media.map(item=>item.replace(process.env.S3_URL,''))
+				let oldImageContainer = statusUpdate.media.map((item) =>
+					item.replace(process.env.S3_URL, "")
+				);
 				statusUpdate.media = [...oldImageContainer, ...req.images];
 				await statusUpdate.save();
-			}			
+			}
 
 			if (!statusUpdate) {
 				const error = new Error("Update status failed");
@@ -260,7 +261,6 @@ class StatusController {
 				});
 			}
 		} catch (err) {
-			
 			if (!err.statusCode) {
 				err.statusCode = 500;
 			}
@@ -312,7 +312,6 @@ class StatusController {
 				data: findStatusByUser,
 			});
 		} catch (err) {
-			
 			if (!err.statusCode) {
 				err.statusCode = 500;
 			}
@@ -331,9 +330,9 @@ class StatusController {
 				throw error;
 			}
 
-			let indexOfLike = findStatusByUser.likeBy.indexOf(req.profile.id);			
+			let indexOfLike = findStatusByUser.likeBy.indexOf(req.profile.id);
 
-			if (indexOfLike == -1) {				
+			if (indexOfLike == -1) {
 				const error = new Error("Status not liked yet");
 				error.statusCode = 400;
 				throw error;
@@ -360,7 +359,6 @@ class StatusController {
 
 			next();
 		} catch (err) {
-			
 			if (!err.statusCode) {
 				err.statusCode = 500;
 			}
@@ -391,7 +389,6 @@ class StatusController {
 				});
 			}
 		} catch (err) {
-			
 			if (!err.statusCode) {
 				err.statusCode = 500;
 			}
@@ -420,7 +417,6 @@ class StatusController {
 
 			next();
 		} catch (err) {
-			
 			if (!err.statusCode) {
 				err.statusCode = 500;
 			}
@@ -467,7 +463,6 @@ class StatusController {
 				});
 			}
 		} catch (err) {
-			
 			if (!err.statusCode) {
 				err.statusCode = 500;
 			}
@@ -522,7 +517,6 @@ class StatusController {
 				});
 			}
 		} catch (err) {
-			
 			if (!err.statusCode) {
 				err.statusCode = 500;
 			}
@@ -570,7 +564,6 @@ class StatusController {
 				});
 			}
 		} catch (err) {
-			
 			if (!err.statusCode) {
 				err.statusCode = 500;
 			}
@@ -583,17 +576,15 @@ class StatusController {
 		try {
 			validationErrorHandler(req, res, next);
 
-			let statusData = await status
-				.findOne({ _id: req.params.id })
-				.populate([
-					{
-						path: "owner",
-						select: "id name avatar",
-						populate: "location",
-					},
-					{ path: "interest", select: "interest category icon" },
-					// { path: "likeBy" , select : "name avatar"}
-				]);
+			let statusData = await status.findOne({ _id: req.params.id }).populate([
+				{
+					path: "owner",
+					select: "id name avatar",
+					populate: "location",
+				},
+				{ path: "interest", select: "interest category icon" },
+				// { path: "likeBy" , select : "name avatar"}
+			]);
 
 			if (!statusData) {
 				const error = new Error("Status Data can't be appeared");
@@ -607,7 +598,208 @@ class StatusController {
 				});
 			}
 		} catch (err) {
-			
+			if (!err.statusCode) {
+				err.statusCode = 500;
+			}
+			next(err);
+		}
+	}
+
+	async searchAll(req, res, next) {
+		try {
+			validationErrorHandler(req, res, next);
+
+			let limit = req.query.limit ? req.query.limit : 10;
+			let skip = req.query.skip ? req.query.skip : 0;
+
+			let statusData = [];
+
+			const query = req.query.query
+				.split(/[\ +]/)
+				.filter((word) => word.length > 1);
+
+			if (query.length) {
+				let regex = matchWords([...query]);
+
+				statusData = await status
+					.find({ content: { $regex: regex, $options: "i" } })
+					.sort({ updated_at: -1 })
+					.populate("interest")
+					.populate("owner", "name avatar id location")
+					.limit(limit)
+					.skip(skip)
+					.exec();
+
+				regex = matchWordsForHtml([...query]);
+
+				statusData.forEach((status, index) => {
+					statusData[index].content = status.content.replace(
+						regex,
+						"<b>$1</b>"
+					);
+				});
+			}
+
+			res.status(200).send({
+				success: true,
+				message: "success",
+				data: statusData,
+			});
+		} catch (err) {
+			console.log(err);
+			if (!err.statusCode) {
+				err.statusCode = 500;
+			}
+			next(err);
+		}
+	}
+
+	async searchByUser(req, res, next) {
+		try {
+			validationErrorHandler(req, res, next);
+
+			let limit = req.query.limit ? req.query.limit : 10;
+			let skip = req.query.skip ? req.query.skip : 0;
+
+			let statusData = [];
+
+			const query = req.query.query
+				.split(/[\ +]/)
+				.filter((word) => word.length > 1);
+
+			if (query.length) {
+				const regex = matchWords([...query]);
+
+				statusData = await status
+					.find({
+						content: { $regex: regex, $options: "i" },
+						owner: req.params.id,
+					})
+					.sort({ updated_at: -1 })
+					.populate("interest")
+					.populate("owner", "name avatar id location")
+					.limit(limit)
+					.skip(skip)
+					.exec();
+
+				regex = matchWordsForHtml([...query]);
+
+				statusData.forEach((status, index) => {
+					statusData[index].content = status.content.replace(
+						regex,
+						"<b>$1</b>"
+					);
+				});
+			}
+
+			res.status(200).send({
+				success: true,
+				message: "success",
+				data: statusData,
+			});
+		} catch (err) {
+			console.log(err);
+			if (!err.statusCode) {
+				err.statusCode = 500;
+			}
+			next(err);
+		}
+	}
+
+	async searchAll(req, res, next) {
+		try {
+			validationErrorHandler(req, res, next);
+
+			let limit = req.query.limit ? req.query.limit : 10;
+			let skip = req.query.skip ? req.query.skip : 0;
+
+			let statusData = [];
+
+			const query = req.query.query
+				.split(/[\ +]/)
+				.filter((word) => word.length > 1);
+
+			if (query.length) {
+				let regex = matchWords([...query]);
+
+				statusData = await status
+					.find({ content: { $regex: regex, $options: "i" } })
+					.sort({ updated_at: -1 })
+					.populate("interest")
+					.populate("owner", "name avatar id location")
+					.limit(limit)
+					.skip(skip)
+					.exec();
+
+				regex = matchWordsForHtml([...query]);
+
+				statusData.forEach((status, index) => {
+					statusData[index].content = status.content.replace(
+						regex,
+						"<b>$1</b>"
+					);
+				});
+			}
+
+			res.status(200).send({
+				success: true,
+				message: "success",
+				data: statusData,
+			});
+		} catch (err) {
+			console.log(err);
+			if (!err.statusCode) {
+				err.statusCode = 500;
+			}
+			next(err);
+		}
+	}
+
+	async searchByUser(req, res, next) {
+		try {
+			validationErrorHandler(req, res, next);
+
+			let limit = req.query.limit ? req.query.limit : 10;
+			let skip = req.query.skip ? req.query.skip : 0;
+
+			let statusData = [];
+
+			const query = req.query.query
+				.split(/[\ +]/)
+				.filter((word) => word.length > 1);
+
+			if (query.length) {
+				const regex = matchWords([...query]);
+
+				statusData = await status
+					.find({
+						content: { $regex: regex, $options: "i" },
+						owner: req.params.id,
+					})
+					.sort({ updated_at: -1 })
+					.populate("interest")
+					.populate("owner", "name avatar id location")
+					.limit(limit)
+					.skip(skip)
+					.exec();
+
+				regex = matchWordsForHtml([...query]);
+
+				statusData.forEach((status, index) => {
+					statusData[index].content = status.content.replace(
+						regex,
+						"<b>$1</b>"
+					);
+				});
+			}
+
+			res.status(200).send({
+				success: true,
+				message: "success",
+				data: statusData,
+			});
+		} catch (err) {
+			console.log(err);
 			if (!err.statusCode) {
 				err.statusCode = 500;
 			}

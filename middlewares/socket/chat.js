@@ -3,6 +3,7 @@ const { chat, profile } = require("../../models");
 const crypto = require("crypto");
 const { S3Client, PutObjectCommand } = require("@aws-sdk/client-s3");
 const { tokenDecoder } = require("../../utils/chatUtils");
+const pushNotif = require("../../utils/pushNotification");
 
 async function startSocketChat(req, res) {
 	try {
@@ -58,6 +59,16 @@ async function startSocketChat(req, res) {
 							.emit("messageFromServer", sendMess);
 
 						req.io.emit("chat:" + message.to, sendMess);
+
+						//push notification
+						let notifMessage = {
+							notification : {
+								title : `${sendMess.from.name} send you a message`,
+								body : `${sendMess.message.substring(0, 50)}`,
+							},
+							topic : "chat-" + message.to
+						}
+						pushNotif(notifMessage);
 					})
 					.catch((e) => {
 						//emit to specific room if message create message error
@@ -151,7 +162,17 @@ async function socketImageUpload(req, res) {
 				//emit to specific room if message create message success
 				req.io.to(req.utils.handshake).emit("messageFromServer", sendMess);
 				req.io.emit("chat:" + req.utils.message.to, sendMess);
-				req.io.emit("chat:" + req.utils.from, sendMess);
+
+				//push notification
+				let notifMessage = {
+					notification : {
+						title : `${sendMess.from.name} send you a message`,
+						body : `${sendMess.message}`,
+					},
+					topic : "chat-" + req.utils.message.to
+				}
+				pushNotif(notifMessage);
+				
 			})
 			.catch((e) => {
 				//emit to specific room if message create message error

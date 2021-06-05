@@ -123,7 +123,7 @@ class CommentController {
 				to: updateStatus.owner,
 			});
 
-			notif.populate("comment_id from to").execPopulate();
+			await notif.populate("comment_id from to").execPopulate();
 
 			req.io.emit("notif:" + updateStatus.owner, notif);
 			

@@ -6,6 +6,7 @@ const {
 	activities,
 	notification,
 } = require("../models");
+const pushNotif = require("../../utils/pushNotification");
 
 const matchWords = (words) => {
 	for (let i = 0; i < words.length; i++) {

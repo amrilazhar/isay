@@ -2,12 +2,9 @@ const validationErrorHandler = require("../utils/validationErrorHandler");
 
 const {
 	status,
-	comment,
 	profile,
-	interest,
 	activities,
 	notification,
-	location,
 } = require("../models");
 
 const matchWords = (words) => {
@@ -305,6 +302,15 @@ class StatusController {
 			await notif.populate("status_id from to").execPopulate();
 
 			req.io.emit("notif:" + findStatusByUser.owner, notif);
+			//push notification
+			let notifMessage = {
+				notification : {
+					title : `${notif.from.name} like your status`,
+					body : `Feed : ${notif.status_id.content.substring(0, 50)}`,
+				},
+				topic : "notif-" + findStatusByUser.owner
+			}
+			pushNotif(notifMessage);
 
 			res.status(200).json({
 				success: true,

@@ -1,11 +1,4 @@
-const {
-	profile,
-	comment,
-	post,
-	status,
-	activities,
-	notification,
-} = require("../models");
+const { comment, status, activities, notification } = require("../models");
 
 class CommentController {
 	//===============================|| get all comment ||=========================//
@@ -61,7 +54,6 @@ class CommentController {
 					data: { count: dataComment.length, comments: threads },
 				});
 		} catch (err) {
-			
 			if (!err.statusCode) {
 				err.statusCode = 500;
 			}
@@ -87,7 +79,6 @@ class CommentController {
 				data: dataComment,
 			});
 		} catch (err) {
-			
 			if (!err.statusCode) {
 				err.statusCode = 500;
 			}
@@ -126,7 +117,7 @@ class CommentController {
 			let notif = await notification.create({
 				type: "post_comment",
 				comment_id: createComment._id,
-        status_id : req.body.status_id,
+				status_id: req.body.status_id,
 				from: req.profile.id,
 				to: updateStatus.owner,
 			});
@@ -134,13 +125,23 @@ class CommentController {
 			notif.populate("comment_id from to").execPopulate();
 
 			req.io.emit("notif:" + updateStatus.owner, notif);
+			
+			//push notification
+			let notifMessage = {
+				notification : {
+					title : `${notif.from.name} Comment your status`,
+					body : `Comment : ${req.body.content.substring(0, 50)}`,
+				},
+				topic : "notif-" + updateStatus.owner
+			}
+			pushNotif(notifMessage);
 
-				await activities.create({
-					type: "post_comment",
-					comment_id: createComment._id,
-          status_id : req.body.status_id,
-					owner: req.profile.id,
-				});
+			await activities.create({
+				type: "post_comment",
+				comment_id: createComment._id,
+				status_id: req.body.status_id,
+				owner: req.profile.id,
+			});
 
 			res.status(200).json({
 				success: true,
@@ -148,7 +149,6 @@ class CommentController {
 				data: createComment,
 			});
 		} catch (err) {
-			
 			if (!err.statusCode) {
 				err.statusCode = 500;
 			}
@@ -172,11 +172,12 @@ class CommentController {
 			);
 
 			if (req.images) {
-				let oldImageContainer = dataComment.media.map(item=>item.replace(process.env.S3_URL,''))
+				let oldImageContainer = dataComment.media.map((item) =>
+					item.replace(process.env.S3_URL, "")
+				);
 				dataComment.media = [...oldImageContainer, ...req.images];
 				await dataComment.save();
 			}
-
 
 			res.status(200).json({
 				success: true,
@@ -184,7 +185,6 @@ class CommentController {
 				data: dataComment,
 			});
 		} catch (err) {
-			
 			if (!err.statusCode) {
 				err.statusCode = 500;
 			}
@@ -214,7 +214,6 @@ class CommentController {
 				owner: req.profile.id,
 			});
 		} catch (err) {
-			
 			if (!err.statusCode) {
 				err.statusCode = 500;
 			}
@@ -242,7 +241,6 @@ class CommentController {
 			await activities.deleteOne({ _id: req.params.id });
 			next();
 		} catch (err) {
-			
 			if (!err.statusCode) {
 				err.statusCode = 500;
 			}
@@ -254,7 +252,7 @@ class CommentController {
 	async deleteComment(req, res) {
 		try {
 			let deleteCom = await comment.deleteOne({ _id: req.params.id }); //id comment that want to delete
-			
+
 			await activities.deleteOne({ _id: req.params.id });
 			res.status(200).json({
 				success: true,
@@ -262,7 +260,6 @@ class CommentController {
 				data: deleteCom.deletedCount,
 			});
 		} catch (err) {
-			
 			if (!err.statusCode) {
 				err.statusCode = 500;
 			}
@@ -289,7 +286,6 @@ class CommentController {
 
 			next();
 		} catch (err) {
-			
 			if (!err.statusCode) {
 				err.statusCode = 500;
 			}

@@ -19,25 +19,25 @@ let dir = (req, res, next) => {
 
 // SET ROUTER HERE
 router.post(
-  "/",
-  tokenParser,
-  isAuth,
-  setProfileId,
-  dir,
-  imageUpload,
-  statusValidator.create,
-  statusController.createStatus
+	"/",
+	tokenParser,
+	isAuth,
+	setProfileId,
+	dir,
+	imageUpload,
+	statusValidator.create,
+	statusController.createStatus
 );
 
 router.get(
-  "/search",
-  tokenParser,
-  isAuth,
-  setProfileId,
-  statusValidator.searchAll,
-  statusController.searchAll
+	"/search",
+	tokenParser,
+	isAuth,
+	setProfileId,
+	statusValidator.searchAll,
+	statusController.searchAll
 );
-
+//TODO : Search Endpoint
 router.get(
 	"/users/",
 	tokenParser,
@@ -53,13 +53,14 @@ router.get(
 	setProfileId,
 	statusController.loadMoreStatusByUser
 );
+//TODO : Search Endpoint By User
 router.get(
 	"/users/:id/search",
-  tokenParser,
-  isAuth,
-  setProfileId,
-  statusValidator.searchByUser,
-  statusController.searchByUser
+	tokenParser,
+	isAuth,
+	setProfileId,
+	statusValidator.searchByUser,
+	statusController.searchByUser
 );
 router.get(
 	"/interest/",
@@ -77,12 +78,12 @@ router.get(
 	statusController.loadMoreStatusByInterest
 );
 router.get(
-  "/interest/:id",
-  tokenParser,
-  isAuth,
-  setProfileId,
-  statusValidator.single,
-  statusController.getSingleInterest
+	"/interest/:id",
+	tokenParser,
+	isAuth,
+	setProfileId,
+	statusValidator.single,
+	statusController.getSingleInterest
 );
 //TODO : Endpoint Get Status By Interest (Single) (Loadmore)
 router.get(
@@ -94,14 +95,14 @@ router.get(
 	statusController.loadMoreSingleInterest
 );
 router.put(
-  "/:id",
-  tokenParser,
-  isAuth,
-  setProfileId,
-  dir,
-  imageUpload,
-  statusValidator.update,
-  statusController.updateStatus
+	"/:id",
+	tokenParser,
+	isAuth,
+	setProfileId,
+	dir,
+	imageUpload,
+	statusValidator.update,
+	statusController.updateStatus
 );
 router.put(
 	"/like/:id",
@@ -119,22 +120,22 @@ router.put(
 );
 //TODO : DELETE IMAGE
 router.delete(
-	"/delim/:id", 
-	tokenParser, 
-	isAuth, 
-	setProfileId, 
-	dir, 
+	"/delim/:id",
+	tokenParser,
+	isAuth,
+	setProfileId,
+	dir,
 	statusValidator.remove,
 	statusController.imageDelete,
 	imageDeletes
 );
 router.delete(
-  "/:id",
-  tokenParser,
-  isAuth,
-  setProfileId,
-  statusValidator.delete,
-  statusController.deleteStatus
+	"/:id",
+	tokenParser,
+	isAuth,
+	setProfileId,
+	statusValidator.delete,
+	statusController.deleteStatus
 );
 router.get(
 	"/:id",

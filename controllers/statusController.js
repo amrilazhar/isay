@@ -611,7 +611,8 @@ class StatusController {
 			next(err);
 		}
 	}
-
+	
+	//TODO-GET : Search All
 	async searchAll(req, res, next) {
 		try {
 			validationErrorHandler(req, res, next);
@@ -653,14 +654,15 @@ class StatusController {
 				data: statusData,
 			});
 		} catch (err) {
-			console.log(err);
+			// console.log(err);
 			if (!err.statusCode) {
 				err.statusCode = 500;
 			}
 			next(err);
 		}
 	}
-
+	
+	//TODO-GET : Search by User
 	async searchByUser(req, res, next) {
 		try {
 			validationErrorHandler(req, res, next);
@@ -705,108 +707,7 @@ class StatusController {
 				data: statusData,
 			});
 		} catch (err) {
-			console.log(err);
-			if (!err.statusCode) {
-				err.statusCode = 500;
-			}
-			next(err);
-		}
-	}
-
-	async searchAll(req, res, next) {
-		try {
-			validationErrorHandler(req, res, next);
-
-			let limit = req.query.limit ? req.query.limit : 10;
-			let skip = req.query.skip ? req.query.skip : 0;
-
-			let statusData = [];
-
-			const query = req.query.query
-				.split(/[\ +]/)
-				.filter((word) => word.length > 1);
-
-			if (query.length) {
-				let regex = matchWords([...query]);
-
-				statusData = await status
-					.find({ content: { $regex: regex, $options: "i" } })
-					.sort({ updated_at: -1 })
-					.populate("interest")
-					.populate("owner", "name avatar id location")
-					.limit(limit)
-					.skip(skip)
-					.exec();
-
-				regex = matchWordsForHtml([...query]);
-
-				statusData.forEach((status, index) => {
-					statusData[index].content = status.content.replace(
-						regex,
-						"<b>$1</b>"
-					);
-				});
-			}
-
-			res.status(200).send({
-				success: true,
-				message: "success",
-				data: statusData,
-			});
-		} catch (err) {
-			console.log(err);
-			if (!err.statusCode) {
-				err.statusCode = 500;
-			}
-			next(err);
-		}
-	}
-
-	async searchByUser(req, res, next) {
-		try {
-			validationErrorHandler(req, res, next);
-
-			let limit = req.query.limit ? req.query.limit : 10;
-			let skip = req.query.skip ? req.query.skip : 0;
-
-			let statusData = [];
-
-			const query = req.query.query
-				.split(/[\ +]/)
-				.filter((word) => word.length > 1);
-
-			if (query.length) {
-				const regex = matchWords([...query]);
-
-				statusData = await status
-					.find({
-						content: { $regex: regex, $options: "i" },
-						owner: req.params.id,
-					})
-					.sort({ updated_at: -1 })
-					.populate("interest")
-					.populate("owner", "name avatar id location")
-					.limit(limit)
-					.skip(skip)
-					.exec();
-
-				regex = matchWordsForHtml([...query]);
-
-				statusData.forEach((status, index) => {
-					statusData[index].content = status.content.replace(
-						regex,
-						"<b>$1</b>"
-					);
-				});
-			}
-
-			res.status(200).send({
-				success: true,
-				message: "success",
-				data: statusData,
-			});
-		} catch (err) {
-			console.log(err);
+			// console.log(err);
 			if (!err.statusCode) {
 				err.statusCode = 500;
 			}

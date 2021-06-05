@@ -29,7 +29,7 @@ class ProfileController {
 
 			if (!dataProfile._doc.backgroundImage) {
 				dataProfile._doc.backgroundImage = `${process.env.S3_URL}images/background_profile_isay.jpeg`;
-			}				
+			}
 
 			res.status(200).json({
 				success: true,
@@ -37,7 +37,6 @@ class ProfileController {
 				data: dataProfile,
 			});
 		} catch (err) {
-			
 			if (!err.statusCode) {
 				err.statusCode = 500;
 			}
@@ -63,7 +62,7 @@ class ProfileController {
 					{ path: "owner", populate: "location" },
 					{ path: "interest", select: "interest category" },
 				],
-				pagination : paginateStatus,
+				pagination: paginateStatus,
 			};
 
 			let dataProfile = await status.paginate(
@@ -77,7 +76,6 @@ class ProfileController {
 				data: dataProfile,
 			});
 		} catch (err) {
-			
 			if (!err.statusCode) {
 				err.statusCode = 500;
 			}
@@ -97,7 +95,7 @@ class ProfileController {
 
 			const options = {
 				select: "type status_id comment_id owner created_at",
-				sort: { created_at : -1 },
+				sort: { created_at: -1 },
 				// lean : true,
 				populate: [
 					{
@@ -129,7 +127,6 @@ class ProfileController {
 				data: dataProfile,
 			});
 		} catch (err) {
-			
 			if (!err.statusCode) {
 				err.statusCode = 500;
 			}
@@ -171,7 +168,6 @@ class ProfileController {
 				data: dataProfiles,
 			});
 		} catch (err) {
-			
 			if (!err.statusCode) {
 				err.statusCode = 500;
 			}
@@ -199,9 +195,9 @@ class ProfileController {
 				options
 			);
 
-				//restruktur data mongoose paginate
-				let returnData = { ...statusUsers, data: statusUsers.docs };
-				delete returnData.docs;
+			//restruktur data mongoose paginate
+			let returnData = { ...statusUsers, data: statusUsers.docs };
+			delete returnData.docs;
 
 			res.status(200).json({
 				success: true,
@@ -209,7 +205,6 @@ class ProfileController {
 				...returnData,
 			});
 		} catch (err) {
-			
 			if (!err.statusCode) {
 				err.statusCode = 500;
 			}
@@ -229,7 +224,7 @@ class ProfileController {
 
 			const options = {
 				select: "type status_id comment_id owner created_at",
-				sort: { created_at : -1 },
+				sort: { created_at: -1 },
 				populate: [
 					{
 						path: "status_id",
@@ -263,7 +258,6 @@ class ProfileController {
 				...returnData,
 			});
 		} catch (err) {
-			
 			if (!err.statusCode) {
 				err.statusCode = 500;
 			}
@@ -273,37 +267,44 @@ class ProfileController {
 	// =======================|| Update Profile ||================//
 	async profileUpdate(req, res, next) {
 		try {
-			let profileData = {
-				bio: req.body.bio,
-			};
+			let profileData = {};
+
+			if (req.body.bio) {
+				profileData.bio = req.body.bio;
+			}
 
 			if (req.body.location) {
 				profileData.location = req.body.location;
 			}
 
-			if(req.images && req.images.length > 0) {
+			if (req.images && req.images.length > 0) {
 				profileData.backgroundImage = req.images[0];
 			}
 
-			let dataProfile = await profile.findOneAndUpdate(
-				{ _id: req.profile.id },
-				profileData,
-				{ new: true }
-			);
+			if (profileData !== {}) {
+				let dataProfile = await profile.findOneAndUpdate(
+					{ _id: req.profile.id },
+					profileData,
+					{ new: true }
+				);
 
-			if (!dataProfile) {
-				const error = new Error("Data user can't be appeared");
-				error.statusCode = 400;
-				throw error;
+				if (!dataProfile) {
+					const error = new Error("Data user can't be appeared");
+					error.statusCode = 400;
+					throw error;
+				}
+
+				res.status(200).json({
+					success: true,
+					message: "Update Profile Success",
+					data: dataProfile,
+				});
+			} else {
+				const err = new Error("No data Updated");
+				err.statusCode = 400;
+				throw err;
 			}
-
-			res.status(200).json({
-				success: true,
-				message: "Update Profile Success",
-				data: dataProfile,
-			});
 		} catch (err) {
-			
 			if (!err.statusCode) {
 				err.statusCode = 500;
 			}
@@ -324,13 +325,12 @@ class ProfileController {
 				{ new: true }
 			);
 
-				res.status(200).json({
-					success: true,
-					message: "Add Interest Success",
-					data: findUser,
-				});
+			res.status(200).json({
+				success: true,
+				message: "Add Interest Success",
+				data: findUser,
+			});
 		} catch (e) {
-			
 			if (!err.statusCode) {
 				err.statusCode = 500;
 			}
@@ -369,7 +369,6 @@ class ProfileController {
 				data: findUser,
 			});
 		} catch (e) {
-			
 			if (!err.statusCode) {
 				err.statusCode = 500;
 			}
@@ -385,13 +384,12 @@ class ProfileController {
 				.findOne({ _id: req.profile.id })
 				.populate("interest");
 
-				res.status(200).json({
-					success: true,
-					message: "Get User Interest Success",
-					data: findUser.interest,
-				});
+			res.status(200).json({
+				success: true,
+				message: "Get User Interest Success",
+				data: findUser.interest,
+			});
 		} catch (err) {
-			
 			if (!err.statusCode) {
 				err.statusCode = 500;
 			}
@@ -423,7 +421,6 @@ class ProfileController {
 				});
 			}
 		} catch (err) {
-			
 			if (!err.statusCode) {
 				err.statusCode = 500;
 			}
@@ -440,7 +437,6 @@ class ProfileController {
 				data: avatarPic,
 			});
 		} catch (err) {
-			
 			if (!err.statusCode) {
 				err.statusCode = 500;
 			}

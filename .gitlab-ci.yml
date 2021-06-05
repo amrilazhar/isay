@@ -29,6 +29,7 @@ test:
     - echo "MAILGUN_API_KEY"=$MAILGUN_API_KEY >> .env.test
     - echo "MAILGUN_DOMAIN"=$MAILGUN_DOMAIN >> .env.test
     - echo "SERVER_URI"=$SERVER_URI >> .env.test
+    - echo "GOOGLE_ACCOUNT_KEY"=$GOOGLE_ACCOUNT_KEY >> .env.test
     - npm i
     - npm run test
   # Defines the names of branches and tags the job runs for
@@ -52,6 +53,7 @@ deploy:
     - echo "S3_BUCKET_NAME"=$ENVIRONMENT_PROD_S3_BUCKET_NAME >> .env.production
     - echo "S3_URL"=$ENVIRONMENT_PROD_S3_URL >> .env.production
     - echo "PUBLIC_URL"=$PUBLIC_URL >> .env.production
+    - echo "GOOGLE_ACCOUNT_KEY"=$GOOGLE_ACCOUNT_KEY >> .env.production
     - npm i
     # Restart NodeJS service
     - npm run stop

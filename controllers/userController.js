@@ -537,6 +537,12 @@ exports.createFirstProfile = async (req, res, next) => {
       throw err;
     }
 
+    if (user.profile) {
+      const err = new Error("Profile Has Been Created");
+      err.statusCode = 400;
+      throw err;
+    }
+
     if (!req.body.location) {
       const err = new Error("Location ID must be inserted");
       err.statusCode = 400;

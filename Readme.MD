@@ -50,5 +50,5 @@ Postmant Documentation Link : https://bit.ly/isay-docs
 1. Video Promotion Link : https://bit.ly/isay-promote
 2. Video Explanation Link : https://bit.ly/isay-video
 3. Presentation Link : https://bit.ly/isay-presentation
-4. Web Demo Link : https://bit.ly/isay-web
+4. Web Demo Link : https://isaybatch11.herokuapp.com
 5. APK Link : https://bit.ly/isay-apk8

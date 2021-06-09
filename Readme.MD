@@ -45,3 +45,10 @@ GOOGLE_ACCOUNT_KEY= << firebase secretAccKey JSON >>
 
 ## __Full Documentation__
 Postmant Documentation Link : https://bit.ly/isay-docs
+
+## __Explanation About The App__
+1. Video Promotion Link : https://bit.ly/isay-promote
+2. Video Explanation Link : https://bit.ly/isay-video
+3. Presentation Link : https://bit.ly/isay-presentation
+4. Web Demo Link : https://bit.ly/isay-web
+5. APK Link : https://bit.ly/isay-apk8

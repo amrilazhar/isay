@@ -85,7 +85,6 @@ async function startSocketChat(req, res) {
 
 async function socketImageUpload(req, res) {
 	try {
-		let from = mongoose.Types.ObjectId(req.profile.id);
 		let fileName = crypto.randomBytes(16).toString("hex");
 		const mimeArr = ["image/jpeg", "image/png", "image/gif", "image/bmp"];
 		let mimeType = "";
@@ -136,7 +135,7 @@ async function socketImageUpload(req, res) {
 		// Create and upload the object to the specified Amazon S3 bucket.
 		const run = async () => {
 			try {
-				const data = await s3.send(new PutObjectCommand(uploadParams));
+				await s3.send(new PutObjectCommand(uploadParams));
 				return uploadParams.Key;
 			} catch (err) {
 				console.log("Error", err);

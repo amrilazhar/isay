@@ -6,7 +6,7 @@ async function startSocketNotif(req, res) {
 		req.profile = (await tokenDecoder(req)).profile;
 
 		//join room to receive targeted emit
-		req.socket.join(req.profile.id);
+		req.socket.join(req.profile.id.toString());
 
 		//set user status as Online
 		req.io.emit("online:" + req.profile.id, true);
@@ -19,7 +19,7 @@ async function startSocketNotif(req, res) {
 		//start listening event read notif
 		req.socket.on("readNotif", async (data) => {
 			await notification.findByIdAndUpdate(data.notif_id, { readed: true });
-			req.io.to(req.profile.id).emit("readedNotif:" + req.profile.id, data.notif_id);
+			req.io.to(req.profile.id.toString()).emit("readedNotif:" + req.profile.id, data.notif_id);
 		});
 
 		//disconnect the connection

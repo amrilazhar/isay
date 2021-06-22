@@ -302,7 +302,7 @@ class StatusController {
 
 			await notif.populate("status_id from to").execPopulate();
 
-			req.io.to(findStatusByUser.owner).emit("notif:" + findStatusByUser.owner, notif);
+			req.io.to(findStatusByUser.owner.toString()).emit("notif:" + findStatusByUser.owner, notif);
 			//push notification
 			let notifMessage = {
 				notification : {

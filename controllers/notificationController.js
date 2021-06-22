@@ -78,7 +78,7 @@ class NotificationController {
 			);
 
 			if (setRead) {
-				req.io.to(req.profile.id).emit("readedNotif:" + req.profile.id, "readed");
+				req.io.to(req.profile.id.toString()).emit("readedNotif:" + req.profile.id, "readed");
 			}
 
 			if (setRead) {

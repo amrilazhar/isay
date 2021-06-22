@@ -125,7 +125,7 @@ class CommentController {
 
 			await notif.populate("comment_id from to").execPopulate();
 
-			req.io.to(updateStatus.owner).emit("notif:" + updateStatus.owner, notif);
+			req.io.to(updateStatus.owner.toString()).emit("notif:" + updateStatus.owner, notif);
 			
 			//push notification
 			let notifMessage = {

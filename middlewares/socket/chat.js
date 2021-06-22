@@ -19,7 +19,7 @@ async function startSocketChat(req, res) {
 				.to(req.socket.handshake.query.roomID)
 				.emit("updatedReadMessage", data.message_id);
 
-			req.io.emit("readedChat:" + req.profile.id, data.message_id);
+			req.io.to(req.profile.id).emit("readedChat:" + req.profile.id, data.message_id);
 		});
 
 		//disconnect the connection
@@ -58,7 +58,7 @@ async function startSocketChat(req, res) {
 							.to(req.socket.handshake.query.roomID)
 							.emit("messageFromServer", sendMess);
 
-						req.io.emit("chat:" + message.to, sendMess);
+						req.io.to(message.to).emit("chat:" + message.to, sendMess);
 
 						//push notification
 						let notifMessage = {
@@ -160,7 +160,7 @@ async function socketImageUpload(req, res) {
 
 				//emit to specific room if message create message success
 				req.io.to(req.utils.handshake).emit("messageFromServer", sendMess);
-				req.io.emit("chat:" + req.utils.message.to, sendMess);
+				req.io.to(req.utils.message.to).emit("chat:" + req.utils.message.to, sendMess);
 
 				//push notification
 				let notifMessage = {

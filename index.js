@@ -62,9 +62,6 @@ app.use(
 //set fileUpload plugins
 app.use(fileUpload()); //support Form Data
 
-//set static assets to public directory
-app.use(express.static("public"));
-
 //======================== security code ==============================//
 // Sanitize data
 app.use(mongoSanitize());
